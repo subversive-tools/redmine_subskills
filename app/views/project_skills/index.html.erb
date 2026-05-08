@@ -1,0 +1,56 @@
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag 'subskills', plugin: 'redmine_subskills' %>
+<% end %>
+
+<h2>Skill-Anforderungen</h2>
+
+<div class="contextual">
+  <% if User.current.allowed_to?(:manage_subskills, @project) %>
+    <%= link_to 'Anforderungen bearbeiten', edit_project_skills_path(@project),
+        class: 'icon icon-edit' %>
+  <% end %>
+  <%= link_to 'Best Match →', project_skills_best_match_path(@project),
+      class: 'icon icon-user' %>
+</div>
+
+<% if @requirements.empty? %>
+  <p class="nodata">
+    Noch keine Skill-Anforderungen definiert.
+    <% if User.current.allowed_to?(:manage_subskills, @project) %>
+      <%= link_to 'Jetzt konfigurieren', edit_project_skills_path(@project) %>
+    <% end %>
+  </p>
+<% else %>
+  <% @skills_by_cat.each do |cat, skills| %>
+    <% cat_reqs = @requirements.select { |r| r.skill.category == cat } %>
+    <% next if cat_reqs.empty? %>
+
+    <h3 class="subskills-category-title"><%= cat %></h3>
+    <table class="list">
+      <thead>
+        <tr>
+          <th>Kompetenz</th>
+          <th style="width:160px;">Anforderung</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% cat_reqs.sort_by { |r| r.skill.position.to_i }.each_with_index do |req, i| %>
+          <% imp = SubskillProjectRole::IMPORTANCE[req.importance] %>
+          <tr class="<%= i.even? ? 'even' : 'odd' %>">
+            <td><strong><%= req.skill.name %></strong>
+              <% if req.skill.description.present? %>
+                <span style="color:#888;font-size:0.8rem;"> – <%= req.skill.description %></span>
+              <% end %>
+            </td>
+            <td>
+              <span class="sk-importance-badge"
+                    style="background:<%= imp[:color] %>;padding:2px 8px;border-radius:3px;font-size:0.8rem;">
+                <%= imp[:label] %>
+              </span>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+<% end %>

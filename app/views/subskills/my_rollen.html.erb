@@ -1,0 +1,57 @@
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag 'subskills', plugin: 'redmine_subskills' %>
+<% end %>
+
+<h2>Skills</h2>
+<% current_tab = :my_rollen %>
+<%= render partial: 'subskills/tabs', locals: { current_tab: current_tab } %>
+
+<% if @target_user != User.current %>
+  <p style="color:#888;font-size:0.85rem;margin-bottom:8px;">
+    Rollen-Passung von: <strong><%= @target_user.name %></strong>
+  </p>
+<% end %>
+
+<p style="font-size:0.82rem;color:#666;margin-bottom:12px;">
+  Wie gut passen deine Selbsteinschätzungen zu den Anforderungen jeder Rolle?
+</p>
+
+<table class="list" style="max-width:600px;">
+  <thead>
+    <tr>
+      <th>Rolle</th>
+      <th>Kategorie</th>
+      <th style="width:180px;">Fit-Score</th>
+      <th style="width:50px;text-align:right;">%</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @scores.each_with_index do |entry, i| %>
+      <% role  = entry[:role] %>
+      <% score = entry[:score] %>
+      <% css   = score >= 70 ? 'fit-high' : score >= 40 ? 'fit-mid' : 'fit-low' %>
+      <tr class="<%= i.even? ? 'even' : 'odd' %>">
+        <td>
+          <%= link_to role.name, subskills_role_path(role) %>
+        </td>
+        <td style="font-size:0.8rem;color:#888;">
+          <%= role.category.sub(/\A[A-Z]\.\s*/, '') %>
+        </td>
+        <td>
+          <div class="sk-fit-bar-bg">
+            <div class="sk-fit-bar-fill <%= css %>" style="width:<%= score %>%;"></div>
+          </div>
+        </td>
+        <td style="text-align:right;font-weight:700;" class="<%= css %>">
+          <%= score %>%
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<div class="subskills-legend" style="margin-top:12px;">
+  <span class="sk-legend-item fit-high">≥ 70% – Gute Passung</span>
+  <span class="sk-legend-item fit-mid">40–69% – Teilweise</span>
+  <span class="sk-legend-item fit-low">&lt; 40% – Lücken vorhanden</span>
+</div>

@@ -1,0 +1,53 @@
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag 'subskills', plugin: 'redmine_subskills' %>
+<% end %>
+
+<h2>Skill-Matrix Team</h2>
+
+<% if @skills.empty? %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+  <% @categories.each do |category| %>
+    <% cat_skills = @skills.select { |s| s.category == category } %>
+
+    <h3 class="subskills-category-title"><%= category %></h3>
+    <div class="subskills-table-wrapper">
+      <table class="list subskills-matrix">
+        <thead>
+          <tr>
+            <th class="skill-name-col"><%= category %></th>
+            <% @users.each do |user| %>
+              <th class="user-col" title="<%= user.name %>">
+                <%= link_to user_skills_subskills_path(user_id: user.id) do %>
+                  <span class="sk-avatar"><%= user.name.chars.first(2).join.upcase %></span>
+                <% end %>
+              </th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody>
+          <% cat_skills.each_with_index do |skill, i| %>
+            <tr class="<%= i.even? ? 'even' : 'odd' %>">
+              <td class="skill-name-col"><%= skill.name %></td>
+              <% @users.each do |user| %>
+                <% cell  = @matrix.dig(user.id, skill.id) %>
+                <% level = cell.is_a?(Hash) ? cell[:level] : (cell || 0) %>
+                <% prio  = cell.is_a?(Hash) ? cell[:learn_priority].to_i : 0 %>
+                <td class="sk-level-cell sk-level-<%= level %>" title="<%= user.name %>: Level <%= level %>">
+                  <span class="sk-badge"><%= level %></span>
+                  <% if prio > 0 %><span title="Lernziel" style="font-size:0.7rem;">★</span><% end %>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+
+  <div class="subskills-legend">
+    <% SubskillUserSkill::LEVELS.each do |lvl, info| %>
+      <span class="sk-legend-item sk-level-<%= lvl %>"><%= lvl %> – <%= info[:label] %></span>
+    <% end %>
+  </div>
+<% end %>

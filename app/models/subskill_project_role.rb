@@ -1,0 +1,35 @@
+class SubskillProjectRole < ActiveRecord::Base
+  self.table_name = 'subskill_project_roles'
+
+  belongs_to :project
+  has_many   :requirements,
+             class_name:  'SubskillProjectRequirement',
+             foreign_key: :project_id,
+             primary_key: :project_id,
+             dependent:   :destroy
+
+  IMPORTANCE = {
+    0 => { label: '–',             color: '#eee' },
+    1 => { label: 'Hilfreich',     color: '#c8e6c9' },
+    2 => { label: 'Wichtig',       color: '#fff176' },
+    3 => { label: 'Erforderlich',  color: '#ffab91' }
+  }.freeze
+
+  # { skill_id => importance }
+  def requirements_map
+    requirements.each_with_object({}) { |r, h| h[r.subskill_skill_id] = r.importance }
+  end
+
+  # Fit score 0–100 for a user given { skill_id => level }
+  def fit_score(user_skills_map)
+    req = requirements_map
+    return 0 if req.empty?
+    max   = req.values.sum * 5
+    score = req.sum { |sid, imp| [user_skills_map[sid].to_i, 5].min * imp }
+    (score * 100.0 / max).round
+  end
+
+  def name
+    project&.name || '–'
+  end
+end

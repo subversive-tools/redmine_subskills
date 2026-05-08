@@ -1,0 +1,122 @@
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag 'subskills', plugin: 'redmine_subskills' %>
+<% end %>
+
+<div class="subskills-admin-header">
+  <h2>Skill-Katalog verwalten</h2>
+  <div class="subskills-admin-actions">
+    <%= link_to '+ Neuer Skill', new_subskills_admin_path, class: 'button-positive' %>
+    <%= form_with url: import_csv_subskills_admin_index_path, multipart: true, local: true,
+                  style: 'display:inline;' do |f| %>
+      <%= f.file_field :csv_file, accept: '.csv',
+          style: 'display:none;', id: 'sk-csv-input',
+          onchange: 'this.form.submit()' %>
+      <label for="sk-csv-input" class="button" style="cursor:pointer;color:#169;" title="CSV: name,category,description">
+        ↑ Importieren
+      </label>
+    <% end %>
+    <%= link_to '↓ Exportieren', export_csv_subskills_admin_index_path, class: 'button' %>
+  </div>
+</div>
+
+<% if flash[:notice] %>
+  <div class="flash notice"><%= flash[:notice] %></div>
+<% end %>
+
+<% SubskillSkill::CATEGORIES.each do |category| %>
+  <% cat_skills = @skills.select { |s| s.category == category } %>
+  <% next if cat_skills.empty? %>
+
+  <div class="subskills-section">
+    <h3 class="subskills-category-title"><%= category %></h3>
+    <table class="list sk-sortable-table" data-reorder-url="<%= reorder_subskills_admin_path %>">
+      <tbody>
+        <% cat_skills.each do |skill| %>
+          <tr class="sk-sortable-row <%= skill.active? ? '' : 'subskills-inactive' %>"
+              data-skill-id="<%= skill.id %>">
+            <td class="sk-drag-handle" title="Verschieben">⠿</td>
+            <td style="text-align:left;">
+              <strong><%= skill.name %></strong>
+              <%= link_to edit_subskills_admin_path(skill), title: 'Bearbeiten', class: 'sk-edit-link' do %>
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     style="vertical-align:middle;margin-left:5px;opacity:0.45;">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+              <% end %>
+            </td>
+            <td style="text-align:left;" class="subskills-desc"><%= skill.description.presence %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>
+
+<% if @skills.empty? %>
+  <p class="nodata">Noch keine Skills definiert.
+    <%= link_to 'Standard-Skills jetzt einspielen', '#',
+        onclick: "document.querySelector('[action*=seed]').submit(); return false;" %>
+  </p>
+<% end %>
+
+<script>
+// ── Drag-and-drop reorder ─────────────────────────────────────
+(function() {
+  var dragging = null;
+
+  document.querySelectorAll('.sk-sortable-table').forEach(function(table) {
+    var tbody = table.querySelector('tbody');
+    var reorderUrl = table.dataset.reorderUrl;
+
+    tbody.querySelectorAll('.sk-sortable-row').forEach(function(row) {
+      var handle = row.querySelector('.sk-drag-handle');
+      handle.setAttribute('draggable', 'false'); // only handle triggers drag
+
+      // Start drag only from handle
+      handle.addEventListener('mousedown', function() { row.setAttribute('draggable', 'true'); });
+      handle.addEventListener('mouseup',   function() { row.setAttribute('draggable', 'false'); });
+
+      row.addEventListener('dragstart', function(e) {
+        dragging = row;
+        e.dataTransfer.effectAllowed = 'move';
+        setTimeout(function() { row.style.opacity = '0.4'; }, 0);
+      });
+      row.addEventListener('dragend', function() {
+        dragging = null;
+        row.style.opacity = '';
+        row.setAttribute('draggable', 'false');
+        tbody.querySelectorAll('.sk-drag-over').forEach(function(r) { r.classList.remove('sk-drag-over'); });
+      });
+      row.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        if (dragging && dragging !== row) {
+          tbody.querySelectorAll('.sk-drag-over').forEach(function(r) { r.classList.remove('sk-drag-over'); });
+          row.classList.add('sk-drag-over');
+          var rows = Array.from(tbody.querySelectorAll('.sk-sortable-row'));
+          var fromIdx = rows.indexOf(dragging);
+          var toIdx   = rows.indexOf(row);
+          if (fromIdx < toIdx) {
+            tbody.insertBefore(dragging, row.nextSibling);
+          } else {
+            tbody.insertBefore(dragging, row);
+          }
+        }
+      });
+      row.addEventListener('drop', function(e) {
+        e.preventDefault();
+        // Collect new order and POST
+        var ids = Array.from(tbody.querySelectorAll('.sk-sortable-row')).map(function(r) {
+          return r.dataset.skillId;
+        });
+        var body = new URLSearchParams();
+        ids.forEach(function(id) { body.append('ids[]', id); });
+        var csrf = document.querySelector('meta[name="csrf-token"]');
+        if (csrf) body.append('authenticity_token', csrf.content);
+        fetch(reorderUrl, { method: 'POST', body: body, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+      });
+    });
+  });
+})();
+</script>

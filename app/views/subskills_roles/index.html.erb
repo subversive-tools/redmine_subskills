@@ -1,0 +1,54 @@
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag 'subskills', plugin: 'redmine_subskills' %>
+<% end %>
+
+<h2>Rollen-Passung Team</h2>
+
+<p style="font-size:0.82rem;color:#666;margin-bottom:16px;">
+  Fit-Score: Wie gut passen die Selbsteinschätzungen einer Person zu den Anforderungen einer Rolle?
+  Skala: 🟢 ≥ 70% · 🟡 40–69% · 🔴 &lt; 40%
+</p>
+
+<% @categories.each do |cat| %>
+  <% cat_roles = @roles.select { |r| r.category == cat } %>
+  <h3 class="subskills-category-title"><%= cat %></h3>
+
+  <div class="subskills-table-wrapper">
+    <table class="list subskills-matrix">
+      <thead>
+        <tr>
+          <th class="skill-name-col"><%= cat.sub(/\A[A-Z]\.\s*/, '') %></th>
+          <% @users.each do |user| %>
+            <th class="user-col" title="<%= user.name %>">
+              <%= link_to user_skills_subskills_path(user_id: user.id) do %>
+                <span class="sk-avatar"><%= user.name.chars.first(2).join.upcase %></span>
+              <% end %>
+            </th>
+          <% end %>
+        </tr>
+      </thead>
+      <tbody>
+        <% cat_roles.each_with_index do |role, i| %>
+          <tr class="<%= i.even? ? 'even' : 'odd' %>">
+            <td class="skill-name-col">
+              <%= link_to role.name, subskills_role_path(role) %>
+            </td>
+            <% @users.each do |user| %>
+              <% score = @fit_scores.dig(role.id, user.id) || 0 %>
+              <% css = score >= 70 ? 'fit-high' : score >= 40 ? 'fit-mid' : 'fit-low' %>
+              <td class="sk-fit-cell <%= css %>" title="<%= user.name %>: <%= score %>%">
+                <span class="sk-fit-badge"><%= score %>%</span>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>
+
+<div class="subskills-legend">
+  <span class="sk-legend-item fit-high">≥ 70% – Gute Passung</span>
+  <span class="sk-legend-item fit-mid">40–69% – Teilweise</span>
+  <span class="sk-legend-item fit-low">&lt; 40% – Lücken vorhanden</span>
+</div>

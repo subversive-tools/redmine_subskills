@@ -1,0 +1,64 @@
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag 'subskills', plugin: 'redmine_subskills' %>
+<% end %>
+
+<h2><%= @skill.new_record? ? 'Neuer Skill' : "Skill bearbeiten: #{@skill.name}" %></h2>
+
+<%= form_with model: @skill,
+              url: @skill.new_record? ? subskills_admin_index_path : subskills_admin_path(@skill),
+              local: true do |f| %>
+
+  <% if @skill.errors.any? %>
+    <div class="flash error">
+      <ul><% @skill.errors.full_messages.each do |msg| %><li><%= msg %></li><% end %></ul>
+    </div>
+  <% end %>
+
+  <div class="box tabular">
+    <p>
+      <%= f.label :name, 'Name', class: 'required' %>
+      <%= f.text_field :name, required: true, size: 50 %>
+    </p>
+    <p>
+      <%= f.label :category, 'Kategorie', class: 'required' %>
+      <%= f.select :category, @categories, { prompt: '— bitte wählen —' }, required: true %>
+    </p>
+    <p>
+      <%= f.label :description, 'Kurzbeschreibung (Tooltip)' %>
+      <%= f.text_area :description, rows: 2, cols: 60,
+          placeholder: 'Kurze Beschreibung des Skills (erscheint als Tooltip)' %>
+    </p>
+    <p>
+      <%= f.label :active, 'Aktiv' %>
+      <%= f.check_box :active %>
+      <em class="info">Inaktive Skills werden in der Matrix ausgeblendet.</em>
+    </p>
+  </div>
+
+  <%# ── Level-Beschreibungen 1–5 ─────────────────────────────── %>
+  <h3 style="margin: 20px 0 8px;">Level-Beschreibungen</h3>
+  <p style="font-size:0.82rem;color:#888;margin-bottom:12px;">
+    Was bedeutet jeder Level für diesen Skill? Diese Texte werden dem User beim Auswählen angezeigt.
+  </p>
+
+  <% level_names = ['–', 'Grundkenntnisse', 'Anwender', 'Fortgeschritten', 'Experte', 'Spezialist'] %>
+
+  <div class="box tabular">
+    <%= f.fields_for :level_descriptions, @skill.level_descriptions.sort_by(&:level) do |lf| %>
+      <%= lf.hidden_field :level %>
+      <% lvl = lf.object.level %>
+      <p>
+        <label style="width:180px;display:inline-block;font-weight:600;">
+          Level <%= lvl %> – <%= level_names[lvl] %>
+        </label>
+        <%= lf.text_area :description, rows: 2, cols: 55,
+            placeholder: "Was kann jemand auf Level #{lvl}?" %>
+      </p>
+    <% end %>
+  </div>
+
+  <p>
+    <%= f.submit @skill.new_record? ? 'Erstellen' : 'Speichern', class: 'button-positive' %>
+    <%= link_to 'Abbrechen', subskills_admin_index_path, class: 'button' %>
+  </p>
+<% end %>

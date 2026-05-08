@@ -1,0 +1,410 @@
+/* =============================================================
+   redmine_subskills – minimal custom CSS
+   Alles andere kommt vom Redmine-Theme.
+   ============================================================= */
+
+/* Hide project nav on skill pages */
+body.subskills-active-page #main-menu { display: none !important; }
+
+/* ── Category heading ─────────────────────────────────────── */
+.subskills-category-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: #666;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 4px;
+  margin: 20px 0 8px;
+}
+
+/* ── Team matrix ──────────────────────────────────────────── */
+.subskills-table-wrapper { overflow-x: auto; margin-bottom: 8px; }
+
+.subskills-matrix th { text-align: center; white-space: nowrap; }
+
+.skill-name-col { text-align: left !important; min-width: 190px; }
+.user-col { width: 44px; }
+
+.sk-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: #628db6;   /* Redmine's link blue approx */
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* ── Level badge ──────────────────────────────────────────── */
+.sk-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* Cell backgrounds – subtle tint only */
+.sk-level-cell { text-align: center; vertical-align: middle; }
+.sk-level-0 .sk-badge { background: #aaa; }
+.sk-level-1 .sk-badge { background: #90b8d8; }
+.sk-level-2 .sk-badge { background: #5b9ec9; }
+.sk-level-3 .sk-badge { background: #2e78b7; }
+.sk-level-4 .sk-badge { background: #1a5c99; }
+.sk-level-5 .sk-badge { background: #0d3d6b; }
+
+/* ── Legend ───────────────────────────────────────────────── */
+.subskills-legend {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: #555;
+}
+
+.sk-legend-item {
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  background: #f4f4f4;
+}
+
+/* ── Skill block (my_skills) ──────────────────────────────── */
+.sk-skill-block {
+  border-bottom: 1px solid #e8e8e8;
+  padding: 10px 0 6px;
+}
+
+/* Header: name + inline star */
+.sk-skill-header {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+
+.sk-skill-name { font-size: 0.9rem; font-weight: 600; }
+
+.sk-tooltip-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: #ccc;
+  color: #555;
+  font-size: 0.6rem;
+  font-style: normal;
+  font-weight: 700;
+  cursor: help;
+  margin-left: 3px;
+  text-decoration: none;
+}
+
+/* Body: stacked level rows */
+.sk-skill-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* ── Round option buttons (level) ─────────────────────────── */
+.sk-radio-input { display: none; }
+
+.sk-option-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: #666;
+  background: #f8f8f8;
+  transition: border-color .15s, background .15s, color .15s, transform .1s;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.sk-option-btn:hover {
+  border-color: #628db6;
+  background: #e8f0f8;
+  color: #1a5c99;
+  transform: scale(1.1);
+}
+
+/* Active state per level */
+.sk-option-btn--active.sk-level-0 { background: #aaa;    border-color: #888;    color: #fff; }
+.sk-option-btn--active.sk-level-1 { background: #90b8d8; border-color: #6a9ec0; color: #fff; }
+.sk-option-btn--active.sk-level-2 { background: #5b9ec9; border-color: #3a80ad; color: #fff; }
+.sk-option-btn--active.sk-level-3 { background: #2e78b7; border-color: #1f5e96; color: #fff; }
+.sk-option-btn--active.sk-level-4 { background: #1a5c99; border-color: #0f4278; color: #fff; }
+.sk-option-btn--active.sk-level-5 { background: #0d3d6b; border-color: #061e35; color: #fff; }
+
+/* ── Star toggle (Lernziel) ───────────────────────────────── */
+.sk-star-btn {
+  background: none;
+  border: none;
+  font-size: 0.95rem;
+  color: #bbb;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+  transition: color .15s, transform .1s;
+  flex-shrink: 0;
+}
+
+.sk-star-btn:hover { color: #e53935; transform: scale(1.15); }
+.sk-star-btn--active { color: #e53935; }
+
+/* ── Level description rows ───────────────────────────────── */
+.sk-level-all {
+  padding: 2px 0 4px 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.sk-level-row {
+  display: grid;
+  grid-template-columns: 22px 115px 1fr;
+  gap: 23px;
+  align-items: center;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  color: #aaa;
+  line-height: 1.2;
+  transition: background .1s, color .1s;
+}
+
+.sk-level-row--active {
+  background: #f0f5fb;
+  color: #1a3d6b;
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 3px 4px;
+}
+
+/* Shrink button in inactive rows */
+.sk-level-row:not(.sk-level-row--active) .sk-option-btn {
+  width: 22px;
+  height: 22px;
+  font-size: 0.68rem;
+  border-width: 1px;
+}
+
+.sk-badge-sm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.sk-level-row-label { font-weight: 600; white-space: nowrap; }
+.sk-level-row-desc  { line-height: 1.35; }
+
+/* Readonly bar */
+.sk-bar-readonly {
+  width: 100%;
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.sk-bar-fill { height: 100%; border-radius: 4px; }
+.sk-bar-fill.sk-level-0 { background: #aaa; }
+.sk-bar-fill.sk-level-1 { background: #90b8d8; }
+.sk-bar-fill.sk-level-2 { background: #5b9ec9; }
+.sk-bar-fill.sk-level-3 { background: #2e78b7; }
+.sk-bar-fill.sk-level-4 { background: #1a5c99; }
+.sk-bar-fill.sk-level-5 { background: #0d3d6b; }
+
+/* ── Profile tab section ──────────────────────────────────── */
+.subskills-profile-section {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 2px solid #628db6;
+}
+
+/* ── Admin ────────────────────────────────────────────────── */
+.subskills-inactive td { opacity: 0.4; }
+
+.subskills-desc {
+  max-width: 280px;
+  font-size: 0.82rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #666;
+}
+
+.btn-move {
+  padding: 1px 5px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  background: #f4f4f4;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+.btn-move:hover { background: #e8e8e8; }
+
+button.button-danger, input.button-danger {
+  background: #c00;
+  color: #fff;
+  border-color: #900;
+}
+
+/* ── Fit-score cells (role matrix) ──────────────────────────── */
+.sk-fit-cell { text-align: center; vertical-align: middle; }
+
+.sk-fit-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.fit-high .sk-fit-badge { background: #c8e6c9; color: #1b5e20; }
+.fit-mid  .sk-fit-badge { background: #fff9c4; color: #7b5800; }
+.fit-low  .sk-fit-badge { background: #ffccbc; color: #8d1f00; }
+
+.sk-legend-item.fit-high { background: #c8e6c9; border-color: #a5d6a7; }
+.sk-legend-item.fit-mid  { background: #fff9c4; border-color: #f0e68c; }
+.sk-legend-item.fit-low  { background: #ffccbc; border-color: #ffab91; }
+
+/* Fit bar (role detail) */
+.sk-fit-bar-bg {
+  background: #eee;
+  border-radius: 4px;
+  height: 10px;
+  overflow: hidden;
+}
+.sk-fit-bar-fill { height: 100%; border-radius: 4px; transition: width .3s; }
+.sk-fit-bar-fill.fit-high { background: #66bb6a; }
+.sk-fit-bar-fill.fit-mid  { background: #ffd54f; }
+.sk-fit-bar-fill.fit-low  { background: #ff7043; }
+
+td.fit-high { color: #1b5e20; font-weight: 700; }
+td.fit-mid  { color: #7b5800; font-weight: 700; }
+td.fit-low  { color: #8d1f00; }
+
+/* Importance badge */
+.sk-importance-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+/* Importance dot (gap table) */
+.sk-importance-dot { font-size: 0.65rem; margin-left: 4px; }
+.sk-imp-1 { color: #66bb6a; }
+.sk-imp-2 { color: #ffd54f; }
+.sk-imp-3 { color: #ff7043; }
+
+/* ── Drag handle ──────────────────────────────────────────── */
+.sk-drag-handle {
+  cursor: grab;
+  color: #bbb;
+  font-size: 1rem;
+  text-align: center;
+  user-select: none;
+  padding: 0 4px;
+}
+.sk-drag-handle:active { cursor: grabbing; }
+.sk-drag-over { outline: 2px dashed #5ba4cf; background: #f0f7ff; }
+
+/* ── Admin sortable table alignment ──────────────────────── */
+.sk-sortable-table,
+.sk-sortable-table td,
+.sk-sortable-table th { text-align: left !important; }
+.sk-sortable-table .sk-drag-handle { text-align: center !important; width: 22px; }
+
+/* Inline pencil edit link */
+.sk-edit-link { color: #aaa; text-decoration: none; }
+.sk-edit-link:hover { color: #169; }
+.sk-edit-link:hover svg { opacity: 1 !important; }
+
+.sk-sortable-table .sk-kebab-cell  {
+  position: relative;
+  text-align: right !important;
+  width: 1.5rem;
+  padding-right: 4px;
+  white-space: nowrap;
+}
+
+/* ── Admin menu icon ──────────────────────────────────────── */
+#admin-menu a.subskills-admin,
+#admin-menu a.subskills_admin {
+  background-image: url(../images/skills.svg);
+  background-repeat: no-repeat;
+  background-position: 0 50%;
+  background-size: 16px 16px;
+  padding-left: 20px;
+}
+
+/* ── Kebab menu ───────────────────────────────────────────── */
+.sk-kebab-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #555;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.sk-kebab-btn:hover { background: #eee; color: #169; }
+
+.sk-kebab-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 999;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.12);
+  min-width: 130px;
+  padding: 4px 0;
+  text-align: left;
+}
+.sk-kebab-menu a,
+.sk-kebab-menu .sk-kebab-form input[type=submit] {
+  display: block;
+  width: 100%;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  color: #333;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+.sk-kebab-menu a:hover,
+.sk-kebab-menu .sk-kebab-form input[type=submit]:hover { background: #f0f4ff; color: #169; }
+.sk-kebab-menu .sk-kebab-form input[type=submit] { color: #c0392b; }
+.sk-kebab-menu .sk-kebab-form input[type=submit]:hover { background: #fff0f0; }
+.sk-kebab-form { margin: 0; }
+

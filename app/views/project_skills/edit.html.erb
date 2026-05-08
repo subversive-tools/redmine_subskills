@@ -1,0 +1,51 @@
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag 'subskills', plugin: 'redmine_subskills' %>
+<% end %>
+
+<h2>Skill-Anforderungen bearbeiten</h2>
+
+<p style="font-size:0.82rem;color:#666;margin-bottom:16px;">
+  Lege fest, welche Skills für dieses Projekt erwartet werden und wie wichtig sie sind.
+  Nicht ausgewählte Skills werden nicht berücksichtigt.
+</p>
+
+<%= form_tag update_project_skills_path(@project), method: :post do %>
+  <% @skills_by_cat.each do |cat, skills| %>
+    <h3 class="subskills-category-title"><%= cat %></h3>
+    <table class="list" style="margin-bottom:12px;">
+      <thead>
+        <tr>
+          <th>Kompetenz</th>
+          <th style="width:200px;">Anforderung</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% skills.each_with_index do |skill, i| %>
+          <% current_imp = @req_map[skill.id] || 0 %>
+          <tr class="<%= i.even? ? 'even' : 'odd' %>">
+            <td>
+              <strong><%= skill.name %></strong>
+              <% if skill.description.present? %>
+                <span style="color:#888;font-size:0.78rem;"> – <%= skill.description %></span>
+              <% end %>
+            </td>
+            <td>
+              <select name="skills[<%= skill.id %>]" class="sk-importance-select">
+                <% SubskillProjectRole::IMPORTANCE.each do |val, meta| %>
+                  <option value="<%= val %>" <%= 'selected' if current_imp == val %>>
+                    <%= meta[:label] %>
+                  </option>
+                <% end %>
+              </select>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+
+  <p>
+    <%= submit_tag 'Speichern', class: 'button-positive' %>
+    <%= link_to 'Abbrechen', project_skills_path(@project) %>
+  </p>
+<% end %>

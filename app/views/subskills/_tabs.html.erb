@@ -1,0 +1,27 @@
+<div class="tabs">
+  <ul>
+    <li>
+      <%= link_to 'Rollen & Skills',
+          User.current.admin? ? subskills_admin_index_path : subskills_katalog_path,
+          class: ([:katalog, :admin].include?(current_tab) ? 'selected' : nil) %>
+    </li>
+    <li>
+      <%= link_to 'Meine Skills',
+          user_skills_subskills_path(user_id: User.current.id),
+          class: (current_tab == :my_skills ? 'selected' : nil) %>
+    </li>
+    <li>
+      <%= link_to 'Rollen-Passung',
+          my_rollen_subskills_path(user_id: User.current.id),
+          class: (current_tab == :my_rollen ? 'selected' : nil) %>
+    </li>
+    <li>
+      <%= link_to 'Skill-Matrix Team', subskills_path,
+          class: (current_tab == :matrix ? 'selected' : nil) %>
+    </li>
+    <li>
+      <%= link_to 'Rollen-Passung Team', subskills_roles_path,
+          class: (current_tab == :rollen ? 'selected' : nil) %>
+    </li>
+  </ul>
+</div>

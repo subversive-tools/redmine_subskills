@@ -1,0 +1,109 @@
+<div class="subskills-profile-section">
+  <h3>Skills</h3>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+
+  <div class="subskills-radar-wrapper">
+    <canvas id="skillsRadarChart-<%= user.id %>" width="360" height="360"></canvas>
+  </div>
+
+  <%= form_tag update_user_skills_subskills_path(user_id: user.id), method: :post, id: "skills-form-#{user.id}" do %>
+    <% categories.each do |category| %>
+      <% cat_skills = skills.select { |s| s.category == category } %>
+      <div class="subskills-section">
+        <h3 class="subskills-category-title"><%= category %></h3>
+        <% cat_skills.each do |skill| %>
+          <% current_level = user_skills[skill.id]&.level || 0 %>
+          <div class="skill-row">
+            <div class="skill-row-name">
+              <%= skill.name %>
+              <% if skill.description.present? %>
+                <span class="skill-tooltip" title="<%= skill.description %>">?</span>
+              <% end %>
+            </div>
+            <div class="skill-row-slider">
+              <% if editable %>
+                <input type="range"
+                       name="skills[<%= skill.id %>]"
+                       min="0" max="5" step="1"
+                       value="<%= current_level %>"
+                       class="skill-slider"
+                       data-skill-index="<%= skills.index(skill) %>"
+                       data-chart-id="skillsRadarChart-<%= user.id %>"
+                       oninput="subskillsUpdateSlider(this)">
+              <% else %>
+                <div class="skill-bar-readonly">
+                  <div class="skill-bar-fill level-<%= current_level %>" style="width:<%= current_level * 20 %>%"></div>
+                </div>
+              <% end %>
+            </div>
+            <div class="skill-row-level level-<%= current_level %>" id="level-label-<%= user.id %>-<%= skill.id %>">
+              <span class="level-badge"><%= current_level %></span>
+              <span class="level-text"><%= SubskillUserSkill::LEVELS[current_level][:label] %></span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% if editable %>
+      <div class="subskills-actions">
+        <%= submit_tag 'Skills speichern', class: 'button-positive' %>
+      </div>
+    <% end %>
+  <% end %>
+</div>
+
+<script>
+(function() {
+  const LEVEL_LABELS = <%= raw SubskillUserSkill::LEVELS.values.map { |v| v[:label] }.to_json %>;
+  const userId = <%= user.id %>;
+  const chartId = 'skillsRadarChart-' + userId;
+
+  const ctx = document.getElementById(chartId);
+  if (!ctx) return;
+
+  const radarChart = new Chart(ctx.getContext('2d'), {
+    type: 'radar',
+    data: {
+      labels: <%= raw radar_labels %>,
+      datasets: [{
+        label: '<%= j user.name %>',
+        data: <%= raw radar_data %>,
+        backgroundColor: 'rgba(30, 136, 229, 0.18)',
+        borderColor: 'rgba(30, 136, 229, 0.9)',
+        pointBackgroundColor: 'rgba(30, 136, 229, 1)',
+        borderWidth: 2,
+        pointRadius: 3
+      }]
+    },
+    options: {
+      scales: { r: { min: 0, max: 5, ticks: { stepSize: 1, font: { size: 9 } }, pointLabels: { font: { size: 10 } } } },
+      plugins: { legend: { display: false } }
+    }
+  });
+
+  // Expose chart globally so sliders can update it
+  window['subskillsChart_' + userId] = radarChart;
+})();
+
+function subskillsUpdateSlider(input) {
+  const level   = parseInt(input.value);
+  const skillId = input.name.match(/\[(\d+)\]/)[1];
+  const userId  = input.closest('form').id.replace('skills-form-', '');
+  const label   = document.getElementById('level-label-' + userId + '-' + skillId);
+
+  if (label) {
+    const LEVELS = <%= raw SubskillUserSkill::LEVELS.values.map { |v| v[:label] }.to_json %>;
+    label.querySelector('.level-badge').textContent = level;
+    label.querySelector('.level-text').textContent  = LEVELS[level] || '';
+    label.className = 'skill-row-level level-' + level;
+  }
+
+  const chart = window['subskillsChart_' + userId];
+  if (chart) {
+    chart.data.datasets[0].data[parseInt(input.dataset.skillIndex)] = level;
+    chart.update('none');
+  }
+}
+</script>

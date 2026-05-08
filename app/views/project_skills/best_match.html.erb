@@ -1,0 +1,58 @@
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag 'subskills', plugin: 'redmine_subskills' %>
+<% end %>
+
+<h2>Best Match</h2>
+
+<div class="contextual">
+  <%= link_to '← Anforderungen', project_skills_path(@project), class: 'icon icon-list' %>
+</div>
+
+<p style="font-size:0.82rem;color:#666;margin-bottom:12px;">
+  Rangfolge aller aktiven User nach Übereinstimmung mit den Skill-Anforderungen dieses Projekts.
+</p>
+
+<% if @skill_role.requirements.empty? %>
+  <p class="nodata">
+    Noch keine Skill-Anforderungen definiert –
+    <%= link_to 'jetzt konfigurieren', edit_project_skills_path(@project) %>.
+  </p>
+<% else %>
+  <table class="list" style="max-width:640px;">
+    <thead>
+      <tr>
+        <th style="width:32px;">#</th>
+        <th>Person</th>
+        <th style="width:220px;">Fit-Score</th>
+        <th style="width:50px;text-align:right;">%</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @ranked_users.each_with_index do |entry, i| %>
+        <% score = entry[:score] %>
+        <% css   = score >= 70 ? 'fit-high' : score >= 40 ? 'fit-mid' : 'fit-low' %>
+        <tr class="<%= i.even? ? 'even' : 'odd' %>">
+          <td style="color:#aaa;font-size:0.85rem;"><%= i + 1 %></td>
+          <td>
+            <%= link_to entry[:user].name,
+                user_skills_subskills_path(user_id: entry[:user].id) %>
+          </td>
+          <td>
+            <div class="sk-fit-bar-bg">
+              <div class="sk-fit-bar-fill <%= css %>" style="width:<%= score %>%;"></div>
+            </div>
+          </td>
+          <td style="text-align:right;font-weight:700;" class="<%= css %>">
+            <%= score %>%
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <div class="subskills-legend" style="margin-top:12px;">
+    <span class="sk-legend-item fit-high">≥ 70% – Gute Passung</span>
+    <span class="sk-legend-item fit-mid">40–69% – Teilweise</span>
+    <span class="sk-legend-item fit-low">&lt; 40% – Lücken</span>
+  </div>
+<% end %>
