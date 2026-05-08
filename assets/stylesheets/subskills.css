@@ -339,10 +339,70 @@ td.fit-low  { color: #8d1f00; }
 .sk-sortable-table th { text-align: left !important; }
 .sk-sortable-table .sk-drag-handle { text-align: center !important; width: 22px; }
 
-/* Inline pencil edit link */
+/* Dropdown separator */
+.sk-drdn-sep { border-top: 1px solid #eee; margin: 4px 0; }
+/* Delete button inside dropdown matches link style */
+.sk-drdn-items .sk-inline-form { margin: 0; }
+.sk-drdn-items .sk-inline-form input[type=submit],
+.sk-drdn-items .sk-inline-form button {
+  display: block; width: 100%; padding: 6px 14px;
+  font-size: 0.85rem; color: #c0392b; background: none;
+  border: none; text-align: left; cursor: pointer;
+  font-family: inherit; box-sizing: border-box;
+}
+.sk-drdn-items .sk-inline-form input[type=submit]:hover,
+.sk-drdn-items .sk-inline-form button:hover { background: #fff0f0; }
+
 .sk-edit-link { color: #aaa; text-decoration: none; }
 .sk-edit-link:hover { color: #169; }
 .sk-edit-link:hover svg { opacity: 1 !important; }
+
+/* Top drdn + row drdn shared dropdown */
+.sk-drdn-items {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 9999;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.12);
+  min-width: 140px;
+  padding: 4px 0;
+  list-style: none;
+  margin: 0;
+  white-space: nowrap;
+}
+.sk-drdn-item,
+.sk-drdn-items a {
+  display: block;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  color: #169;
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  box-sizing: border-box;
+}
+.sk-drdn-item:hover,
+.sk-drdn-items a:hover { background: #f0f4ff; }
+/* Delete button inside row drdn */
+.sk-row-menu .sk-kebab-form input[type=submit] {
+  display: block;
+  width: 100%;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  color: #c0392b;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+}
+.sk-row-menu .sk-kebab-form input[type=submit]:hover { background: #fff0f0; }
+.sk-kebab-form { margin: 0; }
 
 .sk-sortable-table .sk-kebab-cell  {
   position: relative;

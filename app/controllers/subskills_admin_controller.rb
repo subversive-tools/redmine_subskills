@@ -8,13 +8,26 @@ class SubskillsAdminController < ApplicationController
   # GET /subskills/admin
   def index
     @skills = SubskillSkill.ordered
+    @skills = @skills.where(category: params[:category]) if params[:category].present?
+    @skills = @skills.where(active: params[:active] == '1') if params[:active].present? && params[:active] != ''
     @categories = SubskillSkill::CATEGORIES
   end
 
   # GET /subskills/admin/new
   def new
-    @skill = SubskillSkill.new(active: true, position: SubskillSkill.maximum(:position).to_i + 1)
-    build_level_descriptions(@skill)
+    if params[:copy_from].present? && (src = SubskillSkill.find_by(id: params[:copy_from]))
+      @skill = src.dup
+      @skill.name = "Kopie von #{src.name}"
+      @skill.position = SubskillSkill.maximum(:position).to_i + 1
+      build_level_descriptions(@skill)
+      # copy existing level descriptions
+      src.level_descriptions.each do |ld|
+        @skill.level_descriptions.find { |d| d.level == ld.level }&.tap { |d| d.description = ld.description }
+      end
+    else
+      @skill = SubskillSkill.new(active: true, position: SubskillSkill.maximum(:position).to_i + 1)
+      build_level_descriptions(@skill)
+    end
     @categories = SubskillSkill::CATEGORIES
   end
 

@@ -1,121 +1,201 @@
-<% content_for :header_tags do %>
-  <%= stylesheet_link_tag 'subskills', plugin: 'redmine_subskills' %>
-<% end %>
-
-<div class="subskills-admin-header">
-  <h2>Skill-Katalog verwalten</h2>
-  <div class="subskills-admin-actions">
-    <%= link_to '+ Neuer Skill', new_subskills_admin_path, class: 'button-positive' %>
-    <%= form_with url: import_csv_subskills_admin_index_path, multipart: true, local: true,
-                  style: 'display:inline;' do |f| %>
-      <%= f.file_field :csv_file, accept: '.csv',
-          style: 'display:none;', id: 'sk-csv-input',
-          onchange: 'this.form.submit()' %>
-      <label for="sk-csv-input" class="button" style="cursor:pointer;color:#169;" title="CSV: name,category,description">
-        ↑ Importieren
-      </label>
-    <% end %>
-    <%= link_to '↓ Exportieren', export_csv_subskills_admin_index_path, class: 'button' %>
-  </div>
+<%# ─── Contextual toolbar ─────────────────────────────────────────────────── %>
+<div class="contextual">
+  <%= link_to 'Neuer Skill', new_subskills_admin_path, class: 'icon icon-add' %>
+  <span class="drdn" id="sk-top-drdn" style="position:relative;display:inline-block;margin-left:4px;">
+    <a href="#" class="icon-only icon-actions" title="Aktionen"
+       onclick="skDrdnToggle(event,'sk-top-drdn');return false;"></a>
+    <ul class="sk-drdn-items" style="display:none;">
+      <li>
+        <%= form_with url: import_csv_subskills_admin_index_path, multipart: true, local: true, id: 'sk-import-form' do |f| %>
+          <%= f.file_field :csv_file, accept: '.csv', style: 'display:none;',
+              id: 'sk-csv-input', onchange: 'this.form.submit()' %>
+          <label for="sk-csv-input" class="sk-drdn-item icon icon-import">CSV importieren</label>
+        <% end %>
+      </li>
+      <li>
+        <%= link_to export_csv_subskills_admin_index_path,
+            class: 'sk-drdn-item icon icon-export' do %>CSV exportieren<% end %>
+      </li>
+    </ul>
+  </span>
 </div>
 
-<% if flash[:notice] %>
-  <div class="flash notice"><%= flash[:notice] %></div>
+<h2>Skills</h2>
+
+<%# ─── Filter (exakt wie /admin/projects) ────────────────────────────────── %>
+<%= form_tag subskills_admin_index_path, method: :get, id: 'query_form' do %>
+  <fieldset id="filters" class="collapsible">
+    <legend class="icon icon-expanded" onclick="toggleFieldset(this);">Filter</legend>
+    <div id="query_form_content">
+      <p class="filter">
+        <label>Kategorie</label>
+        <select name="category" class="value">
+          <option value="">alle</option>
+          <% SubskillSkill::CATEGORIES.each do |cat| %>
+            <option value="<%= cat %>" <%= 'selected' if params[:category] == cat %>><%= cat %></option>
+          <% end %>
+        </select>
+      </p>
+      <p class="filter">
+        <label>Status</label>
+        <select name="active" class="value">
+          <option value="">alle</option>
+          <option value="1" <%= 'selected' if params[:active] == '1' %>>aktiv</option>
+          <option value="0" <%= 'selected' if params[:active] == '0' %>>inaktiv</option>
+        </select>
+      </p>
+    </div>
+  </fieldset>
+
+  <p class="buttons">
+    <a class="icon icon-checked" href="#"
+       onclick="document.getElementById('query_form').submit(); return false;">Anwenden</a>
+    <%= link_to 'Zurücksetzen', subskills_admin_index_path, class: 'icon icon-reload' %>
+  </p>
 <% end %>
 
-<% SubskillSkill::CATEGORIES.each do |category| %>
-  <% cat_skills = @skills.select { |s| s.category == category } %>
-  <% next if cat_skills.empty? %>
+<%# ─── Bulk-Action Toolbar (erscheint wenn Checkboxen aktiv) ─────────────── %>
+<div id="sk-bulk-bar" style="display:none;margin-bottom:8px;">
+  <%= button_to 'Ausgewählte löschen', '#',
+      id: 'sk-bulk-delete',
+      class: 'icon icon-del',
+      onclick: 'skBulkDelete(); return false;' %>
+</div>
 
-  <div class="subskills-section">
+<%# ─── Tabelle ────────────────────────────────────────────────────────────── %>
+<% if @skills.empty? %>
+  <p class="nodata">Keine Skills gefunden.</p>
+<% else %>
+
+  <% @skills.group_by(&:category).each do |category, cat_skills| %>
     <h3 class="subskills-category-title"><%= category %></h3>
-    <table class="list sk-sortable-table" data-reorder-url="<%= reorder_subskills_admin_path %>">
+    <table class="list skills sk-sortable-table"
+           data-reorder-url="<%= reorder_subskills_admin_path %>">
+      <colgroup>
+        <col class="checkbox hide-when-print" style="width:30px;">
+        <col class="sk-drag-col" style="width:24px;">
+        <col class="name">
+        <col class="identifier" style="width:160px;">
+        <col class="short_description">
+        <col class="buttons" style="width:30px;">
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="checkbox hide-when-print">
+            <input type="checkbox" class="sk-check-all" title="Alle auswählen"
+                   onchange="skCheckAll(this, '<%= category %>')">
+          </th>
+          <th class="sk-drag-col"></th>
+          <th class="name">Name</th>
+          <th class="identifier">Kategorie</th>
+          <th class="short_description">Beschreibung</th>
+          <th class="buttons"></th>
+        </tr>
+      </thead>
       <tbody>
-        <% cat_skills.each do |skill| %>
-          <tr class="sk-sortable-row <%= skill.active? ? '' : 'subskills-inactive' %>"
+        <% cat_skills.each_with_index do |skill, i| %>
+          <tr class="skill <%= i.even? ? 'odd' : 'even' %> <%= 'subskills-inactive' unless skill.active? %>"
               data-skill-id="<%= skill.id %>">
-            <td class="sk-drag-handle" title="Verschieben">⠿</td>
-            <td style="text-align:left;">
-              <strong><%= skill.name %></strong>
-              <%= link_to edit_subskills_admin_path(skill), title: 'Bearbeiten', class: 'sk-edit-link' do %>
-                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
-                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                     style="vertical-align:middle;margin-left:5px;opacity:0.45;">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                </svg>
-              <% end %>
+            <td class="checkbox hide-when-print">
+              <input type="checkbox" name="ids[]" value="<%= skill.id %>"
+                     class="sk-row-check" data-category="<%= category %>">
             </td>
-            <td style="text-align:left;" class="subskills-desc"><%= skill.description.presence %></td>
+            <td class="sk-drag-handle" title="Verschieben">⠿</td>
+            <td class="name"><strong><%= skill.name %></strong></td>
+            <td class="identifier"><%= skill.category %></td>
+            <td class="short_description"><%= skill.description %></td>
+            <td class="buttons">
+              <span class="sk-row-drdn" style="position:relative;display:inline-block;">
+                <a href="#" class="icon-only icon-actions" title="Aktionen"
+                   onclick="skRowToggle(event,this);return false;"></a>
+                <ul class="sk-drdn-items" style="display:none;">
+                  <li><%= link_to 'Bearbeiten', edit_subskills_admin_path(skill),
+                              class: 'sk-drdn-item icon icon-edit' %></li>
+                  <li><%= link_to 'Kopieren', new_subskills_admin_path(copy_from: skill.id),
+                              class: 'sk-drdn-item icon icon-copy' %></li>
+                  <li class="sk-drdn-sep"></li>
+                  <li>
+                    <%= button_to 'Löschen', subskills_admin_path(skill),
+                        method: :delete,
+                        class: 'icon icon-del',
+                        form_class: 'sk-inline-form',
+                        data: { confirm: "Skill '#{skill.name}' wirklich löschen?" } %>
+                  </li>
+                </ul>
+              </span>
+            </td>
           </tr>
         <% end %>
       </tbody>
     </table>
-  </div>
-<% end %>
-
-<% if @skills.empty? %>
-  <p class="nodata">Noch keine Skills definiert.
-    <%= link_to 'Standard-Skills jetzt einspielen', '#',
-        onclick: "document.querySelector('[action*=seed]').submit(); return false;" %>
-  </p>
+  <% end %>
 <% end %>
 
 <script>
-// ── Drag-and-drop reorder ─────────────────────────────────────
+// ── Dropdown (top drdn + row drdn) ────────────────────────────────────────────
+function skDrdnToggle(e, id) {
+  e.preventDefault(); e.stopPropagation();
+  var menu = document.getElementById(id).querySelector('.sk-drdn-items');
+  var open = menu.style.display !== 'none';
+  skCloseAll(); menu.style.display = open ? 'none' : 'block';
+}
+function skRowToggle(e, btn) {
+  e.preventDefault(); e.stopPropagation();
+  var menu = btn.parentElement.querySelector('.sk-drdn-items');
+  var open = menu.style.display !== 'none';
+  skCloseAll(); menu.style.display = open ? 'none' : 'block';
+}
+function skCloseAll() {
+  document.querySelectorAll('.sk-drdn-items').forEach(function(m) { m.style.display='none'; });
+}
+document.addEventListener('click', skCloseAll);
+
+// ── Checkbox: check-all per Kategorie ────────────────────────────────────────
+function skCheckAll(master, cat) {
+  document.querySelectorAll('.sk-row-check[data-category="' + cat + '"]').forEach(function(cb) {
+    cb.checked = master.checked;
+  });
+  skUpdateBulkBar();
+}
+document.addEventListener('change', function(e) {
+  if (e.target.classList.contains('sk-row-check')) skUpdateBulkBar();
+});
+function skUpdateBulkBar() {
+  var any = document.querySelectorAll('.sk-row-check:checked').length > 0;
+  document.getElementById('sk-bulk-bar').style.display = any ? '' : 'none';
+}
+
+// ── Drag-and-drop reorder ─────────────────────────────────────────────────────
 (function() {
   var dragging = null;
-
-  document.querySelectorAll('.sk-sortable-table').forEach(function(table) {
-    var tbody = table.querySelector('tbody');
-    var reorderUrl = table.dataset.reorderUrl;
-
-    tbody.querySelectorAll('.sk-sortable-row').forEach(function(row) {
-      var handle = row.querySelector('.sk-drag-handle');
-      handle.setAttribute('draggable', 'false'); // only handle triggers drag
-
-      // Start drag only from handle
-      handle.addEventListener('mousedown', function() { row.setAttribute('draggable', 'true'); });
-      handle.addEventListener('mouseup',   function() { row.setAttribute('draggable', 'false'); });
-
-      row.addEventListener('dragstart', function(e) {
-        dragging = row;
-        e.dataTransfer.effectAllowed = 'move';
-        setTimeout(function() { row.style.opacity = '0.4'; }, 0);
+  document.querySelectorAll('.sk-sortable-table tbody tr').forEach(function(row) {
+    row.setAttribute('draggable', 'true');
+    row.addEventListener('dragstart', function(e) {
+      dragging = row; row.style.opacity = '0.5';
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    row.addEventListener('dragend', function() {
+      row.style.opacity = ''; dragging = null;
+    });
+    row.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      if (row !== dragging) row.style.outline = '2px solid #5ba4cf';
+    });
+    row.addEventListener('dragleave', function() { row.style.outline = ''; });
+    row.addEventListener('drop', function(e) {
+      e.preventDefault(); row.style.outline = '';
+      if (!dragging || dragging === row) return;
+      row.parentNode.insertBefore(dragging, row);
+      var ids = [];
+      row.closest('table').querySelectorAll('tr[data-skill-id]').forEach(function(r) {
+        ids.push(r.dataset.skillId);
       });
-      row.addEventListener('dragend', function() {
-        dragging = null;
-        row.style.opacity = '';
-        row.setAttribute('draggable', 'false');
-        tbody.querySelectorAll('.sk-drag-over').forEach(function(r) { r.classList.remove('sk-drag-over'); });
-      });
-      row.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        if (dragging && dragging !== row) {
-          tbody.querySelectorAll('.sk-drag-over').forEach(function(r) { r.classList.remove('sk-drag-over'); });
-          row.classList.add('sk-drag-over');
-          var rows = Array.from(tbody.querySelectorAll('.sk-sortable-row'));
-          var fromIdx = rows.indexOf(dragging);
-          var toIdx   = rows.indexOf(row);
-          if (fromIdx < toIdx) {
-            tbody.insertBefore(dragging, row.nextSibling);
-          } else {
-            tbody.insertBefore(dragging, row);
-          }
-        }
-      });
-      row.addEventListener('drop', function(e) {
-        e.preventDefault();
-        // Collect new order and POST
-        var ids = Array.from(tbody.querySelectorAll('.sk-sortable-row')).map(function(r) {
-          return r.dataset.skillId;
-        });
-        var body = new URLSearchParams();
-        ids.forEach(function(id) { body.append('ids[]', id); });
-        var csrf = document.querySelector('meta[name="csrf-token"]');
-        if (csrf) body.append('authenticity_token', csrf.content);
-        fetch(reorderUrl, { method: 'POST', body: body, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-      });
+      var body = new URLSearchParams();
+      ids.forEach(function(id) { body.append('ids[]', id); });
+      body.append('authenticity_token',
+        (document.querySelector('meta[name="csrf-token"]') || {}).content || '');
+      fetch(row.closest('table').dataset.reorderUrl,
+        { method: 'POST', body: body, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
     });
   });
 })();
