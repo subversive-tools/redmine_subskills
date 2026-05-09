@@ -17,19 +17,20 @@ module RedmineSubskills
       user = context[:user]
       return '' unless user && User.current.logged?
 
-      skills      = SubskillSkill.active.ordered
-      skill_ids   = skills.map(&:id)
+      tree_rows   = SubskillSkill.active.tree_rows
+      all_ids     = tree_rows.map { |r| r[:skill].id }
       user_skills = SubskillUserSkill.where(user_id: user.id).index_by(&:subskill_skill_id)
-      # {[skill_id, level] => description_text}
+      score_map   = SubskillSkill.active.compute_scores_for_user(user.id)
       level_descs = SubskillLevelDescription
-                      .where(subskill_skill_id: skill_ids)
+                      .where(subskill_skill_id: all_ids)
                       .each_with_object({}) { |d, h| h[[d.subskill_skill_id, d.level]] = d.description }
       can_edit    = (User.current == user) || User.current.admin?
 
       context[:controller].render_to_string(
         partial: 'subskills/my_account_skills',
-        locals:  { user: user, skills: skills, user_skills: user_skills,
-                   level_descs: level_descs, editable: false, can_edit: can_edit }
+        locals:  { user: user, tree_rows: tree_rows, user_skills: user_skills,
+                   score_map: score_map, level_descs: level_descs,
+                   editable: false, can_edit: can_edit }
       )
     rescue => e
       Rails.logger.error "RedmineSubskills Hook error: #{e.message}"

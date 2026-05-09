@@ -333,6 +333,26 @@ td.fit-low  { color: #8d1f00; }
 .sk-drag-handle:active { cursor: grabbing; }
 .sk-drag-over { outline: 2px dashed #5ba4cf; background: #f0f7ff; }
 
+/* ── Kategorieblöcke (kollabierbar + sortierbar) ──────────────────────────── */
+.sk-cat-block { margin-bottom: 12px; }
+.sk-cat-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  background: #f4f4f4;
+  border: 1px solid #ddd;
+  border-radius: 3px 3px 0 0;
+  cursor: default;
+  user-select: none;
+}
+.sk-cat-drag { color: #aaa; cursor: grab; font-size: 1rem; padding: 0 2px; }
+.sk-cat-drag:active { cursor: grabbing; }
+.sk-cat-name { flex: 1; font-size: 0.9rem; cursor: pointer; }
+.sk-cat-name:hover { color: #169; }
+.sk-cat-caret { color: #888; font-size: 0.75rem; }
+.sk-cat-body > table { border-top: none; margin-top: 0; border-radius: 0 0 3px 3px; }
+
 /* ── Admin sortable table alignment ──────────────────────── */
 .sk-sortable-table,
 .sk-sortable-table td,
@@ -467,4 +487,10 @@ td.fit-low  { color: #8d1f00; }
 .sk-kebab-menu .sk-kebab-form input[type=submit] { color: #c0392b; }
 .sk-kebab-menu .sk-kebab-form input[type=submit]:hover { background: #fff0f0; }
 .sk-kebab-form { margin: 0; }
+
+/* ── Admin form: tabular label alignment ─────────────────── */
+.subskills-admin-form .tabular label {
+  line-height: 18px;
+  margin-right: 0.5rem;
+}
 

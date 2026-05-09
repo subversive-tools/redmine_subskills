@@ -6,197 +6,335 @@
        onclick="skDrdnToggle(event,'sk-top-drdn');return false;"></a>
     <ul class="sk-drdn-items" style="display:none;">
       <li>
-        <%= form_with url: import_csv_subskills_admin_index_path, multipart: true, local: true, id: 'sk-import-form' do |f| %>
+        <%= form_with url: import_csv_subskills_admin_index_path, multipart: true, local: true do |f| %>
           <%= f.file_field :csv_file, accept: '.csv', style: 'display:none;',
               id: 'sk-csv-input', onchange: 'this.form.submit()' %>
           <label for="sk-csv-input" class="sk-drdn-item icon icon-import">CSV importieren</label>
         <% end %>
       </li>
-      <li>
-        <%= link_to export_csv_subskills_admin_index_path,
-            class: 'sk-drdn-item icon icon-export' do %>CSV exportieren<% end %>
-      </li>
+      <li><%= link_to 'CSV exportieren', export_csv_subskills_admin_index_path,
+                  class: 'sk-drdn-item icon icon-export' %></li>
     </ul>
   </span>
 </div>
 
 <h2>Skills</h2>
 
-<%# ─── Filter (exakt wie /admin/projects) ────────────────────────────────── %>
-<%= form_tag subskills_admin_index_path, method: :get, id: 'query_form' do %>
-  <fieldset id="filters" class="collapsible">
-    <legend class="icon icon-expanded" onclick="toggleFieldset(this);">Filter</legend>
-    <div id="query_form_content">
-      <p class="filter">
-        <label>Kategorie</label>
-        <select name="category" class="value">
-          <option value="">alle</option>
-          <% SubskillSkill::CATEGORIES.each do |cat| %>
-            <option value="<%= cat %>" <%= 'selected' if params[:category] == cat %>><%= cat %></option>
-          <% end %>
-        </select>
-      </p>
-      <p class="filter">
-        <label>Status</label>
-        <select name="active" class="value">
-          <option value="">alle</option>
-          <option value="1" <%= 'selected' if params[:active] == '1' %>>aktiv</option>
-          <option value="0" <%= 'selected' if params[:active] == '0' %>>inaktiv</option>
-        </select>
-      </p>
-    </div>
-  </fieldset>
+<%# Toast-Nachricht für Drag-Fehler %>
+<div id="sk-toast" style="display:none;position:fixed;bottom:20px;right:20px;z-index:9999;
+     padding:10px 16px;background:#c0392b;color:#fff;border-radius:4px;font-size:0.85rem;
+     box-shadow:0 2px 8px rgba(0,0,0,.3);"></div>
 
-  <p class="buttons">
-    <a class="icon icon-checked" href="#"
-       onclick="document.getElementById('query_form').submit(); return false;">Anwenden</a>
-    <%= link_to 'Zurücksetzen', subskills_admin_index_path, class: 'icon icon-reload' %>
-  </p>
-<% end %>
-
-<%# ─── Bulk-Action Toolbar (erscheint wenn Checkboxen aktiv) ─────────────── %>
-<div id="sk-bulk-bar" style="display:none;margin-bottom:8px;">
-  <%= button_to 'Ausgewählte löschen', '#',
-      id: 'sk-bulk-delete',
-      class: 'icon icon-del',
-      onclick: 'skBulkDelete(); return false;' %>
-</div>
-
-<%# ─── Tabelle ────────────────────────────────────────────────────────────── %>
-<% if @skills.empty? %>
-  <p class="nodata">Keine Skills gefunden.</p>
+<% if @tree_rows.empty? %>
+  <p class="nodata">Keine Skills vorhanden.</p>
 <% else %>
 
-  <% @skills.group_by(&:category).each do |category, cat_skills| %>
-    <h3 class="subskills-category-title"><%= category %></h3>
-    <table class="list skills sk-sortable-table"
-           data-reorder-url="<%= reorder_subskills_admin_path %>">
-      <colgroup>
-        <col class="checkbox hide-when-print" style="width:30px;">
-        <col class="sk-drag-col" style="width:24px;">
-        <col class="name">
-        <col class="identifier" style="width:160px;">
-        <col class="short_description">
-        <col class="buttons" style="width:30px;">
-      </colgroup>
-      <thead>
-        <tr>
-          <th class="checkbox hide-when-print">
-            <input type="checkbox" class="sk-check-all" title="Alle auswählen"
-                   onchange="skCheckAll(this, '<%= category %>')">
-          </th>
-          <th class="sk-drag-col"></th>
-          <th class="name">Name</th>
-          <th class="identifier">Kategorie</th>
-          <th class="short_description">Beschreibung</th>
-          <th class="buttons"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <% cat_skills.each_with_index do |skill, i| %>
-          <tr class="skill <%= i.even? ? 'odd' : 'even' %> <%= 'subskills-inactive' unless skill.active? %>"
-              data-skill-id="<%= skill.id %>">
-            <td class="checkbox hide-when-print">
-              <input type="checkbox" name="ids[]" value="<%= skill.id %>"
-                     class="sk-row-check" data-category="<%= category %>">
-            </td>
-            <td class="sk-drag-handle" title="Verschieben">⠿</td>
-            <td class="name"><strong><%= skill.name %></strong></td>
-            <td class="identifier"><%= skill.category %></td>
-            <td class="short_description"><%= skill.description %></td>
-            <td class="buttons">
-              <span class="sk-row-drdn" style="position:relative;display:inline-block;">
-                <a href="#" class="icon-only icon-actions" title="Aktionen"
-                   onclick="skRowToggle(event,this);return false;"></a>
-                <ul class="sk-drdn-items" style="display:none;">
-                  <li><%= link_to 'Bearbeiten', edit_subskills_admin_path(skill),
-                              class: 'sk-drdn-item icon icon-edit' %></li>
-                  <li><%= link_to 'Kopieren', new_subskills_admin_path(copy_from: skill.id),
-                              class: 'sk-drdn-item icon icon-copy' %></li>
-                  <li class="sk-drdn-sep"></li>
-                  <li>
-                    <%= button_to 'Löschen', subskills_admin_path(skill),
-                        method: :delete,
-                        class: 'icon icon-del',
-                        form_class: 'sk-inline-form',
-                        data: { confirm: "Skill '#{skill.name}' wirklich löschen?" } %>
-                  </li>
-                </ul>
-              </span>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  <% end %>
+<table class="list projects" id="sk-skill-table"
+       data-reorder-url="<%= reorder_subskills_admin_path %>"
+       data-reorder-root-url="<%= reorder_categories_subskills_admin_path %>"
+       data-reparent-url="<%= reparent_subskills_admin_path %>">
+  <thead>
+    <tr id="sk-thead-row" class="sk-toplevel-dropzone">
+      <th class="checkbox hide-when-print">
+        <input type="checkbox" class="toggle-selection" onchange="skCheckAll(this)">
+      </th>
+      <th class="name" colspan="2">Name</th>
+      <th class="short_description">Beschreibung</th>
+      <th class="buttons"></th>
+    </tr>
+  </thead>
+  <tbody id="sk-tbody">
+    <% @tree_rows.each_with_index do |row, i| %>
+      <% skill = row[:skill] %>
+      <% depth = row[:depth] %>
+      <% is_root = depth == 0 %>
+      <% css = "project #{is_root ? 'root parent' : "child leaf idnt idnt-#{depth}"} #{i.even? ? 'odd' : 'even'}" %>
+
+      <tr class="<%= css %> sk-row"
+          id="sk-row-<%= skill.id %>"
+          data-skill-id="<%= skill.id %>"
+          data-depth="<%= depth %>"
+          data-parent-id="<%= skill.parent_id.to_s %>"
+          data-is-root="<%= is_root %>"
+          data-has-ratings="<%= skill.user_skills.any? && skill.children.none? %>">
+
+        <td class="checkbox hide-when-print">
+          <input type="checkbox" name="ids[]" value="<%= skill.id %>" class="sk-row-check">
+        </td>
+
+        <td class="name" colspan="<%= is_root ? 1 : 1 %>">
+          <% if is_root %>
+            <span class="expander icon-expander open sk-expander"
+                  onclick="skToggle(<%= skill.id %>, this)" title="Ein-/Ausklappen"></span>
+          <% end %>
+          <%# Drag handle — always shown %>
+          <span class="sk-drag-handle" title="Verschieben (auch auf andere Skills ziehen zum Umhängen)">⠿</span>
+          <%= link_to skill.name, edit_subskills_admin_path(skill) %>
+          <% if skill.composite? && !is_root %>
+            <em style="font-size:0.75rem;color:#999;margin-left:4px;">(aggregiert)</em>
+          <% end %>
+        </td>
+
+        <td class="short_description"><%= skill.description %></td>
+
+        <td class="buttons">
+          <span style="position:relative;display:inline-block;">
+            <a href="#" class="icon-only icon-actions" title="Aktionen"
+               onclick="skRowToggle(event,this);return false;"></a>
+            <ul class="sk-drdn-items" style="display:none;">
+              <li><%= link_to 'Bearbeiten', edit_subskills_admin_path(skill),
+                          class: 'sk-drdn-item icon icon-edit' %></li>
+              <li><%= link_to 'Kopieren', new_subskills_admin_path(copy_from: skill.id),
+                          class: 'sk-drdn-item icon icon-copy' %></li>
+              <% if skill.can_add_children? %>
+                <li><%= link_to 'Neuer Unter-Skill', new_subskills_admin_path(parent_id: skill.id),
+                            class: 'sk-drdn-item icon icon-add' %></li>
+              <% end %>
+              <li class="sk-drdn-sep"></li>
+              <li>
+                <%= button_to 'Löschen', subskills_admin_path(skill),
+                    method: :delete, class: 'icon icon-del',
+                    form_class: 'sk-inline-form',
+                    data: { confirm: "Skill '#{skill.name}' wirklich löschen?" } %>
+              </li>
+            </ul>
+          </span>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
 <% end %>
 
 <script>
-// ── Dropdown (top drdn + row drdn) ────────────────────────────────────────────
-function skDrdnToggle(e, id) {
+(function() {
+'use strict';
+
+// ── Dropdown helpers ──────────────────────────────────────────────────────────
+window.skDrdnToggle = function(e, id) {
   e.preventDefault(); e.stopPropagation();
-  var menu = document.getElementById(id).querySelector('.sk-drdn-items');
-  var open = menu.style.display !== 'none';
-  skCloseAll(); menu.style.display = open ? 'none' : 'block';
-}
-function skRowToggle(e, btn) {
+  var m = document.getElementById(id).querySelector('.sk-drdn-items');
+  var o = m.style.display !== 'none'; skCloseAll(); if (!o) m.style.display = 'block';
+};
+window.skRowToggle = function(e, btn) {
   e.preventDefault(); e.stopPropagation();
-  var menu = btn.parentElement.querySelector('.sk-drdn-items');
-  var open = menu.style.display !== 'none';
-  skCloseAll(); menu.style.display = open ? 'none' : 'block';
-}
+  var m = btn.parentElement.querySelector('.sk-drdn-items');
+  var o = m.style.display !== 'none'; skCloseAll(); if (!o) m.style.display = 'block';
+};
 function skCloseAll() {
-  document.querySelectorAll('.sk-drdn-items').forEach(function(m) { m.style.display='none'; });
+  document.querySelectorAll('.sk-drdn-items').forEach(function(m){ m.style.display='none'; });
 }
 document.addEventListener('click', skCloseAll);
 
-// ── Checkbox: check-all per Kategorie ────────────────────────────────────────
-function skCheckAll(master, cat) {
-  document.querySelectorAll('.sk-row-check[data-category="' + cat + '"]').forEach(function(cb) {
-    cb.checked = master.checked;
+// ── Collapse / Expand ─────────────────────────────────────────────────────────
+window.skToggle = function(rootId, expander) {
+  var open = expander.classList.contains('open');
+  document.querySelectorAll('#sk-tbody tr[data-parent-id]').forEach(function(r) {
+    if (isDescendantOf(r, rootId)) r.style.display = open ? 'none' : '';
   });
-  skUpdateBulkBar();
-}
-document.addEventListener('change', function(e) {
-  if (e.target.classList.contains('sk-row-check')) skUpdateBulkBar();
-});
-function skUpdateBulkBar() {
-  var any = document.querySelectorAll('.sk-row-check:checked').length > 0;
-  document.getElementById('sk-bulk-bar').style.display = any ? '' : 'none';
+  expander.classList.toggle('open', !open);
+};
+function isDescendantOf(row, ancestorId) {
+  var tbody = document.getElementById('sk-tbody');
+  var pid = row.dataset.parentId;
+  while (pid) {
+    if (String(pid) === String(ancestorId)) return true;
+    var pr = tbody.querySelector('tr[data-skill-id="' + pid + '"]');
+    pid = pr ? pr.dataset.parentId : null;
+  }
+  return false;
 }
 
-// ── Drag-and-drop reorder ─────────────────────────────────────────────────────
-(function() {
-  var dragging = null;
-  document.querySelectorAll('.sk-sortable-table tbody tr').forEach(function(row) {
-    row.setAttribute('draggable', 'true');
-    row.addEventListener('dragstart', function(e) {
-      dragging = row; row.style.opacity = '0.5';
-      e.dataTransfer.effectAllowed = 'move';
-    });
-    row.addEventListener('dragend', function() {
-      row.style.opacity = ''; dragging = null;
-    });
-    row.addEventListener('dragover', function(e) {
-      e.preventDefault();
-      if (row !== dragging) row.style.outline = '2px solid #5ba4cf';
-    });
-    row.addEventListener('dragleave', function() { row.style.outline = ''; });
-    row.addEventListener('drop', function(e) {
-      e.preventDefault(); row.style.outline = '';
-      if (!dragging || dragging === row) return;
-      row.parentNode.insertBefore(dragging, row);
-      var ids = [];
-      row.closest('table').querySelectorAll('tr[data-skill-id]').forEach(function(r) {
-        ids.push(r.dataset.skillId);
+// ── Checkbox ──────────────────────────────────────────────────────────────────
+window.skCheckAll = function(master) {
+  document.querySelectorAll('.sk-row-check').forEach(function(cb){ cb.checked = master.checked; });
+};
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+function showToast(msg, ok) {
+  var t = document.getElementById('sk-toast');
+  t.textContent = msg;
+  t.style.background = ok ? '#27ae60' : '#c0392b';
+  t.style.display = 'block';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function(){ t.style.display = 'none'; }, 3000);
+}
+
+// ── AJAX helpers ──────────────────────────────────────────────────────────────
+var CSRF = function(){ return (document.querySelector('meta[name="csrf-token"]')||{}).content||''; };
+var TABLE = document.getElementById('sk-skill-table');
+if (!TABLE) return;
+
+function postJSON(url, data, cb) {
+  var body = new URLSearchParams();
+  Object.keys(data).forEach(function(k) {
+    var v = data[k];
+    if (Array.isArray(v)) {
+      // Send as ids[]=X&ids[]=Y so Rails parses as Array, not Hash
+      v.forEach(function(item) { body.append(k + '[]', item); });
+    } else {
+      body.append(k, v == null ? '' : v);
+    }
+  });
+  body.append('authenticity_token', CSRF());
+  fetch(url, {
+    method: 'POST',
+    body: body,
+    headers: {'X-Requested-With': 'XMLHttpRequest'}
+  }).then(function(r){ return r.json(); })
+    .then(function(j){ cb(j); })
+    .catch(function(){ cb({ok: false, error: 'Netzwerkfehler'}); });
+}
+
+// ── Drag & Drop ───────────────────────────────────────────────────────────────
+var dragging = null;
+var REPARENT_URL     = TABLE.dataset.reparentUrl;
+var REORDER_URL      = TABLE.dataset.reorderUrl;
+var REORDER_ROOT_URL = TABLE.dataset.reorderRootUrl;
+
+function clearHighlights() {
+  document.querySelectorAll('.sk-row').forEach(function(r) {
+    r.style.outline = '';
+    r.style.borderTop = '';
+    r.style.background = '';
+  });
+  var th = document.getElementById('sk-thead-row');
+  if (th) th.style.background = '';
+}
+
+// Returns 'before' (top 55%) or 'into' (bottom 45%) based on cursor Y in row
+function dropZone(e, row) {
+  var rect = row.getBoundingClientRect();
+  return (e.clientY - rect.top) / rect.height < 0.55 ? 'before' : 'into';
+}
+
+// Init each draggable row
+document.querySelectorAll('.sk-row').forEach(function(row) {
+  var handle = row.querySelector('.sk-drag-handle');
+  if (!handle) return;
+  handle.style.cursor = 'grab';
+
+  handle.addEventListener('mousedown', function() { row.setAttribute('draggable', 'true'); });
+
+  row.addEventListener('dragstart', function(e) {
+    if (!row.hasAttribute('draggable')) { e.preventDefault(); return; }
+    dragging = row;
+    row.style.opacity = '0.45';
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', row.dataset.skillId);
+  });
+
+  row.addEventListener('dragend', function() {
+    row.style.opacity = '';
+    row.removeAttribute('draggable');
+    dragging = null;
+    clearHighlights();
+  });
+
+  row.addEventListener('dragover', function(e) {
+    if (!dragging || dragging === row) return;
+    e.preventDefault();
+    clearHighlights();
+
+    var dragId = dragging.dataset.skillId;
+
+    // Can't drop onto own descendant — no visual needed
+    if (isDescendantOf(row, dragId)) return;
+
+    var zone = dropZone(e, row);
+    if (zone === 'into') {
+      row.style.outline = '2px dashed #999';
+    } else {
+      row.style.borderTop = '2px solid #999';
+    }
+  });
+
+  row.addEventListener('dragleave', function() { clearHighlights(); });
+
+  row.addEventListener('drop', function(e) {
+    e.preventDefault(); e.stopPropagation();
+    clearHighlights();
+    if (!dragging || dragging === row) return;
+
+    var dragId  = dragging.dataset.skillId;
+    var dragPid = dragging.dataset.parentId;
+    var tbody   = document.getElementById('sk-tbody');
+
+    if (isDescendantOf(row, dragId)) {
+      showToast('Zirkuläre Abhängigkeit nicht erlaubt.', false); return;
+    }
+
+    var zone     = dropZone(e, row);
+    var targetId = row.dataset.skillId;
+
+    if (zone === 'into') {
+      // ── REPARENT: make dragged skill a child of target ──────────────────
+      if (row.dataset.hasRatings === 'true') {
+        showToast('Dieser Skill hat Bewertungen und kann keine Kinder aufnehmen.', false); return;
+      }
+      postJSON(REPARENT_URL, { skill_id: dragId, new_parent_id: targetId }, function(j) {
+        if (j.ok) {
+          showToast('✓ Skill verschoben', true);
+          setTimeout(function() { window.location.reload(); }, 700);
+        } else {
+          showToast(j.error || 'Fehler', false);
+        }
       });
-      var body = new URLSearchParams();
-      ids.forEach(function(id) { body.append('ids[]', id); });
-      body.append('authenticity_token',
-        (document.querySelector('meta[name="csrf-token"]') || {}).content || '');
-      fetch(row.closest('table').dataset.reorderUrl,
-        { method: 'POST', body: body, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+
+    } else {
+      // ── REORDER: insert dragged skill before target (same parent) ───────
+      var newPid = row.dataset.parentId;  // target's parent becomes dragging's new parent
+
+      if (dragPid === newPid) {
+        // Same parent → simple DOM reorder + save position
+        tbody.insertBefore(dragging, row);
+        var ids = [];
+        tbody.querySelectorAll('tr.sk-row[data-parent-id="' + dragPid + '"]')
+             .forEach(function(r) { ids.push(r.dataset.skillId); });
+        postJSON(REORDER_URL, { ids: ids }, function(j) {
+          if (!j.ok) showToast(j.error || 'Fehler', false);
+        });
+      } else {
+        // Different parent → reparent to target's parent (insert as sibling of target)
+        postJSON(REPARENT_URL, { skill_id: dragId, new_parent_id: newPid || '' }, function(j) {
+          if (j.ok) {
+            showToast('✓ Skill verschoben', true);
+            setTimeout(function() { window.location.reload(); }, 700);
+          } else {
+            showToast(j.error || 'Fehler', false);
+          }
+        });
+      }
+    }
+  });
+});
+
+// ── Drop on table header = make top-level ────────────────────────────────────
+var theadRow = document.getElementById('sk-thead-row');
+if (theadRow) {
+  theadRow.addEventListener('dragover', function(e) {
+    if (!dragging) return;
+    if (dragging.dataset.parentId === '') return; // already top-level
+    e.preventDefault();
+  });
+  theadRow.addEventListener('dragleave', function() {});
+  theadRow.addEventListener('drop', function(e) {
+    e.preventDefault(); e.stopPropagation();
+    theadRow.style.background = '';
+    if (!dragging) return;
+    var dragId  = dragging.dataset.skillId;
+    var dragPid = dragging.dataset.parentId;
+    if (dragPid === '') { showToast('Skill ist bereits auf oberster Ebene.', false); return; }
+    postJSON(REPARENT_URL, { skill_id: dragId, new_parent_id: '' }, function(j) {
+      if (j.ok) {
+        showToast('✓ Auf oberste Ebene verschoben', true);
+        setTimeout(function() { window.location.reload(); }, 700);
+      } else {
+        showToast(j.error || 'Fehler', false);
+      }
     });
   });
+}
+
 })();
 </script>

@@ -3,23 +3,14 @@
 <% end %>
 
 <h2>
-  <% if @target_user == User.current %>
-    Meine Skills
-  <% else %>
-    Skills: <%= @target_user.name %>
-  <% end %>
+  <% if @target_user == User.current %>Meine Skills
+  <% else %>Skills: <%= @target_user.name %><% end %>
 </h2>
 
 <div id="sk-save-indicator" class="sk-save-indicator" style="display:none;"></div>
 
-<%
-  # Use /me/skill for current user, /user/:id/skill for others
-  if @target_user == User.current
-    save_url = update_my_skill_subskills_path
-  else
-    save_url = update_single_skill_subskills_path(user_id: @target_user.id)
-  end
-%>
+<% save_url = @target_user == User.current ? update_my_skill_subskills_path :
+                                              update_single_skill_subskills_path(user_id: @target_user.id) %>
 
 <% if @target_user != User.current %>
   <p style="color:#888;font-size:0.85rem;margin-bottom:8px;">
@@ -28,17 +19,45 @@
 <% end %>
 
 <p style="font-size:0.85rem;margin-bottom:16px;">
-  <a href="<%= url_for(controller: 'users', action: 'show', id: @target_user.id) %>">
-    ← Zurück zum Profil
-  </a>
+  <a href="<%= url_for(controller: 'users', action: 'show', id: @target_user.id) %>">← Zurück zum Profil</a>
 </p>
 
-<% @skills.group_by(&:category).each do |category, cat_skills| %>
-  <h3 style="margin:24px 0 8px;font-size:1rem;color:#555;border-bottom:1px solid #ddd;padding-bottom:4px;">
-    <%= category %>
-  </h3>
+<%# ── Tree rendering ────────────────────────────────────────────────────────── %>
+<% @tree_rows.each do |row| %>
+  <% skill = row[:skill] %>
+  <% depth = row[:depth] %>
 
-  <% cat_skills.each do |skill| %>
+  <% if skill.composite? %>
+    <%# Parent/composite skill – section header with aggregated score %>
+    <% agg_score = (@score_map[skill.id] || 0.0).round %>
+    <% level_colors = ['#aaa', '#90b8d8', '#5b9ec9', '#2e78b7', '#1a5c99', '#0d3d6b'] %>
+    <% dot_color = agg_score > 0 ? level_colors[agg_score] : '#ccc' %>
+
+    <div style="margin: <%= depth == 0 ? '24px' : '14px' %> 0 4px;
+                padding-left: <%= depth * 16 %>px;
+                display: flex; align-items: center; gap: 10px;
+                border-bottom: 1px solid #eee; padding-bottom: 4px;">
+      <span style="font-size: <%= depth == 0 ? '1rem' : '0.9rem' %>;
+                   font-weight: 600; color: #444; flex:1;">
+        <%= skill.name %>
+        <% if skill.description.present? %>
+          <abbr title="<%= skill.description %>" class="sk-tooltip-icon">?</abbr>
+        <% end %>
+      </span>
+      <%# Aggregated score dots (gray style) %>
+      <div style="display:inline-flex;gap:3px;align-items:center;" title="Aggregierter Score: <%= agg_score %>/5">
+        <% (1..5).each do |lvl| %>
+          <span style="display:inline-block;width:10px;height:10px;border-radius:50%;
+                       border: 1px dashed <%= agg_score >= lvl ? dot_color : '#ccc' %>;
+                       background: <%= agg_score >= lvl ? dot_color : 'transparent' %>;
+                       opacity: 0.7;"></span>
+        <% end %>
+      </div>
+      <span style="font-size:0.75rem;color:#999;">(<%= sprintf('%.1f', @score_map[skill.id] || 0) %>)</span>
+    </div>
+
+  <% else %>
+    <%# Leaf skill – editable (or read-only) %>
     <% current_level = @user_skills[skill.id]&.level || 0 %>
     <% learn_prio    = @user_skills[skill.id]&.learn_priority || 0 %>
     <% level_descs   = @level_descriptions[skill.id] || {} %>
@@ -48,7 +67,8 @@
          data-skill-id="<%= skill.id %>"
          data-save-url="<%= save_url %>"
          data-level="<%= current_level %>"
-         data-learn-priority="<%= learn_prio %>">
+         data-learn-priority="<%= learn_prio %>"
+         style="padding-left: <%= depth * 16 %>px;">
 
       <div class="sk-skill-header">
         <span class="sk-skill-name">
@@ -75,7 +95,6 @@
                id="sk-lrow-<%= skill.id %>-<%= lvl %>"
                <% if @editable %>onclick="skSelectLevel(<%= skill.id %>, <%= lvl %>)"<% end %>
                style="<%= @editable ? 'cursor:pointer;' : '' %>">
-
             <span class="sk-option-btn sk-level-<%= lvl %> <%= 'sk-option-btn--active' if lvl == current_level %>">
               <%= lvl %>
             </span>
@@ -91,57 +110,39 @@
 <% if @editable %>
 <script>
 const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.content || '';
-
-function getBlock(skillId) {
-  return document.querySelector(`.sk-skill-block[data-skill-id="${skillId}"]`);
-}
-
+function getBlock(skillId) { return document.querySelector(`.sk-skill-block[data-skill-id="${skillId}"]`); }
 function skSelectLevel(skillId, level) {
-  const block = getBlock(skillId);
-  if (!block) return;
+  const block = getBlock(skillId); if (!block) return;
   block.dataset.level = level;
   for (let lvl = 0; lvl <= 5; lvl++) {
-    const row = document.getElementById('sk-lrow-' + skillId + '-' + lvl);
-    if (!row) continue;
+    const row = document.getElementById('sk-lrow-' + skillId + '-' + lvl); if (!row) continue;
     row.classList.toggle('sk-level-row--active', lvl === level);
     const btn = row.querySelector('.sk-option-btn');
     if (btn) btn.classList.toggle('sk-option-btn--active', lvl === level);
   }
   saveSkill(skillId);
 }
-
 function skToggleStar(btn) {
-  const skillId = btn.dataset.skillId;
-  const block   = getBlock(skillId);
-  const active  = btn.classList.contains('sk-star-btn--active');
+  const skillId = btn.dataset.skillId; const block = getBlock(skillId);
+  const active = btn.classList.contains('sk-star-btn--active');
   btn.classList.toggle('sk-star-btn--active', !active);
   btn.textContent = active ? '☆' : '★';
   block.dataset.learnPriority = active ? 0 : 1;
   saveSkill(skillId);
 }
-
 function saveSkill(skillId) {
   const block = getBlock(skillId);
   fetch(block.dataset.saveUrl, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'X-CSRF-Token': CSRF_TOKEN,
-      'X-Requested-With': 'XMLHttpRequest'
-    },
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRF-Token': CSRF_TOKEN, 'X-Requested-With': 'XMLHttpRequest' },
     body: `skill_id=${skillId}&level=${block.dataset.level}&learn_priority=${block.dataset.learnPriority}`
-  })
-  .then(r => r.json())
-  .then(d => showIndicator(d.ok ? '✓ Gespeichert' : '✗ Fehler', d.ok))
-  .catch(() => showIndicator('✗ Verbindungsfehler', false));
+  }).then(r => r.json()).then(d => showIndicator(d.ok ? '✓ Gespeichert' : '✗ Fehler', d.ok))
+    .catch(() => showIndicator('✗ Verbindungsfehler', false));
 }
-
 function showIndicator(msg, ok) {
   const el = document.getElementById('sk-save-indicator');
-  el.textContent = msg;
-  el.className   = 'sk-save-indicator ' + (ok ? 'sk-save-ok' : 'sk-save-err');
-  el.style.display = 'inline-block';
-  clearTimeout(el._timer);
+  el.textContent = msg; el.className = 'sk-save-indicator ' + (ok ? 'sk-save-ok' : 'sk-save-err');
+  el.style.display = 'inline-block'; clearTimeout(el._timer);
   el._timer = setTimeout(() => { el.style.display = 'none'; }, 2000);
 }
 </script>

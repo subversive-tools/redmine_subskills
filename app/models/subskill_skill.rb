@@ -10,16 +10,29 @@ class SubskillSkill < ActiveRecord::Base
     'Sozial- & Selbstkompetenz'
   ].freeze
 
-  has_many :user_skills,      class_name: 'SubskillUserSkill',       foreign_key: 'subskill_skill_id', dependent: :destroy
-  has_many :level_descriptions, class_name: 'SubskillLevelDescription', foreign_key: 'subskill_skill_id', dependent: :destroy
+  # ── Tree ──────────────────────────────────────────────────────────────── #
+  belongs_to :parent,   class_name: 'SubskillSkill', foreign_key: 'parent_id', optional: true
+  has_many   :children, -> { order(:position) },
+             class_name: 'SubskillSkill', foreign_key: 'parent_id',
+             dependent: :nullify, inverse_of: :parent
 
-  accepts_nested_attributes_for :level_descriptions, allow_destroy: false
+  has_many :user_skills,        class_name: 'SubskillUserSkill',       foreign_key: 'subskill_skill_id', dependent: :destroy
+  has_many :level_descriptions, class_name: 'SubskillLevelDescription', foreign_key: 'subskill_skill_id',
+           dependent: :destroy, inverse_of: :skill
+
+  accepts_nested_attributes_for :level_descriptions, allow_destroy: false,
+    reject_if: proc { |a| a['description'].blank? }
 
   validates :name, presence: true, uniqueness: true
-  validates :category, presence: true
+  # category kept for legacy CSV compat; no longer required
 
   scope :active,  -> { where(active: true) }
-  scope :ordered, -> { order(:category, :position, :name) }
+  scope :ordered, -> { order(:position, :name) }
+  scope :roots,   -> { where(parent_id: nil).order(:position, :name) }
+  scope :leaves,  -> {
+    parent_ids = unscoped.where.not(parent_id: nil).select(:parent_id)
+    where.not(id: parent_ids)
+  }
 
   DEFAULTS = [
     { name: 'Linux / Server-Administration',          category: 'Systeme' },
@@ -226,4 +239,63 @@ class SubskillSkill < ActiveRecord::Base
   def level_descriptions_map
     level_descriptions.index_by(&:level).transform_values(&:description)
   end
+
+  # ── Tree helpers ──────────────────────────────────────────────────────── #
+
+  def leaf?      = children.empty?
+  def composite? = children.any?
+  def root?      = parent_id.nil?
+
+  # Can this skill gain children? Only if no one has rated it yet.
+  def can_add_children?
+    user_skills.none?
+  end
+
+  def depth
+    return 0 if parent_id.nil?
+    (parent&.depth || 0) + 1
+  end
+
+  # ── Flat array [{skill:, depth:}] for tree rendering (1 query) ────────── #
+  def self.tree_rows(scope = nil)
+    all_skills  = (scope || all).order(:position).to_a
+    by_parent   = all_skills.group_by(&:parent_id)
+    result      = []
+    collect_rows(nil, by_parent, result, 0)
+    result
+  end
+
+  def self.collect_rows(parent_id, by_parent, result, depth)
+    (by_parent[parent_id] || []).each do |skill|
+      result << { skill: skill, depth: depth }
+      collect_rows(skill.id, by_parent, result, depth + 1)
+    end
+  end
+  private_class_method :collect_rows
+
+  # ── Score computation for a user (no N+1) ─────────────────────────────── #
+  # Returns Hash { skill_id => Float (0..5) }
+  def self.compute_scores_for_user(user_id)
+    all_skills = all.to_a
+    by_parent  = all_skills.group_by(&:parent_id)
+    us_map     = SubskillUserSkill.where(user_id: user_id).index_by(&:subskill_skill_id)
+    scores     = {}
+    _score_node(nil, by_parent, us_map, scores)
+    scores
+  end
+
+  def self._score_node(parent_id, by_parent, us_map, scores)
+    (by_parent[parent_id] || []).each do |skill|
+      kids = by_parent[skill.id] || []
+      if kids.any?
+        _score_node(skill.id, by_parent, us_map, scores)
+        ws       = kids.map { |c| [c.weight.to_f, scores[c.id] || 0.0] }
+        total_w  = ws.sum { |w, _| w }
+        scores[skill.id] = total_w.zero? ? 0.0 : ws.sum { |w, s| w * s } / total_w
+      else
+        scores[skill.id] = us_map[skill.id]&.level.to_f || 0.0
+      end
+    end
+  end
+  private_class_method :_score_node
 end

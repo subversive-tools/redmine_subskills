@@ -6,11 +6,11 @@ class SubskillsController < ApplicationController
   before_action :use_current_user,   only: [:my_skills_current, :my_rollen_current,
                                             :update_single_skill_current]
 
-  # GET /subskills – Team Skill-Matrix
+  # GET /subskills – Team Skill-Matrix (leaf skills only)
   def index
-    @skills     = SubskillSkill.active.ordered
-    @categories = @skills.map(&:category).uniq
-    @users      = User.active.sort_by(&:name)
+    @tree_rows  = SubskillSkill.active.tree_rows
+    @leaf_skills = SubskillSkill.active.leaves.order(:position, :name)
+    @users       = User.active.sort_by(&:name)
 
     all_user_skills = SubskillUserSkill.where(user_id: @users.map(&:id))
     @matrix = all_user_skills.each_with_object({}) do |us, h|
@@ -21,21 +21,21 @@ class SubskillsController < ApplicationController
 
   # GET /subskills/katalog
   def katalog
-    @skills     = SubskillSkill.active.ordered
-    @categories = @skills.map(&:category).uniq
-    @roles      = SubskillRole.order(:position).includes(:requirements)
-    @role_cats  = @roles.map(&:category).uniq
+    @tree_rows = SubskillSkill.active.tree_rows
+    @roles     = SubskillRole.order(:position).includes(:requirements)
+    @role_cats = @roles.map(&:category).uniq
   end
 
   # GET /subskills/me  → current user
   def my_skills_current
     @target_user = User.current
-    @skills      = SubskillSkill.active.ordered
-    @user_skills = SubskillUserSkill.where(user_id: @target_user.id)
-                                    .index_by(&:subskill_skill_id)
+    @tree_rows   = SubskillSkill.active.tree_rows
+    @score_map   = SubskillSkill.active.compute_scores_for_user(@target_user.id)
+    @user_skills = SubskillUserSkill.where(user_id: @target_user.id).index_by(&:subskill_skill_id)
     @editable    = true
 
-    descs = SubskillLevelDescription.where(subskill_skill_id: @skills.map(&:id))
+    all_leaf_ids = SubskillSkill.active.leaves.pluck(:id)
+    descs = SubskillLevelDescription.where(subskill_skill_id: all_leaf_ids)
     @level_descriptions = descs.each_with_object({}) do |d, h|
       h[d.subskill_skill_id] ||= {}
       h[d.subskill_skill_id][d.level] = d.description
