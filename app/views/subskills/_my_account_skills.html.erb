@@ -13,6 +13,7 @@
 <% end %>
 
 <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+<% first_root_shown = false %>
 <% tree_rows.each do |row| %>
   <% skill = row[:skill]; depth = row[:depth] %>
 
@@ -26,17 +27,17 @@
       <tr>
         <th style="text-align:left;padding:<%= depth == 0 ? '8px' : '4px' %> 4px 2px;
                    padding-left: <%= 4 + depth * 12 %>px;
-                   font-weight:600;color:#444;font-size:<%= depth == 0 ? '0.85rem' : '0.8rem' %>;">
-          <%= skill.name %>
-        </th>
+                   font-weight:600;color:#444;font-size:<%= depth == 0 ? '0.85rem' : '0.8rem' %>;"
+        ><%= skill.name %></th>
         <th style="text-align:center;font-size:0.75rem;color:#bbb;font-weight:normal;">
-          <%= depth == 0 ? 'Level' : '' %>
+          <%= (depth == 0 && !first_root_shown) ? 'Level' : '' %>
         </th>
         <th style="width:54px;text-align:center;font-size:0.75rem;color:#bbb;font-weight:normal;">
-          <%= depth == 0 ? 'Lernziel' : '' %>
+          <%= (depth == 0 && !first_root_shown) ? 'Lernziel' : '' %>
         </th>
       </tr>
     </thead>
+    <% first_root_shown = true if depth == 0 %>
 
   <% else %>
     <%# ── Leaf skill – direct rating row ── %>

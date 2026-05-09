@@ -145,6 +145,7 @@ body.subskills-active-page #main-menu { display: none !important; }
 }
 
 /* Active state per level */
+.sk-option-btn.sk-option-btn--active { margin-left: -0.2rem; }
 .sk-option-btn--active.sk-level-0 { background: #aaa;    border-color: #888;    color: #fff; }
 .sk-option-btn--active.sk-level-1 { background: #90b8d8; border-color: #6a9ec0; color: #fff; }
 .sk-option-btn--active.sk-level-2 { background: #5b9ec9; border-color: #3a80ad; color: #fff; }
@@ -494,3 +495,37 @@ td.fit-low  { color: #8d1f00; }
   margin-right: 0.5rem;
 }
 
+/* ── Project skills table ────────────────────────────────── */
+.psk-scroll         { overflow-x: auto; }
+
+#psk-table th.name  { text-align: left; }
+
+.psk-th-req         { width: 120px; }
+.psk-th-user        { width: 56px; max-width: 56px; text-align: center; font-weight: normal;
+                      font-size: 0.78rem; white-space: nowrap; overflow: hidden;
+                      text-overflow: ellipsis; border-left: 1px solid #e0e0e0; }
+.psk-user-lastname  { font-size: 0.7rem; color: #888; }
+
+.psk-passung-row    { background: #f8f8f8; border-bottom: 2px solid #ddd; }
+.psk-passung-label  { font-size: 0.78rem; color: #666; padding: 4px 6px; font-style: italic; text-align: right; }
+.psk-score-cell     { text-align: center; padding: 4px 2px; border-left: 1px solid #e0e0e0; }
+.psk-score-badge    { display: inline-block; border-radius: 3px; font-size: 0.8rem;
+                      font-weight: 600; padding: 1px 6px; white-space: nowrap; }
+.psk-score-high     { background: #d4edda; }
+.psk-score-mid      { background: #fff3cd; }
+.psk-score-low      { background: #f8d7da; }
+
+.psk-aggregated     { font-size: 0.75rem; color: #999; margin-left: 4px; }
+
+.psk-td-req         { text-align: center; }
+.psk-imp-badge      { padding: 2px 8px; border-radius: 3px; font-size: 0.78rem;
+                      color: #333; white-space: nowrap; }
+
+.psk-td-level       { text-align: center; padding: 3px 2px; border-left: 1px solid #e0e0e0; }
+.psk-level-wrap     { position: relative; display: inline-block; }
+.psk-star-badge     { position: absolute; top: -9px; right: -11px; color: #e53935;
+                      font-size: 1.2rem; line-height: 1; }
+.psk-no-level       { color: #ccc; font-size: 0.85rem; }
+
+.psk-row-active     { background: #fffbe6 !important; }
+.psk-row-clickable  { cursor: pointer; }

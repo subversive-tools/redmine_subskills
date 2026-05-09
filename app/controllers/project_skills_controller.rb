@@ -6,10 +6,49 @@ class ProjectSkillsController < ApplicationController
 
   # GET /projects/:project_id/skills
   def index
-    @requirements    = @skill_role.requirements.includes(:skill)
-                                  .sort_by { |r| [r.skill.category.to_s, r.skill.position.to_i] }
-    @skills_by_cat   = SubskillSkill.active.ordered.group_by(&:category)
-    @req_map         = @requirements.each_with_object({}) { |r, h| h[r.subskill_skill_id] = r.importance }
+    @tree_rows = SubskillSkill.active.tree_rows
+    @req_map   = @skill_role.requirements
+                             .each_with_object({}) { |r, h| h[r.subskill_skill_id] = r.importance }
+
+    leaf_ids = SubskillSkill.active.leaves.pluck(:id)
+    @level_descs = SubskillLevelDescription
+                     .where(subskill_skill_id: leaf_ids)
+                     .each_with_object({}) do |d, h|
+                       h[d.subskill_skill_id] ||= {}
+                       h[d.subskill_skill_id][d.level] = d.description
+                     end
+
+    # Integrated best match
+    @project_users = User.active.sort_by(&:name)
+    all_us = SubskillUserSkill.where(user_id: @project_users.map(&:id))
+    @user_skill_map = all_us.each_with_object({}) do |us, h|
+      h[us.user_id] ||= {}
+      h[us.user_id][us.subskill_skill_id] = { level: us.level, star: us.learn_priority.to_i > 0 }
+    end
+    req_max = @req_map.values.sum * 5
+    @fit_scores = @project_users.map do |u|
+      skill_levels = (@user_skill_map[u.id] || {}).transform_values { |v| v[:level] }
+      pct = if req_max > 0
+        raw = @req_map.sum { |sid, imp| [skill_levels[sid].to_i, 5].min * imp }
+        (raw * 100.0 / req_max).round
+      else
+        0
+      end
+      { user: u, score: pct }
+    end.sort_by { |x| -x[:score] }
+
+    # Exclude users who have level=0 and no star for ANY skill
+    # that is marked as "Erforderlich" (importance = 3)
+    erforderlich_ids = @req_map.select { |_, imp| imp == 3 }.keys
+    unless erforderlich_ids.empty?
+      @fit_scores = @fit_scores.reject do |fs|
+        user_skills = @user_skill_map[fs[:user].id] || {}
+        erforderlich_ids.any? do |sid|
+          entry = user_skills[sid]
+          entry&.dig(:level).to_i == 0 && !entry&.dig(:star)
+        end
+      end
+    end
   end
 
   # GET /projects/:project_id/skills/best-match
@@ -28,9 +67,9 @@ class ProjectSkillsController < ApplicationController
 
   # GET /projects/:project_id/skills/edit
   def edit
-    @skills_by_cat = SubskillSkill.active.ordered.group_by(&:category)
-    @req_map       = @skill_role.requirements
-                                .each_with_object({}) { |r, h| h[r.subskill_skill_id] = r.importance }
+    @tree_rows = SubskillSkill.active.tree_rows
+    @req_map   = @skill_role.requirements
+                             .each_with_object({}) { |r, h| h[r.subskill_skill_id] = r.importance }
   end
 
   # POST /projects/:project_id/skills

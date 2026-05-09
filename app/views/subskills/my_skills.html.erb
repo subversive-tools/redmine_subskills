@@ -12,52 +12,116 @@
 <% save_url = @target_user == User.current ? update_my_skill_subskills_path :
                                               update_single_skill_subskills_path(user_id: @target_user.id) %>
 
-<% if @target_user != User.current %>
-  <p style="color:#888;font-size:0.85rem;margin-bottom:8px;">
-    Skills von: <strong><%= @target_user.name %></strong>
-  </p>
-<% end %>
-
 <p style="font-size:0.85rem;margin-bottom:16px;">
   <a href="<%= url_for(controller: 'users', action: 'show', id: @target_user.id) %>">← Zurück zum Profil</a>
 </p>
 
-<%# ── Tree rendering ────────────────────────────────────────────────────────── %>
+<%# ── Helper: dot bar ────────────────────────────────────────────────────── %>
+<% dot_colors = ['#aaa','#90b8d8','#5b9ec9','#2e78b7','#1a5c99','#0d3d6b'] %>
+
+<%# ── Render tree ─────────────────────────────────────────────────────────── %>
 <% @tree_rows.each do |row| %>
-  <% skill = row[:skill] %>
-  <% depth = row[:depth] %>
+  <% skill = row[:skill]; depth = row[:depth] %>
 
   <% if skill.composite? %>
-    <%# Parent/composite skill – section header with aggregated score %>
-    <% agg_score = (@score_map[skill.id] || 0.0).round %>
-    <% level_colors = ['#aaa', '#90b8d8', '#5b9ec9', '#2e78b7', '#1a5c99', '#0d3d6b'] %>
-    <% dot_color = agg_score > 0 ? level_colors[agg_score] : '#ccc' %>
+    <%# ─── Composite / parent skill: section header + compact sub-skill table ─ %>
+    <% agg = (@score_map[skill.id] || 0.0) %>
+    <% agg_r = agg.round %>
 
-    <div style="margin: <%= depth == 0 ? '24px' : '14px' %> 0 4px;
-                padding-left: <%= depth * 16 %>px;
-                display: flex; align-items: center; gap: 10px;
-                border-bottom: 1px solid #eee; padding-bottom: 4px;">
-      <span style="font-size: <%= depth == 0 ? '1rem' : '0.9rem' %>;
-                   font-weight: 600; color: #444; flex:1;">
-        <%= skill.name %>
-        <% if skill.description.present? %>
-          <abbr title="<%= skill.description %>" class="sk-tooltip-icon">?</abbr>
-        <% end %>
-      </span>
-      <%# Aggregated score dots (gray style) %>
-      <div style="display:inline-flex;gap:3px;align-items:center;" title="Aggregierter Score: <%= agg_score %>/5">
-        <% (1..5).each do |lvl| %>
-          <span style="display:inline-block;width:10px;height:10px;border-radius:50%;
-                       border: 1px dashed <%= agg_score >= lvl ? dot_color : '#ccc' %>;
-                       background: <%= agg_score >= lvl ? dot_color : 'transparent' %>;
-                       opacity: 0.7;"></span>
-        <% end %>
+    <div style="margin-top:<%= depth == 0 ? '28px' : '16px' %>;
+                padding-left:<%= depth * 16 %>px;">
+      <%# Header row %>
+      <div style="display:flex;align-items:center;gap:10px;
+                  border-bottom:1px solid #ddd;padding-bottom:4px;margin-bottom:6px;">
+        <span style="font-weight:700;font-size:<%= depth == 0 ? '0.95rem' : '0.88rem' %>;
+                     color:#333;flex:1;">
+          <%= skill.name %>
+          <% if skill.description.present? %>
+            <abbr title="<%= skill.description %>" style="cursor:help;font-size:0.75rem;
+                         color:#999;border-bottom:1px dotted #999;margin-left:4px;">?</abbr>
+          <% end %>
+        </span>
+        <%# Aggregate dots (muted) %>
+        <span style="display:inline-flex;gap:3px;" title="Aggregierter Score: <%= sprintf('%.1f', agg) %>">
+          <% (1..5).each do |l| %>
+            <% c = agg_r >= l ? dot_colors[agg_r] : '#ddd' %>
+            <span style="width:9px;height:9px;border-radius:50%;background:<%= c %>;
+                         border:1px solid <%= c %>;opacity:0.6;display:inline-block;"></span>
+          <% end %>
+        </span>
+        <span style="font-size:0.7rem;color:#bbb;"><%= sprintf('%.1f', agg) %></span>
       </div>
-      <span style="font-size:0.75rem;color:#999;">(<%= sprintf('%.1f', @score_map[skill.id] || 0) %>)</span>
+
+      <%# Sub-skill compact rows — find direct children in tree %>
+      <% children = @tree_rows.select { |r| r[:skill].parent_id == skill.id } %>
+      <table style="width:100%;border-collapse:collapse;">
+        <% children.each do |cr| %>
+          <% cs = cr[:skill] %>
+          <% us = @user_skills[cs.id] %>
+          <% lvl = us&.level.to_i %>
+          <% star = us&.learn_priority.to_i > 0 %>
+          <% desc = @level_descriptions.dig(cs.id, lvl) %>
+
+          <% if cs.composite? %>
+            <%# Nested composite — just a sub-header (recursion handled by outer loop) %>
+            <tr><td colspan="3" style="padding:6px 0 2px;padding-left:12px;
+                font-weight:600;font-size:0.82rem;color:#555;border-bottom:1px solid #eee;">
+              <%= cs.name %>
+            </td></tr>
+          <% else %>
+            <%# Leaf sub-skill — full level picker (same as root leaf) %>
+            <% lvl       = us&.level.to_i %>
+            <% star      = us&.learn_priority.to_i > 0 %>
+            <% lvl_descs = @level_descriptions[cs.id] || {} %>
+            <tr><td colspan="3" style="padding:0;">
+            <div class="sk-skill-block"
+                 data-skill-id="<%= cs.id %>"
+                 data-save-url="<%= save_url %>"
+                 data-level="<%= lvl %>"
+                 data-learn-priority="<%= us&.learn_priority.to_i || 0 %>"
+                 style="padding-left:<%= (depth + 1) * 16 %>px;">
+              <div class="sk-skill-header">
+                <span class="sk-skill-name">
+                  <%= cs.name %>
+                  <% if cs.weight && cs.weight.to_f != 1.0 %>
+                    <span style="font-size:0.72rem;color:#bbb;margin-left:4px;">
+                      (×<%= number_with_precision(cs.weight, precision: 1, strip_insignificant_zeros: true) %>)
+                    </span>
+                  <% end %>
+                  <% if @editable %>
+                    <button type="button"
+                            class="sk-star-btn <%= 'sk-star-btn--active' if star %>"
+                            id="sk-star-<%= cs.id %>"
+                            data-skill-id="<%= cs.id %>"
+                            title="Lernziel"
+                            onclick="skToggleStar(this)"><%= star ? '★' : '☆' %></button>
+                  <% end %>
+                </span>
+              </div>
+              <div class="sk-skill-body">
+                <% (0..5).each do |l| %>
+                  <div class="sk-level-row <%= 'sk-level-row--active' if l == lvl %>"
+                       id="sk-lrow-<%= cs.id %>-<%= l %>"
+                       <% if @editable %>onclick="skSelectLevel(<%= cs.id %>, <%= l %>)"<% end %>
+                       style="<%= @editable ? 'cursor:pointer;' : '' %>">
+                    <span class="sk-option-btn sk-level-<%= l %> <%= 'sk-option-btn--active' if l == lvl %>">
+                      <%= l %>
+                    </span>
+                    <span class="sk-level-row-label"><%= SubskillUserSkill::LEVELS[l][:label] %></span>
+                    <span class="sk-level-row-desc"><%= l > 0 ? (lvl_descs[l] || '') : '' %></span>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+            </td></tr>
+          <% end %>
+        <% end %>
+      </table>
     </div>
 
   <% else %>
-    <%# Leaf skill – editable (or read-only) %>
+    <%# ─── Leaf skill at root level (no parent / orphaned) — full picker ──── %>
+    <% next if skill.parent_id.present? %>  <%# already rendered inside composite %>
     <% current_level = @user_skills[skill.id]&.level || 0 %>
     <% learn_prio    = @user_skills[skill.id]&.learn_priority || 0 %>
     <% level_descs   = @level_descriptions[skill.id] || {} %>
@@ -67,15 +131,10 @@
          data-skill-id="<%= skill.id %>"
          data-save-url="<%= save_url %>"
          data-level="<%= current_level %>"
-         data-learn-priority="<%= learn_prio %>"
-         style="padding-left: <%= depth * 16 %>px;">
-
+         data-learn-priority="<%= learn_prio %>">
       <div class="sk-skill-header">
         <span class="sk-skill-name">
           <%= skill.name %>
-          <% if skill.description.present? %>
-            <abbr title="<%= skill.description %>" class="sk-tooltip-icon">?</abbr>
-          <% end %>
           <% if @editable %>
             <button type="button"
                     class="sk-star-btn <%= 'sk-star-btn--active' if starred %>"
@@ -83,12 +142,9 @@
                     data-skill-id="<%= skill.id %>"
                     title="Lernziel"
                     onclick="skToggleStar(this)"><%= starred ? '★' : '☆' %></button>
-          <% elsif starred %>
-            <span class="sk-star-btn sk-star-btn--active" title="Lernziel">★</span>
           <% end %>
         </span>
       </div>
-
       <div class="sk-skill-body">
         <% (0..5).each do |lvl| %>
           <div class="sk-level-row <%= 'sk-level-row--active' if lvl == current_level %>"
@@ -108,41 +164,105 @@
 <% end %>
 
 <% if @editable %>
+<%# Level descriptions lookup for compact rows (JS) %>
+<script>
+var LEVEL_DESCS = <%= @level_descriptions.to_json %>;
+var LEVEL_LABELS = <%= SubskillUserSkill::LEVELS.values.map { |l| l[:label] }.to_json %>;
+</script>
+<% end %>
+
+<% if @editable %>
 <script>
 const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.content || '';
-function getBlock(skillId) { return document.querySelector(`.sk-skill-block[data-skill-id="${skillId}"]`); }
+
+// ── Full picker (root leaf skills) ────────────────────────────────────────────
+function getBlock(id) { return document.querySelector(`.sk-skill-block[data-skill-id="${id}"]`); }
+
 function skSelectLevel(skillId, level) {
   const block = getBlock(skillId); if (!block) return;
   block.dataset.level = level;
-  for (let lvl = 0; lvl <= 5; lvl++) {
-    const row = document.getElementById('sk-lrow-' + skillId + '-' + lvl); if (!row) continue;
-    row.classList.toggle('sk-level-row--active', lvl === level);
+  for (let l = 0; l <= 5; l++) {
+    const row = document.getElementById('sk-lrow-' + skillId + '-' + l); if (!row) continue;
+    row.classList.toggle('sk-level-row--active', l === level);
     const btn = row.querySelector('.sk-option-btn');
-    if (btn) btn.classList.toggle('sk-option-btn--active', lvl === level);
+    if (btn) btn.classList.toggle('sk-option-btn--active', l === level);
   }
-  saveSkill(skillId);
+  saveSkill(skillId, level, parseInt(block.dataset.learnPriority));
 }
 function skToggleStar(btn) {
-  const skillId = btn.dataset.skillId; const block = getBlock(skillId);
+  const skillId = parseInt(btn.dataset.skillId);
+  const block = getBlock(skillId);
   const active = btn.classList.contains('sk-star-btn--active');
   btn.classList.toggle('sk-star-btn--active', !active);
   btn.textContent = active ? '☆' : '★';
-  block.dataset.learnPriority = active ? 0 : 1;
-  saveSkill(skillId);
+  const prio = active ? 0 : 1;
+  block.dataset.learnPriority = prio;
+  saveSkill(skillId, parseInt(block.dataset.level), prio);
 }
-function saveSkill(skillId) {
+
+// ── Compact dot picker (sub-skills of composite) ──────────────────────────────
+function skCompactSelect(skillId, level, btn) {
+  const row = btn.closest('tr[data-skill-id]');
+  if (!row) return;
+  row.dataset.level = level;
+
+  // Update all dot buttons in this row
+  row.querySelectorAll('button[onclick^="skCompactSelect"]').forEach(function(b, i) {
+    const l = i; // 0..5
+    const active = (l === level);
+    const colors = ['','#90b8d8','#5b9ec9','#2e78b7','#1a5c99','#0d3d6b'];
+    const dc = colors[l] || '#ddd';
+    if (l === 0) {
+      b.style.background = active ? '#aaa' : '#eee';
+      b.style.border = '1px solid #ccc';
+      b.style.boxShadow = active ? '0 0 0 2px #aaa' : 'none';
+    } else {
+      b.style.background = active ? dc : 'transparent';
+      b.style.border = '1px solid ' + dc;
+      b.style.boxShadow = active ? '0 0 0 2px ' + dc : 'none';
+    }
+  });
+
+  // Update description
+  const descEl = document.getElementById('sk-desc-' + skillId);
+  if (descEl) {
+    const descs = LEVEL_DESCS[skillId] || {};
+    descEl.textContent = level > 0 ? (descs[level] || '') : '';
+  }
+
+  saveSkill(skillId, level, parseInt(row.dataset.learnPriority || 0), row.dataset.saveUrl);
+}
+function skCompactStar(skillId, btn) {
+  const row = btn.closest('tr[data-skill-id]');
+  if (!row) return;
+  const active = btn.classList.contains('sk-star-btn--active');
+  btn.classList.toggle('sk-star-btn--active', !active);
+  btn.textContent = active ? '☆' : '★';
+  btn.style.color = active ? '#ccc' : '#e53935';
+  const prio = active ? 0 : 1;
+  row.dataset.learnPriority = prio;
+  saveSkill(skillId, parseInt(row.dataset.level || 0), prio, row.dataset.saveUrl);
+}
+
+// ── Save ──────────────────────────────────────────────────────────────────────
+function saveSkill(skillId, level, learnPriority, url) {
   const block = getBlock(skillId);
-  fetch(block.dataset.saveUrl, {
+  const saveUrl = url || (block && block.dataset.saveUrl);
+  if (!saveUrl) return;
+  fetch(saveUrl, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRF-Token': CSRF_TOKEN, 'X-Requested-With': 'XMLHttpRequest' },
-    body: `skill_id=${skillId}&level=${block.dataset.level}&learn_priority=${block.dataset.learnPriority}`
-  }).then(r => r.json()).then(d => showIndicator(d.ok ? '✓ Gespeichert' : '✗ Fehler', d.ok))
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRF-Token': CSRF_TOKEN, 'X-Requested-With': 'XMLHttpRequest' },
+    body: `skill_id=${skillId}&level=${level}&learn_priority=${learnPriority}`
+  }).then(r => r.json())
+    .then(d => showIndicator(d.ok ? '✓ Gespeichert' : '✗ Fehler', d.ok))
     .catch(() => showIndicator('✗ Verbindungsfehler', false));
 }
 function showIndicator(msg, ok) {
   const el = document.getElementById('sk-save-indicator');
-  el.textContent = msg; el.className = 'sk-save-indicator ' + (ok ? 'sk-save-ok' : 'sk-save-err');
-  el.style.display = 'inline-block'; clearTimeout(el._timer);
+  el.textContent = msg; el.style.display = 'inline-block';
+  el.className = 'sk-save-indicator ' + (ok ? 'sk-save-ok' : 'sk-save-err');
+  clearTimeout(el._timer);
   el._timer = setTimeout(() => { el.style.display = 'none'; }, 2000);
 }
 </script>

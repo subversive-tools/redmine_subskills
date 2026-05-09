@@ -66,12 +66,14 @@ class SubskillsController < ApplicationController
 
   # GET /subskills/user/:user_id
   def my_skills
-    @skills      = SubskillSkill.active.ordered
+    @tree_rows   = SubskillSkill.active.tree_rows
+    @score_map   = SubskillSkill.active.compute_scores_for_user(@target_user.id)
     @user_skills = SubskillUserSkill.where(user_id: @target_user.id)
                                     .index_by(&:subskill_skill_id)
     @editable    = (User.current == @target_user) || User.current.admin?
 
-    descs = SubskillLevelDescription.where(subskill_skill_id: @skills.map(&:id))
+    all_leaf_ids = SubskillSkill.active.leaves.pluck(:id)
+    descs = SubskillLevelDescription.where(subskill_skill_id: all_leaf_ids)
     @level_descriptions = descs.each_with_object({}) do |d, h|
       h[d.subskill_skill_id] ||= {}
       h[d.subskill_skill_id][d.level] = d.description

@@ -38,8 +38,9 @@
       <th class="checkbox hide-when-print">
         <input type="checkbox" class="toggle-selection" onchange="skCheckAll(this)">
       </th>
-      <th class="name" colspan="2">Name</th>
+      <th class="name">Name</th>
       <th class="short_description">Beschreibung</th>
+      <th style="width:80px;text-align:right;">Gewichtung</th>
       <th class="buttons"></th>
     </tr>
   </thead>
@@ -62,7 +63,7 @@
           <input type="checkbox" name="ids[]" value="<%= skill.id %>" class="sk-row-check">
         </td>
 
-        <td class="name" colspan="<%= is_root ? 1 : 1 %>">
+        <td class="name">
           <% if is_root %>
             <span class="expander icon-expander open sk-expander"
                   onclick="skToggle(<%= skill.id %>, this)" title="Ein-/Ausklappen"></span>
@@ -76,6 +77,12 @@
         </td>
 
         <td class="short_description"><%= skill.description %></td>
+
+        <td style="text-align:right;color:#888;font-size:0.85rem;padding-right:8px;">
+          <% unless is_root || skill.parent_id.nil? %>
+            <%= number_with_precision(skill.weight, precision: 1, strip_insignificant_zeros: true) %>
+          <% end %>
+        </td>
 
         <td class="buttons">
           <span style="position:relative;display:inline-block;">

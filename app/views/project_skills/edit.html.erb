@@ -10,42 +10,72 @@
 </p>
 
 <%= form_tag update_project_skills_path(@project), method: :post do %>
-  <% @skills_by_cat.each do |cat, skills| %>
-    <h3 class="subskills-category-title"><%= cat %></h3>
-    <table class="list" style="margin-bottom:12px;">
-      <thead>
-        <tr>
-          <th>Kompetenz</th>
-          <th style="width:200px;">Anforderung</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% skills.each_with_index do |skill, i| %>
-          <% current_imp = @req_map[skill.id] || 0 %>
-          <tr class="<%= i.even? ? 'even' : 'odd' %>">
-            <td>
-              <strong><%= skill.name %></strong>
-              <% if skill.description.present? %>
-                <span style="color:#888;font-size:0.78rem;"> – <%= skill.description %></span>
-              <% end %>
-            </td>
-            <td>
-              <select name="skills[<%= skill.id %>]" class="sk-importance-select">
-                <% SubskillProjectRole::IMPORTANCE.each do |val, meta| %>
-                  <option value="<%= val %>" <%= 'selected' if current_imp == val %>>
-                    <%= meta[:label] %>
-                  </option>
-                <% end %>
-              </select>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  <% end %>
 
-  <p>
-    <%= submit_tag 'Speichern', class: 'button-positive' %>
-    <%= link_to 'Abbrechen', project_skills_path(@project) %>
-  </p>
+<table class="list projects" id="psk-edit-table">
+  <thead>
+    <tr>
+      <th class="name">Name</th>
+      <th class="short_description">Beschreibung</th>
+      <th style="width:180px;">Anforderung</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @tree_rows.each_with_index do |row, i| %>
+      <% skill = row[:skill]; depth = row[:depth]; is_root = depth == 0 %>
+      <% current_imp = @req_map[skill.id] || 0 %>
+      <% css = "project #{is_root ? 'root parent' : "child leaf idnt idnt-#{depth}"} #{i.even? ? 'odd' : 'even'}" %>
+
+      <tr class="<%= css %>" id="psk-erow-<%= skill.id %>">
+        <td class="name">
+          <% if is_root %>
+            <span class="expander icon-expander open"
+                  onclick="pskEditToggle(<%= skill.id %>, this)"
+                  title="Ein-/Ausklappen"></span>
+          <% end %>
+          <%= skill.name %>
+          <% if skill.composite? && !is_root %>
+            <em style="font-size:0.75rem;color:#999;margin-left:4px;">(aggregiert)</em>
+          <% end %>
+        </td>
+        <td class="short_description"><%= skill.description %></td>
+        <td>
+          <% if skill.children.none? %>
+            <%# Only leaf skills get a dropdown %>
+            <select name="skills[<%= skill.id %>]" class="sk-importance-select">
+              <% SubskillProjectRole::IMPORTANCE.each do |val, meta| %>
+                <option value="<%= val %>" <%= 'selected' if current_imp == val %>>
+                  <%= meta[:label] %>
+                </option>
+              <% end %>
+            </select>
+          <% else %>
+            <span style="font-size:0.78rem;color:#bbb;">—</span>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<p style="margin-top:16px;">
+  <%= submit_tag 'Speichern', class: 'button-positive' %>
+  <%= link_to 'Abbrechen', project_skills_path(@project) %>
+</p>
+
 <% end %>
+
+<script>
+(function() {
+  window.pskEditToggle = function(rootId, expander) {
+    var tbody = document.querySelector('#psk-edit-table tbody');
+    var rows = Array.from(tbody.querySelectorAll('tr'));
+    var rootIdx = rows.findIndex(function(r){ return r.id === 'psk-erow-' + rootId; });
+    var open = expander.classList.contains('open');
+    for (var j = rootIdx + 1; j < rows.length; j++) {
+      if (rows[j].classList.contains('root')) break;
+      rows[j].style.display = open ? 'none' : '';
+    }
+    expander.classList.toggle('open', !open);
+  };
+})();
+</script>
