@@ -556,3 +556,35 @@ td.fit-low  { color: #8d1f00; }
 
 .psk-row-active     { background: #fffbe6 !important; }
 .psk-row-clickable  { cursor: pointer; }
+
+/* ── Add-member row & modal ───────────────────────────────── */
+#psk-add-member-row td        { border-top: 2px solid #e0e0e0; background: #fafafa;
+                                padding: 6px 4px; }
+.psk-add-member-label         { font-size: 0.78rem; color: #888; font-style: italic; }
+
+.psk-add-member-btn           { background: none; border: 1px solid #c8d8e8;
+                                border-radius: 50%; width: 22px; height: 22px;
+                                font-size: 1rem; line-height: 1; cursor: pointer;
+                                color: #4a90d9; display: inline-flex;
+                                align-items: center; justify-content: center;
+                                padding: 0; transition: background 0.15s, color 0.15s; }
+.psk-add-member-btn:hover     { background: #4a90d9; color: #fff; border-color: #4a90d9; }
+
+.psk-modal-overlay            { position: fixed; inset: 0; background: rgba(0,0,0,.45);
+                                z-index: 9000; display: flex;
+                                align-items: center; justify-content: center; }
+.psk-modal-box                { background: #fff; border-radius: 8px; padding: 24px 28px;
+                                min-width: 320px; max-width: 420px; width: 90%;
+                                box-shadow: 0 8px 32px rgba(0,0,0,.22); }
+.psk-modal-title              { margin: 0 0 6px; font-size: 1.05rem; }
+.psk-modal-user               { margin: 0 0 14px; font-weight: 600; color: #333; }
+.psk-modal-field              { margin-bottom: 16px; }
+.psk-modal-field label        { display: block; font-size: 0.85rem; color: #666;
+                                margin-bottom: 4px; }
+.psk-modal-select             { width: 100%; padding: 5px 8px; border: 1px solid #ccc;
+                                border-radius: 4px; font-size: 0.9rem; }
+.psk-modal-actions            { display: flex; gap: 8px; justify-content: flex-end; }
+.psk-modal-actions button     { padding: 5px 14px; border-radius: 4px; cursor: pointer;
+                                font-size: 0.88rem; border: 1px solid #ccc;
+                                background: #f5f5f5; }
+.psk-modal-actions button:hover { background: #e8e8e8; }

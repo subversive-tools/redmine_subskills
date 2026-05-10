@@ -49,6 +49,9 @@ class ProjectSkillsController < ApplicationController
         end
       end
     end
+
+    @can_manage_members = User.current.allowed_to?(:manage_members, @project)
+    @project_roles = Role.givable.order(:name) if @can_manage_members
   end
 
   # GET /projects/:project_id/skills/best-match

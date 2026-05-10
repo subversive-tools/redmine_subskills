@@ -110,8 +110,49 @@
       </tr>
     <% end %>
   </tbody>
+  <% if @can_manage_members %>
+  <tfoot>
+    <tr id="psk-add-member-row">
+      <td class="name" colspan="3"><span class="psk-add-member-label">Als Mitglied hinzufügen</span></td>
+      <% @fit_scores.each do |fs| %>
+        <td class="psk-td-level" data-user-id="<%= fs[:user].id %>">
+          <button type="button" class="psk-add-member-btn"
+                  data-user-id="<%= fs[:user].id %>"
+                  data-user-name="<%= h(fs[:user].name) %>"
+                  title="<%= h(fs[:user].name) %> als Projektmitglied hinzufügen">+</button>
+        </td>
+      <% end %>
+    </tr>
+  </tfoot>
+  <% end %>
 </table>
 </div>
+
+<%# ── Add-member modal ─────────────────────────────────────────── %>
+<% if @can_manage_members %>
+<div id="psk-member-modal" class="psk-modal-overlay" style="display:none;">
+  <div class="psk-modal-box">
+    <h3 class="psk-modal-title">Mitglied hinzufügen</h3>
+    <p class="psk-modal-user"></p>
+    <%= form_with url: project_memberships_path(@project), method: :post, local: true,
+                  id: 'psk-member-form' do |f| %>
+      <%= hidden_field_tag 'membership[user_ids][]', '', id: 'psk-member-user-id' %>
+      <div class="psk-modal-field">
+        <label>Rolle:</label>
+        <select name="membership[role_ids][]" class="psk-modal-select">
+          <% @project_roles.each do |role| %>
+            <option value="<%= role.id %>"><%= role.name %></option>
+          <% end %>
+        </select>
+      </div>
+      <div class="psk-modal-actions">
+        <%= f.submit 'Hinzufügen', class: 'button-positive' %>
+        <button type="button" id="psk-modal-cancel">Abbrechen</button>
+      </div>
+    <% end %>
+  </div>
+</div>
+<% end %>
 
 <script>
 (function() {
@@ -211,6 +252,27 @@
     }
     expander.classList.toggle('open', !open);
   };
+  /* ── Add-member modal ── */
+  var modal = document.getElementById('psk-member-modal');
+  if (modal) {
+    document.querySelectorAll('.psk-add-member-btn').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var uid  = btn.dataset.userId;
+        var name = btn.dataset.userName;
+        document.getElementById('psk-member-user-id').value = uid;
+        modal.querySelector('.psk-modal-user').textContent = name;
+        modal.style.display = 'flex';
+      });
+    });
+    document.getElementById('psk-modal-cancel').addEventListener('click', function() {
+      modal.style.display = 'none';
+    });
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) modal.style.display = 'none';
+    });
+  }
+
 })();
 </script>
 
