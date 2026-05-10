@@ -52,7 +52,7 @@ Redmine::Plugin.register :redmine_subskills do
   menu :admin_menu, :subskills_admin,
        { controller: 'subskills_admin', action: 'index' },
        caption: 'Skills',
-       after:   :roles_and_permissions,
+       before:  :trackers,
        html: { class: 'icon' }
 end
 

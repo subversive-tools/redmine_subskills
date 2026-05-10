@@ -324,12 +324,13 @@ td.fit-low  { color: #8d1f00; }
 
 /* ── Drag handle ──────────────────────────────────────────── */
 .sk-drag-handle {
+  display: inline;
   cursor: grab;
   color: #bbb;
-  font-size: 1rem;
-  text-align: center;
+  font-size: 0.9rem;
+  vertical-align: middle;
   user-select: none;
-  padding: 0 4px;
+  padding: 0px 5px 3px 0px;
 }
 .sk-drag-handle:active { cursor: grabbing; }
 .sk-drag-over { outline: 2px dashed #5ba4cf; background: #f0f7ff; }
@@ -358,7 +359,8 @@ td.fit-low  { color: #8d1f00; }
 .sk-sortable-table,
 .sk-sortable-table td,
 .sk-sortable-table th { text-align: left !important; }
-.sk-sortable-table .sk-drag-handle { text-align: center !important; width: 22px; }
+.sk-name-content            { display: inline; white-space: nowrap; }
+.sk-sortable-table .sk-drag-handle { display: inline !important; vertical-align: middle; }
 
 /* Dropdown separator */
 .sk-drdn-sep { border-top: 1px solid #eee; margin: 4px 0; }
@@ -436,12 +438,37 @@ td.fit-low  { color: #8d1f00; }
 /* ── Admin menu icon ──────────────────────────────────────── */
 #admin-menu a.subskills-admin,
 #admin-menu a.subskills_admin {
+  background-image: none;
+  padding-left: 20px;
+  position: relative;
+}
+
+#admin-menu a.subskills-admin::before,
+#admin-menu a.subskills_admin::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
   background-image: url(../images/skills.svg);
   background-repeat: no-repeat;
-  background-position: 0 50%;
   background-size: 16px 16px;
-  padding-left: 20px;
 }
+
+#admin-menu a.subskills-admin.selected::before,
+#admin-menu a.subskills_admin.selected::before,
+#admin-menu li.selected a.subskills-admin::before,
+#admin-menu li.selected a.subskills_admin::before {
+  filter: brightness(0) invert(1);
+}
+
+/* Flip icon 180° (used for export = inverted import arrow) */
+.sk-icon-flip { display: inline-flex; transform: rotate(180deg); }
+
+/* Ensure SVG icons in admin skill dropdown inherit link color */
+.sk-drdn-item .icon-svg { color: inherit; fill: currentColor; }
 
 /* ── Kebab menu ───────────────────────────────────────────── */
 .sk-kebab-btn {
