@@ -588,3 +588,115 @@ td.fit-low  { color: #8d1f00; }
                                 font-size: 0.88rem; border: 1px solid #ccc;
                                 background: #f5f5f5; }
 .psk-modal-actions button:hover { background: #e8e8e8; }
+
+/* =============================================================
+   Utility classes – replaces all inline styles in templates
+   ============================================================= */
+
+/* ── Initially hidden elements ─────────────────────────────── */
+#sk-save-indicator { display: none; }
+#sk-toast          { display: none; }
+#psk-member-modal  { display: none; }
+
+/* ── Toast notification ────────────────────────────────────── */
+#sk-toast {
+  position: fixed; bottom: 20px; right: 20px; z-index: 9999;
+  padding: 10px 16px; background: #c0392b; color: #fff;
+  border-radius: 4px; font-size: 0.85rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+}
+
+/* ── Positioned wrappers (dropdowns) ───────────────────────── */
+.sk-drdn-wrap { position: relative; display: inline-block; margin-left: 4px; }
+.sk-drdn-cell { position: relative; display: inline-block; }
+
+/* ── Typography utilities ──────────────────────────────────── */
+.sk-text-muted  { font-size: 0.82rem; color: #888; }
+.sk-text-dim    { font-size: 0.82rem; color: #666; }
+.sk-text-small  { font-size: 0.85rem; }
+.sk-text-tiny   { font-size: 0.75rem; color: #bbb; }
+.sk-text-micro  { font-size: 0.7rem;  color: #bbb; }
+.sk-text-hint   { font-size: 0.75rem; color: #999; margin-left: 4px; }
+.sk-text-dash   { font-size: 0.78rem; color: #bbb; }
+.sk-text-rank   { color: #aaa; font-size: 0.85rem; }
+.sk-text-agg    { font-size: 0.7rem;  color: #bbb; }
+.sk-weight-tag  { font-size: 0.72rem; color: #bbb; margin-left: 4px; }
+
+/* ── Paragraph intro/note styles ───────────────────────────── */
+.sk-intro    { font-size: 0.82rem; color: #666; margin-bottom: 16px; }
+.sk-intro-sm { font-size: 0.85rem; margin-bottom: 16px; }
+.sk-note     { font-size: 0.82rem; color: #888; margin-bottom: 12px; }
+.sk-note-sm  { font-size: 0.85rem; color: #888; margin-bottom: 8px; }
+
+/* ── Section headings ──────────────────────────────────────── */
+.sk-h3 { margin: 20px 0 8px; }
+
+/* ── Table layout ───────────────────────────────────────────── */
+.sk-table-narrow { max-width: 600px; }
+.sk-table-medium { max-width: 700px; }
+.sk-table-wide   { max-width: 640px; }
+.sk-table-full   { width: 100%; border-collapse: collapse; }
+.sk-table-mb     { margin-bottom: 8px; }
+
+/* Table headers */
+.sk-th-score    { width: 180px; }
+.sk-th-score-lg { width: 200px; }
+.sk-th-score-xl { width: 220px; }
+.sk-th-pct      { width: 50px; text-align: right; }
+.sk-th-rank     { width: 32px; }
+.sk-th-weight   { width: 80px; text-align: right; }
+.sk-th-req      { width: 180px; }
+
+/* Table cells */
+.sk-td-muted    { font-size: 0.82rem; color: #888; }
+.sk-td-rank     { color: #aaa; font-size: 0.85rem; }
+.sk-td-weight   { text-align: right; color: #888; font-size: 0.85rem; padding-right: 8px; }
+.sk-td-pct      { text-align: right; font-weight: 700; }
+.sk-td-p0       { padding: 0; }
+
+/* ── Profile skills table (_my_account_skills) ─────────────── */
+.sk-profile-h3             { margin: 20px 0 8px; }
+.sk-profile-edit-p         { font-size: 0.8rem; color: #888; margin-bottom: 10px; }
+.sk-profile-table          { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+.sk-profile-th             { text-align: center; font-size: 0.75rem; color: #bbb; font-weight: normal; }
+.sk-profile-th--lernziel   { width: 54px; }
+.sk-level-desc             { font-size: 0.75rem; color: #bbb; padding-left: 6px; margin-top: 1px; min-height: 1em; }
+.sk-row-divider            { border-bottom: 1px solid #f5f5f5; }
+.sk-td-center-top          { text-align: center; padding: 4px 8px; vertical-align: top; padding-top: 6px; }
+.sk-td-star-col            { text-align: center; padding: 4px; vertical-align: top; padding-top: 1px; }
+.sk-flex-dots              { display: inline-flex; gap: 4px; align-items: center; }
+.sk-dot                    { display: inline-block; width: 12px; height: 12px; border-radius: 50%; }
+.sk-star-red               { color: #e53935; font-size: 1rem; }
+.sk-star-mini              { font-size: 0.7rem; }
+
+/* ── my_skills group containers ─────────────────────────────── */
+.sk-group-header    { display: flex; align-items: center; gap: 10px;
+                      border-bottom: 1px solid #ddd; padding-bottom: 4px; margin-bottom: 6px; }
+.sk-skill-title     { font-weight: 700; color: #333; flex: 1; }
+.sk-skill-title--root { font-size: 0.95rem; }
+.sk-skill-title--sub  { font-size: 0.88rem; }
+.sk-help-abbr       { cursor: help; font-size: 0.75rem; color: #999;
+                      border-bottom: 1px dotted #999; margin-left: 4px; }
+.sk-agg-dots        { display: inline-flex; gap: 3px; }
+.sk-agg-dot         { width: 9px; height: 9px; border-radius: 50%; opacity: 0.6; display: inline-block; }
+.sk-agg-score       { font-size: 0.7rem; color: #bbb; }
+.sk-subtable        { width: 100%; border-collapse: collapse; }
+.sk-sub-header-td   { padding: 6px 0 2px 12px; font-weight: 600;
+                      font-size: 0.82rem; color: #555; border-bottom: 1px solid #eee; }
+.sk-level-row--editable { cursor: pointer; }
+
+/* ── Katalog ─────────────────────────────────────────────────── */
+.sk-cat-heading   { margin: 12px 0 4px; font-size: 0.85rem; color: #555; }
+.sk-cat-name-col  { font-weight: 500; width: 220px; }
+.sk-cat-desc-col  { font-size: 0.82rem; color: #555; }
+.sk-role-name-col { width: 240px; }
+.sk-role-desc-col { font-size: 0.82rem; color: #888; }
+
+/* ── Admin form ──────────────────────────────────────────────── */
+.sk-flash-mt        { margin-top: 12px; }
+.sk-admin-h3        { margin: 20px 0 8px; }
+.sk-admin-note      { font-size: 0.82rem; color: #888; margin-bottom: 12px; }
+.sk-admin-level-lbl { width: 180px; display: inline-block; font-weight: 600; }
+
+/* ── project_skills misc ─────────────────────────────────────── */
+.sk-submit-mt { margin-top: 16px; }

@@ -8,30 +8,30 @@
 
 <h3 class="subskills-category-title">Kompetenz-Katalog</h3>
 <% @categories.each do |cat| %>
-  <h4 style="margin:12px 0 4px;font-size:0.85rem;color:#555;"><%= cat %></h4>
-  <table class="list" style="margin-bottom:8px;">
+  <h4 class="sk-cat-heading"><%= cat %></h4>
+  <table class="list sk-table-mb">
     <tbody>
       <% @skills.select { |s| s.category == cat }.each_with_index do |skill, i| %>
         <tr class="<%= i.even? ? 'even' : 'odd' %>">
-          <td style="font-weight:500;width:220px;"><%= skill.name %></td>
-          <td style="font-size:0.82rem;color:#555;"><%= skill.description.presence || '–' %></td>
+          <td class="sk-cat-name-col"><%= skill.name %></td>
+          <td class="sk-cat-desc-col"><%= skill.description.presence || '–' %></td>
         </tr>
       <% end %>
     </tbody>
   </table>
 <% end %>
 
-<h3 class="subskills-category-title" style="margin-top:24px;">Rollen-Katalog</h3>
+<h3 class="subskills-category-title">Rollen-Katalog</h3>
 <% @role_cats.each do |cat| %>
-  <h4 style="margin:12px 0 4px;font-size:0.85rem;color:#555;"><%= cat.sub(/\A[A-Z]\.\s*/, '') %></h4>
-  <table class="list" style="margin-bottom:8px;">
+  <h4 class="sk-cat-heading"><%= cat.sub(/\A[A-Z]\.\s*/, '') %></h4>
+  <table class="list sk-table-mb">
     <tbody>
       <% @roles.select { |r| r.category == cat }.each_with_index do |role, i| %>
         <tr class="<%= i.even? ? 'even' : 'odd' %>">
-          <td style="width:240px;">
+          <td class="sk-role-name-col">
             <%= link_to role.name, subskills_role_path(role) %>
           </td>
-          <td style="font-size:0.82rem;color:#888;">
+          <td class="sk-role-desc-col">
             <% req_count = role.requirements.select { |r| r.importance > 0 }.count %>
             <%= req_count %> Kompetenz-Anforderungen
           </td>

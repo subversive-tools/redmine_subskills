@@ -7,22 +7,22 @@
 <%= render partial: 'subskills/tabs', locals: { current_tab: current_tab } %>
 
 <% if @target_user != User.current %>
-  <p style="color:#888;font-size:0.85rem;margin-bottom:8px;">
+  <p class="sk-note-sm">
     Rollen-Passung von: <strong><%= @target_user.name %></strong>
   </p>
 <% end %>
 
-<p style="font-size:0.82rem;color:#666;margin-bottom:12px;">
+<p class="sk-intro">
   Wie gut passen deine Selbsteinschätzungen zu den Anforderungen jeder Rolle?
 </p>
 
-<table class="list" style="max-width:600px;">
+<table class="list sk-table-narrow">
   <thead>
     <tr>
       <th>Rolle</th>
       <th>Kategorie</th>
-      <th style="width:180px;">Fit-Score</th>
-      <th style="width:50px;text-align:right;">%</th>
+      <th class="sk-th-score">Fit-Score</th>
+      <th class="sk-th-pct">%</th>
     </tr>
   </thead>
   <tbody>
@@ -34,7 +34,7 @@
         <td>
           <%= link_to role.name, subskills_role_path(role) %>
         </td>
-        <td style="font-size:0.8rem;color:#888;">
+        <td class="sk-td-muted">
           <%= role.category.sub(/\A[A-Z]\.\s*/, '') %>
         </td>
         <td>
@@ -42,7 +42,7 @@
             <div class="sk-fit-bar-fill <%= css %>" style="width:<%= score %>%;"></div>
           </div>
         </td>
-        <td style="text-align:right;font-weight:700;" class="<%= css %>">
+        <td class="sk-td-pct <%= css %>">
           <%= score %>%
         </td>
       </tr>
@@ -50,7 +50,7 @@
   </tbody>
 </table>
 
-<div class="subskills-legend" style="margin-top:12px;">
+<div class="subskills-legend">
   <span class="sk-legend-item fit-high">≥ 70% – Gute Passung</span>
   <span class="sk-legend-item fit-mid">40–69% – Teilweise</span>
   <span class="sk-legend-item fit-low">&lt; 40% – Lücken vorhanden</span>

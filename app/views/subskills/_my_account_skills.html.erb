@@ -4,15 +4,15 @@
    level_labels = ['–', 'Grundkenntnisse', 'Anwender', 'Fortgeschritten', 'Experte', 'Spezialist']
    level_colors = ['#aaa', '#90b8d8', '#5b9ec9', '#2e78b7', '#1a5c99', '#0d3d6b'] %>
 
-<h3 style="margin:20px 0 8px;">Skills</h3>
+<h3 class="sk-profile-h3">Skills</h3>
 
 <% if can_edit %>
-  <p style="font-size:0.8rem;color:#888;margin-bottom:10px;">
+  <p class="sk-profile-edit-p">
     <a href="<%= url_for(controller: 'subskills', action: 'my_skills_current') %>">Skills bearbeiten →</a>
   </p>
 <% end %>
 
-<table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+<table class="sk-profile-table">
 <% first_root_shown = false %>
 <% tree_rows.each do |row| %>
   <% skill = row[:skill]; depth = row[:depth] %>
@@ -26,13 +26,13 @@
     <thead>
       <tr>
         <th style="text-align:left;padding:<%= depth == 0 ? '8px' : '4px' %> 4px 2px;
-                   padding-left: <%= 4 + depth * 12 %>px;
+                   padding-left:<%= 4 + depth * 12 %>px;
                    font-weight:600;color:#444;font-size:<%= depth == 0 ? '0.85rem' : '0.8rem' %>;"
         ><%= skill.name %></th>
-        <th style="text-align:center;font-size:0.75rem;color:#bbb;font-weight:normal;">
+        <th class="sk-profile-th">
           <%= (depth == 0 && !first_root_shown) ? 'Level' : '' %>
         </th>
-        <th style="width:54px;text-align:center;font-size:0.75rem;color:#bbb;font-weight:normal;">
+        <th class="sk-profile-th sk-profile-th--lernziel">
           <%= (depth == 0 && !first_root_shown) ? 'Lernziel' : '' %>
         </th>
       </tr>
@@ -51,33 +51,32 @@
        }.to_json %>
 
     <tbody>
-    <tr style="border-bottom:1px solid #f5f5f5;"
+    <tr class="sk-row-divider"
         data-current-level="<%= current_level %>"
         data-level-descs='<%= descs_json %>'>
 
-      <td style="padding:4px 4px 2px; padding-left: <%= 4 + depth * 12 %>px;">
+      <td style="padding:4px 4px 2px;padding-left:<%= 4 + depth * 12 %>px;">
         <%= skill.name %>
-        <div class="sk-level-desc"
-             style="font-size:0.75rem;color:#bbb;padding-left:6px;margin-top:1px;min-height:1em;">
+        <div class="sk-level-desc">
           <%= level_descs[[skill.id, current_level]] %>
         </div>
       </td>
 
       <% dot_color = current_level > 0 ? level_colors[current_level] : '#ccc' %>
-      <td style="text-align:center;padding:4px 8px;vertical-align:top;padding-top:6px;">
-        <div style="display:inline-flex;gap:4px;align-items:center;">
+      <td class="sk-td-center-top">
+        <div class="sk-flex-dots">
           <% (1..5).each do |lvl| %>
             <span title="<%= level_labels[lvl] %>"
-                  style="display:inline-block;width:12px;height:12px;border-radius:50%;
-                         border:2px solid <%= current_level >= lvl ? dot_color : '#ccc' %>;
+                  class="sk-dot"
+                  style="border:2px solid <%= current_level >= lvl ? dot_color : '#ccc' %>;
                          background:<%= current_level >= lvl ? dot_color : 'transparent' %>;"></span>
           <% end %>
         </div>
       </td>
 
-      <td style="text-align:center;padding:4px;vertical-align:top;padding-top:1px;">
+      <td class="sk-td-star-col">
         <% if learn %>
-          <span style="color:#e53935;font-size:1rem;" title="Lernziel">★</span>
+          <span class="sk-star-red" title="Lernziel">★</span>
         <% end %>
       </td>
     </tr>

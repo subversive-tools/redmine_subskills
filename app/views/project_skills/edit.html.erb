@@ -4,7 +4,7 @@
 
 <h2>Skill-Anforderungen bearbeiten</h2>
 
-<p style="font-size:0.82rem;color:#666;margin-bottom:16px;">
+<p class="sk-intro">
   Lege fest, welche Skills für dieses Projekt erwartet werden und wie wichtig sie sind.
   Nicht ausgewählte Skills werden nicht berücksichtigt.
 </p>
@@ -16,7 +16,7 @@
     <tr>
       <th class="name">Name</th>
       <th class="short_description">Beschreibung</th>
-      <th style="width:180px;">Anforderung</th>
+      <th class="sk-th-req">Anforderung</th>
     </tr>
   </thead>
   <tbody>
@@ -34,7 +34,7 @@
           <% end %>
           <%= skill.name %>
           <% if skill.composite? && !is_root %>
-            <em style="font-size:0.75rem;color:#999;margin-left:4px;">(aggregiert)</em>
+            <em class="sk-text-hint">(aggregiert)</em>
           <% end %>
         </td>
         <td class="short_description"><%= skill.description %></td>
@@ -49,7 +49,7 @@
               <% end %>
             </select>
           <% else %>
-            <span style="font-size:0.78rem;color:#bbb;">—</span>
+            <span class="sk-text-dash">—</span>
           <% end %>
         </td>
       </tr>
@@ -57,7 +57,7 @@
   </tbody>
 </table>
 
-<p style="margin-top:16px;">
+<p class="sk-submit-mt">
   <%= submit_tag 'Speichern', class: 'button-positive' %>
   <%= link_to 'Abbrechen', project_skills_path(@project) %>
 </p>

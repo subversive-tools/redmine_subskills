@@ -2,12 +2,6 @@
   <%= stylesheet_link_tag 'subskills', plugin: 'redmine_subskills' %>
 <% end %>
 
-<style>
-  .subskills-admin-form .tabular label {
-    line-height: 18px;
-    margin-right: 0.5rem;
-  }
-</style>
 
 <h2><%= @skill.new_record? ? 'Neuer Skill' : "Skill bearbeiten: #{@skill.name}" %></h2>
 
@@ -53,19 +47,19 @@
 
   <%# Level-Beschreibungen – nur für Blatt-Skills sinnvoll %>
   <% if @skill.composite? %>
-    <div class="flash warning" style="margin-top:12px;">
+    <div class="flash warning sk-flash-mt">
       Dieser Skill hat Unter-Skills — sein Score wird automatisch berechnet.<br>
       Level-Beschreibungen werden nicht für manuelle Bewertung genutzt.
     </div>
   <% end %>
   <% if @skill.persisted? && @skill.user_skills.any? %>
-    <div class="flash warning" style="margin-top:12px;">
+    <div class="flash warning sk-flash-mt">
       Dieser Skill hat <%= @skill.user_skills.count %> Bewertung(en) — er kann keine Unter-Skills mehr bekommen.
     </div>
   <% end %>
 
-  <h3 style="margin: 20px 0 8px;">Level-Beschreibungen</h3>
-  <p style="font-size:0.82rem;color:#888;margin-bottom:12px;">
+  <h3 class="sk-admin-h3">Level-Beschreibungen</h3>
+  <p class="sk-admin-note">
     Was bedeutet jeder Level für diesen Skill? Diese Texte werden dem User beim Auswählen angezeigt.
   </p>
 
@@ -76,7 +70,7 @@
       <%= lf.hidden_field :level %>
       <% lvl = lf.object.level %>
       <p>
-        <label style="width:180px;display:inline-block;font-weight:600;">
+        <label class="sk-admin-level-lbl">
           Level <%= lvl %> – <%= level_names[lvl] %>
         </label>
         <%= lf.text_area :description, rows: 2, cols: 55,

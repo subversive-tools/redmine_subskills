@@ -3,10 +3,10 @@
   <%= link_to new_subskills_admin_path, class: 'icon icon-add' do %>
     <%= sprite_icon('add') %><span class="icon-label">Neuer Skill</span>
   <% end %>
-  <span class="drdn" id="sk-top-drdn" style="position:relative;display:inline-block;margin-left:4px;">
+  <span class="drdn sk-drdn-wrap" id="sk-top-drdn">
     <a href="#" class="icon-only icon-actions" title="Aktionen"
        onclick="skDrdnToggle(event,'sk-top-drdn');return false;"></a>
-    <ul class="sk-drdn-items" style="display:none;">
+    <ul class="sk-drdn-items">
       <li>
         <%= form_with url: import_csv_subskills_admin_index_path, multipart: true, local: true do |f| %>
           <%= f.file_field :csv_file, accept: '.csv', style: 'display:none;',
@@ -26,9 +26,7 @@
 <h2>Skills</h2>
 
 <%# Toast-Nachricht für Drag-Fehler %>
-<div id="sk-toast" style="display:none;position:fixed;bottom:20px;right:20px;z-index:9999;
-     padding:10px 16px;background:#c0392b;color:#fff;border-radius:4px;font-size:0.85rem;
-     box-shadow:0 2px 8px rgba(0,0,0,.3);"></div>
+<div id="sk-toast"></div>
 
 <% if @tree_rows.empty? %>
   <p class="nodata">Keine Skills vorhanden.</p>
@@ -45,7 +43,7 @@
       </th>
       <th class="name">Name</th>
       <th class="short_description">Beschreibung</th>
-      <th style="width:80px;text-align:right;">Gewichtung</th>
+      <th class="sk-th-weight">Gewichtung</th>
       <th class="buttons"></th>
     </tr>
   </thead>
@@ -78,17 +76,17 @@
 
         <td class="short_description"><%= skill.description %></td>
 
-        <td style="text-align:right;color:#888;font-size:0.85rem;padding-right:8px;">
+        <td class="sk-td-weight">
           <% unless is_root || skill.parent_id.nil? %>
             <%= number_with_precision(skill.weight, precision: 1, strip_insignificant_zeros: true) %>
           <% end %>
         </td>
 
         <td class="buttons">
-          <span style="position:relative;display:inline-block;">
+          <span class="sk-drdn-cell">
             <a href="#" class="icon-only icon-actions" title="Aktionen"
                onclick="skRowToggle(event,this);return false;"></a>
-            <ul class="sk-drdn-items" style="display:none;">
+            <ul class="sk-drdn-items">
               <li><%= link_to 'Bearbeiten', edit_subskills_admin_path(skill),
                           class: 'sk-drdn-item icon icon-edit' %></li>
               <li><%= link_to 'Kopieren', new_subskills_admin_path(copy_from: skill.id),

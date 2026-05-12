@@ -35,7 +35,7 @@
                 <% prio  = cell.is_a?(Hash) ? cell[:learn_priority].to_i : 0 %>
                 <td class="sk-level-cell sk-level-<%= level %>" title="<%= user.name %>: Level <%= level %>">
                   <span class="sk-badge"><%= level %></span>
-                  <% if prio > 0 %><span title="Lernziel" style="font-size:0.7rem;">★</span><% end %>
+                  <% if prio > 0 %><span title="Lernziel" class="sk-star-mini">★</span><% end %>
                 </td>
               <% end %>
             </tr>

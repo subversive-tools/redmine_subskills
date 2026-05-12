@@ -7,12 +7,12 @@
   <% else %>Skills: <%= @target_user.name %><% end %>
 </h2>
 
-<div id="sk-save-indicator" class="sk-save-indicator" style="display:none;"></div>
+<div id="sk-save-indicator" class="sk-save-indicator"></div>
 
 <% save_url = @target_user == User.current ? update_my_skill_subskills_path :
                                               update_single_skill_subskills_path(user_id: @target_user.id) %>
 
-<p style="font-size:0.85rem;margin-bottom:16px;">
+<p class="sk-intro-sm">
   <a href="<%= url_for(controller: 'users', action: 'show', id: @target_user.id) %>">← Zurück zum Profil</a>
 </p>
 
@@ -28,33 +28,28 @@
     <% agg = (@score_map[skill.id] || 0.0) %>
     <% agg_r = agg.round %>
 
-    <div style="margin-top:<%= depth == 0 ? '28px' : '16px' %>;
-                padding-left:<%= depth * 16 %>px;">
+    <div style="margin-top:<%= depth == 0 ? '28px' : '16px' %>;padding-left:<%= depth * 16 %>px;">
       <%# Header row %>
-      <div style="display:flex;align-items:center;gap:10px;
-                  border-bottom:1px solid #ddd;padding-bottom:4px;margin-bottom:6px;">
-        <span style="font-weight:700;font-size:<%= depth == 0 ? '0.95rem' : '0.88rem' %>;
-                     color:#333;flex:1;">
+      <div class="sk-group-header">
+        <span class="sk-skill-title <%= depth == 0 ? 'sk-skill-title--root' : 'sk-skill-title--sub' %>">
           <%= skill.name %>
           <% if skill.description.present? %>
-            <abbr title="<%= skill.description %>" style="cursor:help;font-size:0.75rem;
-                         color:#999;border-bottom:1px dotted #999;margin-left:4px;">?</abbr>
+            <abbr title="<%= skill.description %>" class="sk-help-abbr">?</abbr>
           <% end %>
         </span>
         <%# Aggregate dots (muted) %>
-        <span style="display:inline-flex;gap:3px;" title="Aggregierter Score: <%= sprintf('%.1f', agg) %>">
+        <span class="sk-agg-dots" title="Aggregierter Score: <%= sprintf('%.1f', agg) %>">
           <% (1..5).each do |l| %>
             <% c = agg_r >= l ? dot_colors[agg_r] : '#ddd' %>
-            <span style="width:9px;height:9px;border-radius:50%;background:<%= c %>;
-                         border:1px solid <%= c %>;opacity:0.6;display:inline-block;"></span>
+            <span class="sk-agg-dot" style="background:<%= c %>;border-color:<%= c %>;"></span>
           <% end %>
         </span>
-        <span style="font-size:0.7rem;color:#bbb;"><%= sprintf('%.1f', agg) %></span>
+        <span class="sk-agg-score"><%= sprintf('%.1f', agg) %></span>
       </div>
 
       <%# Sub-skill compact rows — find direct children in tree %>
       <% children = @tree_rows.select { |r| r[:skill].parent_id == skill.id } %>
-      <table style="width:100%;border-collapse:collapse;">
+      <table class="sk-subtable">
         <% children.each do |cr| %>
           <% cs = cr[:skill] %>
           <% us = @user_skills[cs.id] %>
@@ -64,8 +59,7 @@
 
           <% if cs.composite? %>
             <%# Nested composite — just a sub-header (recursion handled by outer loop) %>
-            <tr><td colspan="3" style="padding:6px 0 2px;padding-left:12px;
-                font-weight:600;font-size:0.82rem;color:#555;border-bottom:1px solid #eee;">
+            <tr><td colspan="3" class="sk-sub-header-td">
               <%= cs.name %>
             </td></tr>
           <% else %>
@@ -73,7 +67,7 @@
             <% lvl       = us&.level.to_i %>
             <% star      = us&.learn_priority.to_i > 0 %>
             <% lvl_descs = @level_descriptions[cs.id] || {} %>
-            <tr><td colspan="3" style="padding:0;">
+            <tr><td colspan="3" class="sk-td-p0">
             <div class="sk-skill-block"
                  data-skill-id="<%= cs.id %>"
                  data-save-url="<%= save_url %>"
@@ -84,7 +78,7 @@
                 <span class="sk-skill-name">
                   <%= cs.name %>
                   <% if cs.weight && cs.weight.to_f != 1.0 %>
-                    <span style="font-size:0.72rem;color:#bbb;margin-left:4px;">
+                    <span class="sk-weight-tag">
                       (×<%= number_with_precision(cs.weight, precision: 1, strip_insignificant_zeros: true) %>)
                     </span>
                   <% end %>
@@ -100,10 +94,9 @@
               </div>
               <div class="sk-skill-body">
                 <% (0..5).each do |l| %>
-                  <div class="sk-level-row <%= 'sk-level-row--active' if l == lvl %>"
+                  <div class="sk-level-row <%= 'sk-level-row--active' if l == lvl %> <%= 'sk-level-row--editable' if @editable %>"
                        id="sk-lrow-<%= cs.id %>-<%= l %>"
-                       <% if @editable %>onclick="skSelectLevel(<%= cs.id %>, <%= l %>)"<% end %>
-                       style="<%= @editable ? 'cursor:pointer;' : '' %>">
+                       <% if @editable %>onclick="skSelectLevel(<%= cs.id %>, <%= l %>)"<% end %>>
                     <span class="sk-option-btn sk-level-<%= l %> <%= 'sk-option-btn--active' if l == lvl %>">
                       <%= l %>
                     </span>
@@ -147,10 +140,9 @@
       </div>
       <div class="sk-skill-body">
         <% (0..5).each do |lvl| %>
-          <div class="sk-level-row <%= 'sk-level-row--active' if lvl == current_level %>"
+          <div class="sk-level-row <%= 'sk-level-row--active' if lvl == current_level %> <%= 'sk-level-row--editable' if @editable %>"
                id="sk-lrow-<%= skill.id %>-<%= lvl %>"
-               <% if @editable %>onclick="skSelectLevel(<%= skill.id %>, <%= lvl %>)"<% end %>
-               style="<%= @editable ? 'cursor:pointer;' : '' %>">
+               <% if @editable %>onclick="skSelectLevel(<%= skill.id %>, <%= lvl %>)"<% end %>>
             <span class="sk-option-btn sk-level-<%= lvl %> <%= 'sk-option-btn--active' if lvl == current_level %>">
               <%= lvl %>
             </span>

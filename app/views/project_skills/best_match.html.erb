@@ -8,7 +8,7 @@
   <%= link_to '← Anforderungen', project_skills_path(@project), class: 'icon icon-list' %>
 </div>
 
-<p style="font-size:0.82rem;color:#666;margin-bottom:12px;">
+<p class="sk-intro">
   Rangfolge aller aktiven User nach Übereinstimmung mit den Skill-Anforderungen dieses Projekts.
 </p>
 
@@ -18,13 +18,13 @@
     <%= link_to 'jetzt konfigurieren', edit_project_skills_path(@project) %>.
   </p>
 <% else %>
-  <table class="list" style="max-width:640px;">
+  <table class="list sk-table-wide">
     <thead>
       <tr>
-        <th style="width:32px;">#</th>
+        <th class="sk-th-rank">#</th>
         <th>Person</th>
-        <th style="width:220px;">Fit-Score</th>
-        <th style="width:50px;text-align:right;">%</th>
+        <th class="sk-th-score-xl">Fit-Score</th>
+        <th class="sk-th-pct">%</th>
       </tr>
     </thead>
     <tbody>
@@ -32,7 +32,7 @@
         <% score = entry[:score] %>
         <% css   = score >= 70 ? 'fit-high' : score >= 40 ? 'fit-mid' : 'fit-low' %>
         <tr class="<%= i.even? ? 'even' : 'odd' %>">
-          <td style="color:#aaa;font-size:0.85rem;"><%= i + 1 %></td>
+          <td class="sk-td-rank"><%= i + 1 %></td>
           <td>
             <%= link_to entry[:user].name,
                 user_skills_subskills_path(user_id: entry[:user].id) %>
@@ -42,7 +42,7 @@
               <div class="sk-fit-bar-fill <%= css %>" style="width:<%= score %>%;"></div>
             </div>
           </td>
-          <td style="text-align:right;font-weight:700;" class="<%= css %>">
+          <td class="sk-td-pct <%= css %>">
             <%= score %>%
           </td>
         </tr>
@@ -50,7 +50,7 @@
     </tbody>
   </table>
 
-  <div class="subskills-legend" style="margin-top:12px;">
+  <div class="subskills-legend">
     <span class="sk-legend-item fit-high">≥ 70% – Gute Passung</span>
     <span class="sk-legend-item fit-mid">40–69% – Teilweise</span>
     <span class="sk-legend-item fit-low">&lt; 40% – Lücken</span>
