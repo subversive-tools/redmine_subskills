@@ -4,6 +4,15 @@ _Stand: Mai 2026 · Verantwortlich: IT-Abteilung_
 
 ---
 
+## Verwandte Dokumente
+
+| Dokument | Inhalt |
+|---|---|
+| [Organisationskonzept](organisationskonzept.md) | IT-Organisationsmodell (Anforderungen → Systeme ← IT-Org) und Herleitung der Kompetenzfelder |
+| [Rollenkonzept](rollenkonzept.md) | Vollständiger Rollen-Katalog, Hüte-Prinzip, Verteilungsmechanismus und Rollen-Kompetenz-Verknüpfung |
+
+---
+
 ## 1. Zielsetzung
 
 Das Plugin ermöglicht eine strukturierte, teamweite Selbsteinschätzung von **IT-Fach- und Sozialkompetenzen** direkt in Redmine. Ziel ist es, Kompetenzlücken sichtbar zu machen, Lernziele zu definieren und die Passung zwischen Personen und Rollen zu verbessern – ohne externen Tool-Overhead.
