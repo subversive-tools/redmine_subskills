@@ -1,6 +1,6 @@
 Redmine::Plugin.register :redmine_subskills do
   name        'Redmine Subskills'
-  author      'Simon Mischke'
+  author      'Stefan Mischke'
   description 'Skill Management and Role matrix for Redmine'
   version     '0.1.0'
 
