@@ -1,0 +1,38 @@
+# OS-spezifisch (MacOS, Windows, etc.)
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+
+# Editor & IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Logs & Temp-Dateien
+/log/*
+/tmp/*
+
+# Ruby / Bundler (falls direkt im Plugin-Ordner gemanagt wird)
+/.bundle/
+/vendor/bundle/
+/vendor/ruby/
+*.gem
+
+# Node.js / NPM (falls zukünftig Frontend-Build-Tools hinzukommen)
+node_modules/
+npm-debug.log*
+yarn-error.log*
+yarn.lock
+package-lock.json
+
+# Test-Coverage & Caches
+/coverage/
+/.rspec
+
+# Interne Dokumentation
+/docs/intern/

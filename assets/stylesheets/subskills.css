@@ -382,6 +382,7 @@ td.fit-low  { color: #8d1f00; }
 
 /* Top drdn + row drdn shared dropdown */
 .sk-drdn-items {
+  display: none; /* hidden by default; JS toggles to block */
   position: absolute;
   right: 0;
   top: 100%;

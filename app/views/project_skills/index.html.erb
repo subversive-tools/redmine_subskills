@@ -181,7 +181,10 @@
   /* ── Column reorder ── */
   function reorderColumns(orderedIds) {
     table.querySelectorAll('tr').forEach(function(row) {
-      var userCells = Array.from(row.querySelectorAll('[data-user-id]'));
+      /* Nur direkte Kind-Elemente mit data-user-id – keine verschachtelten (z.B. Button in tfoot-td) */
+      var userCells = Array.from(row.children).filter(function(c) {
+        return c.dataset && c.dataset.userId;
+      });
       if (!userCells.length) return;
       var map = {};
       userCells.forEach(function(c) { map[c.dataset.userId] = c; });
@@ -192,7 +195,10 @@
 
   /* ── Sort by skill level ── */
   function sortBySkill(row) {
-    var cells = Array.from(row.querySelectorAll('[data-user-id]'));
+    /* Nur direkte Kind-TDs der angeklickten Zeile lesen */
+    var cells = Array.from(row.children).filter(function(c) {
+      return c.dataset && c.dataset.userId;
+    });
     if (!cells.length) return;
     var pairs = cells.map(function(c) {
       return { uid: c.dataset.userId, lvl: parseInt(c.dataset.level || '0') };
