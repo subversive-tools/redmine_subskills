@@ -26,13 +26,7 @@
       <%= f.select :parent_id, @parent_options, { include_blank: '— kein (Root-Skill) —' } %>
       <em class="info">Nur Skills wählen, die noch keine Bewertungen haben.</em>
     </p>
-    <% if @skill.parent_id.present? %>
-    <p>
-      <%= f.label :weight, 'Gewichtung' %>
-      <%= f.number_field :weight, step: 0.1, min: 0.1, value: @skill.weight || 1.0, size: 6 %>
-      <em class="info">Relative Gewichtung dieses Skills im Eltern-Score (Standard: 1.0).</em>
     </p>
-    <% end %>
     <p>
       <%= f.label :description, 'Kurzbeschreibung (Tooltip)' %>
       <%= f.text_area :description, rows: 2, cols: 60,
@@ -63,7 +57,15 @@
     Was bedeutet jeder Level für diesen Skill? Diese Texte werden dem User beim Auswählen angezeigt.
   </p>
 
-  <% level_names = ['–', 'Grundkenntnisse', 'Anwender', 'Fortgeschritten', 'Experte', 'Spezialist'] %>
+  <% 
+    level_names = {
+      1 => 'Grundkenntnisse',
+      2 => 'Anwender / Basic',
+      3 => 'Fortgeschritten',
+      4 => 'Spezialist',
+      5 => 'Experte'
+    }
+  %>
 
   <div class="box tabular">
     <%= f.fields_for :level_descriptions, @skill.level_descriptions.sort_by(&:level) do |lf| %>

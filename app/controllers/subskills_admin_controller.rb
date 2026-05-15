@@ -152,10 +152,10 @@ class SubskillsAdminController < ApplicationController
                   .each_with_object({}) { |d, h| (h[d.subskill_skill_id] ||= {})[d.level] = d.description }
 
     csv_data = CSV.generate(headers: true, encoding: 'UTF-8') do |csv|
-      csv << ['name', 'parent', 'weight', 'description', 'level_1', 'level_2', 'level_3', 'level_4', 'level_5']
+      csv << ['name', 'parent', 'description', 'level_1', 'level_2', 'level_3', 'level_4', 'level_5']
       skills.each do |s|
         ld = descs_map[s.id] || {}
-        csv << [s.name, s.parent&.name, s.weight, s.description, ld[1], ld[2], ld[3], ld[4], ld[5]]
+        csv << [s.name, s.parent&.name, s.description, ld[1], ld[2], ld[3], ld[4], ld[5]]
       end
     end
 
@@ -186,7 +186,6 @@ class SubskillsAdminController < ApplicationController
       skill = SubskillSkill.find_or_initialize_by(name: name)
       is_new = skill.new_record?
       skill.parent_id  = parent&.id
-      skill.weight     = row[:weight]&.strip.presence&.to_f || 1.0
       skill.description = row[:description]&.strip if row[:description].present?
       skill.active     = true if is_new
       skill.position ||= SubskillSkill.maximum(:position).to_i + 1
@@ -233,7 +232,7 @@ class SubskillsAdminController < ApplicationController
 
   def skill_params
     params.require(:subskill_skill).permit(
-      :name, :description, :position, :active, :parent_id, :weight,
+      :name, :description, :position, :active, :parent_id,
       level_descriptions_attributes: [:id, :level, :description]
     )
   end

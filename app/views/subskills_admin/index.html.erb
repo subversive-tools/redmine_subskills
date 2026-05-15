@@ -1,3 +1,7 @@
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag 'subskills', plugin: 'redmine_subskills' %>
+<% end %>
+
 <%# ─── Contextual toolbar ─────────────────────────────────────────────────── %>
 <div class="contextual">
   <%= link_to new_subskills_admin_path, class: 'icon icon-add' do %>
@@ -43,7 +47,6 @@
       </th>
       <th class="name">Name</th>
       <th class="short_description">Beschreibung</th>
-      <th class="sk-th-weight">Gewichtung</th>
       <th class="buttons"></th>
     </tr>
   </thead>
@@ -75,12 +78,6 @@
         </td>
 
         <td class="short_description"><%= skill.description %></td>
-
-        <td class="sk-td-weight">
-          <% unless is_root || skill.parent_id.nil? %>
-            <%= number_with_precision(skill.weight, precision: 1, strip_insignificant_zeros: true) %>
-          <% end %>
-        </td>
 
         <td class="buttons">
           <span class="sk-drdn-cell">
@@ -119,12 +116,24 @@
 window.skDrdnToggle = function(e, id) {
   e.preventDefault(); e.stopPropagation();
   var m = document.getElementById(id).querySelector('.sk-drdn-items');
-  var o = m.style.display !== 'none'; skCloseAll(); if (!o) m.style.display = 'block';
+  var o = m.style.display === 'block'; skCloseAll(); 
+  if (!o) {
+    m.style.position = 'absolute';
+    m.style.left = '';
+    m.style.top = '100%';
+    m.style.display = 'block';
+  }
 };
 window.skRowToggle = function(e, btn) {
   e.preventDefault(); e.stopPropagation();
   var m = btn.parentElement.querySelector('.sk-drdn-items');
-  var o = m.style.display !== 'none'; skCloseAll(); if (!o) m.style.display = 'block';
+  var o = m.style.display === 'block'; skCloseAll(); 
+  if (!o) {
+    m.style.position = 'absolute';
+    m.style.left = '';
+    m.style.top = '100%';
+    m.style.display = 'block';
+  }
 };
 function skCloseAll() {
   document.querySelectorAll('.sk-drdn-items').forEach(function(m){ m.style.display='none'; });
@@ -151,9 +160,27 @@ function isDescendantOf(row, ancestorId) {
 }
 
 // ── Checkbox ──────────────────────────────────────────────────────────────────
+function skUpdateRowHighlight(cb) {
+  var row = cb.closest('.sk-row');
+  if (row) {
+    if (cb.checked) {
+      row.classList.add('context-menu-selection');
+    } else {
+      row.classList.remove('context-menu-selection');
+    }
+  }
+}
+
 window.skCheckAll = function(master) {
-  document.querySelectorAll('.sk-row-check').forEach(function(cb){ cb.checked = master.checked; });
+  document.querySelectorAll('.sk-row-check').forEach(function(cb){ 
+    cb.checked = master.checked; 
+    skUpdateRowHighlight(cb);
+  });
 };
+
+document.querySelectorAll('.sk-row-check').forEach(function(cb) {
+  cb.addEventListener('change', function() { skUpdateRowHighlight(cb); });
+});
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
 function showToast(msg, ok) {
@@ -218,6 +245,19 @@ document.querySelectorAll('.sk-row').forEach(function(row) {
   var handle = row.querySelector('.sk-drag-handle');
   if (!handle) return;
   handle.style.cursor = 'grab';
+
+  // ── Context Menu (Right Click) ──
+  row.addEventListener('contextmenu', function(e) {
+    var m = row.querySelector('.sk-drdn-items');
+    if (!m) return;
+    e.preventDefault();
+    e.stopPropagation();
+    skCloseAll();
+    m.style.position = 'fixed';
+    m.style.left = e.clientX + 'px';
+    m.style.top = e.clientY + 'px';
+    m.style.display = 'block';
+  });
 
   handle.addEventListener('mousedown', function() { row.setAttribute('draggable', 'true'); });
 

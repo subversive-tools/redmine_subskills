@@ -1,7 +1,8 @@
 class ProjectSkillsController < ApplicationController
   menu_item :subskills
   before_action :find_project
-  before_action :authorize
+  before_action :authorize, except: [:edit, :update]
+  before_action :authorize_manage_subskills, only: [:edit, :update]
   before_action :find_or_init_skill_role
 
   # GET /projects/:project_id/skills
@@ -20,10 +21,14 @@ class ProjectSkillsController < ApplicationController
 
     # Integrated best match
     @project_users = User.active.sort_by(&:name)
-    all_us = SubskillUserSkill.where(user_id: @project_users.map(&:id))
+    all_us = SubskillUserSkill.where(user_id: @project_users.map(&:id)).includes(:endorsements)
     @user_skill_map = all_us.each_with_object({}) do |us, h|
       h[us.user_id] ||= {}
-      h[us.user_id][us.subskill_skill_id] = { level: us.level, star: us.learn_priority.to_i > 0 }
+      h[us.user_id][us.subskill_skill_id] = { 
+        level: us.level, 
+        star: us.learn_priority.to_i > 0,
+        endorse_count: us.endorsements.size
+      }
     end
     req_max = @req_map.values.sum * 5
     @fit_scores = @project_users.map do |u|
@@ -36,6 +41,12 @@ class ProjectSkillsController < ApplicationController
       end
       { user: u, score: pct }
     end.sort_by { |x| -x[:score] }
+
+    # Fetch roles for shown users in this project
+    memberships = Member.where(project_id: @project.id, user_id: @project_users.map(&:id)).includes(:roles)
+    @user_roles_map = memberships.each_with_object({}) do |m, h|
+      h[m.user_id] = m.roles.sort_by(&:position).map(&:name).join(', ')
+    end
 
     # Exclude users who have level=0 and no star for ANY skill
     # that is marked as "Erforderlich" (importance = 3)
@@ -109,5 +120,14 @@ class ProjectSkillsController < ApplicationController
     @skill_role = SubskillProjectRole.find_or_create_by!(project_id: @project.id) do |r|
       r.category = ''
     end
+  end
+
+  def authorize_manage_subskills
+    # Allow if user has explicit permission OR is a project manager/admin
+    allowed = User.current.allowed_to?(:manage_subskills, @project) || 
+              User.current.allowed_to?(:manage_project, @project) ||
+              User.current.allowed_to?(:manage_members, @project)
+    
+    allowed ? true : deny_access
   end
 end

@@ -3,8 +3,13 @@
 <% end %>
 
 <div class="contextual">
-  <% if User.current.allowed_to?(:manage_subskills, @project) %>
-    <%= link_to 'Anforderungen bearbeiten', edit_project_skills_path(@project), class: 'icon icon-edit' %>
+  <% if User.current.allowed_to?(:manage_subskills, @project) || User.current.allowed_to?(:manage_project, @project) || User.current.allowed_to?(:manage_members, @project) %>
+    <%= link_to edit_project_skills_path(@project), class: 'sk-btn-edit-svg' do %>
+      <svg width="16" height="16" class="sk-svg-icon">
+        <use href="/assets/icons-64cb2f36.svg#icon--edit"></use>
+      </svg>
+      Anforderungen bearbeiten
+    <% end %>
   <% end %>
 </div>
 
@@ -25,7 +30,7 @@
 <% if visible_rows.empty? %>
   <p class="nodata">
     Noch keine Skill-Anforderungen definiert.
-    <% if User.current.allowed_to?(:manage_subskills, @project) %>
+    <% if User.current.allowed_to?(:manage_subskills, @project) || User.current.allowed_to?(:manage_project, @project) || User.current.allowed_to?(:manage_members, @project) %>
       <%= link_to 'Jetzt konfigurieren', edit_project_skills_path(@project) %>
     <% end %>
   </p>
@@ -75,7 +80,7 @@
                   onclick="pskToggle(<%= skill.id %>, this)"
                   title="Ein-/Ausklappen"></span>
           <% end %>
-          <%= skill.name %>
+          <span class="psk-skill-name"><%= skill.name %></span>
           <% if skill.composite? && !is_root %>
             <em class="psk-aggregated">(aggregiert)</em>
           <% end %>
@@ -87,18 +92,23 @@
           <% end %>
         </td>
         <% @fit_scores.each do |fs| %>
-          <% entry = skill.children.none? ? (@user_skill_map[fs[:user].id] || {})[skill.id] : nil %>
-          <% lvl   = entry&.dig(:level).to_i %>
-          <% star  = entry&.dig(:star) %>
+          <% entry   = skill.children.none? ? (@user_skill_map[fs[:user].id] || {})[skill.id] : nil %>
+          <% lvl     = entry&.dig(:level).to_i %>
+          <% star    = entry&.dig(:star) %>
+          <% endorse = entry&.dig(:endorse_count).to_i %>
           <td class="psk-td-level" data-user-id="<%= fs[:user].id %>" data-level="<%= lvl %>">
             <% if skill.children.none? %>
               <% if lvl > 0 %>
                 <% desc = @level_descs.dig(skill.id, lvl).presence %>
                 <% tip  = [level_labels[lvl], desc].compact.join(': ') %>
+                <% tip += " (#{endorse} Bestätigungen)" if endorse > 0 %>
                 <span class="psk-level-wrap" title="<%= tip %>">
                   <span class="sk-option-btn sk-level-<%= lvl %> sk-option-btn--active"><%= lvl %></span>
                   <% if star %>
-                    <span class="psk-star-badge" title="Lernziel (Lernziel gesetzt)">★</span>
+                    <span class="psk-star-badge" title="Lernziel"></span>
+                  <% end %>
+                  <% if endorse > 0 %>
+                    <span class="psk-endorse-badge" title="<%= endorse %> Bestätigungen"></span>
                   <% end %>
                 </span>
               <% else %>
@@ -110,8 +120,18 @@
       </tr>
     <% end %>
   </tbody>
-  <% if @can_manage_members %>
   <tfoot>
+    <tr id="psk-roles-row">
+      <td class="name" colspan="3"><span class="psk-add-member-label">Mitglied als…</span></td>
+      <% @fit_scores.each do |fs| %>
+        <td class="psk-td-level" data-user-id="<%= fs[:user].id %>">
+          <div class="psk-roles-text" title="<%= @user_roles_map[fs[:user].id] %>">
+            <%= @user_roles_map[fs[:user].id].presence || '–' %>
+          </div>
+        </td>
+      <% end %>
+    </tr>
+    <% if @can_manage_members %>
     <tr id="psk-add-member-row">
       <td class="name" colspan="3"><span class="psk-add-member-label">Als Mitglied hinzufügen</span></td>
       <% @fit_scores.each do |fs| %>
@@ -123,8 +143,8 @@
         </td>
       <% end %>
     </tr>
+    <% end %>
   </tfoot>
-  <% end %>
 </table>
 </div>
 
@@ -278,6 +298,25 @@
       if (e.target === modal) modal.style.display = 'none';
     });
   }
+
+  /* ── Tooltip-Fix: Hide browser tooltips on click ── */
+  document.addEventListener('click', function(e) {
+    // Wenn in die Tabelle geklickt wird, alle Tooltips kurz verstecken/zeigen
+    if (table.contains(e.target)) {
+      var titled = table.querySelectorAll('[title]');
+      titled.forEach(function(el) {
+        var t = el.getAttribute('title');
+        if (t) {
+          el.setAttribute('data-sk-title', t);
+          el.removeAttribute('title');
+          // Sofort wiederherstellen – der Browser hat das Fenster dann schon geschlossen
+          setTimeout(function() {
+            el.setAttribute('title', el.getAttribute('data-sk-title'));
+          }, 50);
+        }
+      });
+    }
+  });
 
 })();
 </script>

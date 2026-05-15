@@ -236,4 +236,15 @@ class SubskillRole < ActiveRecord::Base
     score = req.sum { |sid, imp| [user_skills_map[sid] || 0, 5].min * imp }
     (score * 100.0 / max).round
   end
+
+  # Returns detailed fit info: [{ skill_name:, req_imp:, user_level: }]
+  def fit_details(user_skills_map)
+    requirements.includes(:skill).map do |r|
+      {
+        skill_name: r.skill.name,
+        req_imp:    r.importance,
+        user_level: user_skills_map[r.subskill_skill_id] || 0.0
+      }
+    end
+  end
 end

@@ -1,56 +1,39 @@
 class SubskillSkill < ActiveRecord::Base
   self.table_name = 'subskill_skills'
 
-  CATEGORIES = [
-    'Systeme',
-    'Entwicklung',
-    'Security',
-    'Betrieb',
-    'Allgemein',
-    'Sozial- & Selbstkompetenz'
-  ].freeze
+  has_many :user_skills, class_name: 'SubskillUserSkill', foreign_key: 'subskill_skill_id', dependent: :destroy
+  has_many :level_descriptions, class_name: 'SubskillLevelDescription', foreign_key: 'subskill_skill_id', dependent: :destroy
+  has_many :role_requirements, class_name: 'SubskillRoleRequirement', foreign_key: 'subskill_skill_id', dependent: :destroy
+  has_many :project_requirements, class_name: 'SubskillProjectRequirement', foreign_key: 'subskill_skill_id', dependent: :destroy
 
-  # ── Tree ──────────────────────────────────────────────────────────────── #
-  belongs_to :parent,   class_name: 'SubskillSkill', foreign_key: 'parent_id', optional: true
-  has_many   :children, -> { order(:position) },
-             class_name: 'SubskillSkill', foreign_key: 'parent_id',
-             dependent: :nullify, inverse_of: :parent
+  belongs_to :parent, class_name: 'SubskillSkill', optional: true
+  has_many :children, class_name: 'SubskillSkill', foreign_key: 'parent_id', dependent: :destroy
 
-  has_many :user_skills,        class_name: 'SubskillUserSkill',       foreign_key: 'subskill_skill_id', dependent: :destroy
-  has_many :level_descriptions, class_name: 'SubskillLevelDescription', foreign_key: 'subskill_skill_id',
-           dependent: :destroy, inverse_of: :skill
+  validates :name,     presence: true, uniqueness: true
+  validates :category, presence: true
 
-  accepts_nested_attributes_for :level_descriptions, allow_destroy: false,
-    reject_if: proc { |a| a['description'].blank? }
+  scope :active, -> { where(active: true) }
+  scope :roots,  -> { where(parent_id: nil) }
+  scope :leaves, -> { where.not(id: SubskillSkill.select(:parent_id).where.not(parent_id: nil)) }
 
-  validates :name, presence: true, uniqueness: true
-  # category kept for legacy CSV compat; no longer required
-
-  scope :active,  -> { where(active: true) }
-  scope :ordered, -> { order(:position, :name) }
-  scope :roots,   -> { where(parent_id: nil).order(:position, :name) }
-  scope :leaves,  -> {
-    parent_ids = unscoped.where.not(parent_id: nil).select(:parent_id)
-    where.not(id: parent_ids)
-  }
-
+  # Default skills to seed
   DEFAULTS = [
-    { name: 'Linux / Server-Administration',          category: 'Systeme' },
-    { name: 'Netzwerk & Firewall',                    category: 'Systeme' },
-    { name: 'Virtualisierung & Containerisierung',    category: 'Systeme' },
-    { name: 'Storage & Backup Management',            category: 'Systeme' },
-    { name: 'IAM & Directory Services',               category: 'Systeme' },
-    { name: 'Cloud & DevOps',                         category: 'Systeme' },
-    { name: 'Python / Scripting',                     category: 'Entwicklung' },
-    { name: 'Applikations- & Plattformentwicklung',   category: 'Entwicklung' },
-    { name: 'Datenbankadministration',                category: 'Entwicklung' },
-    { name: 'Data Engineering & Analytics',           category: 'Entwicklung' },
-    { name: 'IT-Security',                            category: 'Security' },
-    { name: 'Monitoring & Logging',                   category: 'Betrieb' },
-    { name: 'Helpdesk & User Support',                category: 'Betrieb' },
-    { name: 'Dokumentation & Wissensmanagement',      category: 'Betrieb' },
-    { name: 'IT-Projektmanagement',                   category: 'Allgemein' },
-    { name: 'Kommunikation',                           category: 'Sozial- & Selbstkompetenz' },
+    { name: 'Linux / Server-Administration',            category: 'System-Infrastruktur' },
+    { name: 'Netzwerk & Firewall',                      category: 'System-Infrastruktur' },
+    { name: 'Virtualisierung & Containerisierung',      category: 'System-Infrastruktur' },
+    { name: 'Storage & Backup Management',              category: 'System-Infrastruktur' },
+    { name: 'IAM & Directory Services',                 category: 'System-Infrastruktur' },
+    { name: 'Cloud & DevOps',                           category: 'Cloud & Entwicklung' },
+    { name: 'Python / Scripting',                       category: 'Cloud & Entwicklung' },
+    { name: 'Applikations- & Plattformentwicklung',     category: 'Cloud & Entwicklung' },
+    { name: 'Datenbankadministration',                  category: 'Cloud & Entwicklung' },
+    { name: 'Data Engineering & Analytics',             category: 'Cloud & Entwicklung' },
+    { name: 'IT-Security',                              category: 'Sicherheit & Monitoring' },
+    { name: 'Monitoring & Logging',                     category: 'Sicherheit & Monitoring' },
+    { name: 'Helpdesk & User Support',                  category: 'Service & Support' },
+    { name: 'Dokumentation & Wissensmanagement',        category: 'Service & Support' },
+    { name: 'IT-Projektmanagement',                     category: 'Management & Organisation' },
+    { name: 'Kommunikation',                            category: 'Sozial- & Selbstkompetenz' },
     { name: 'Teamarbeit & Kollaboration',               category: 'Sozial- & Selbstkompetenz' },
     { name: 'Selbstorganisation & Zeitmanagement',      category: 'Sozial- & Selbstkompetenz' },
     { name: 'Konfliktfähigkeit',                        category: 'Sozial- & Selbstkompetenz' },
@@ -61,160 +44,161 @@ class SubskillSkill < ActiveRecord::Base
 
   LEVEL_TEXTS = {
     'Linux / Server-Administration' => [
-      'Führt einfache Befehle aus (ls, cd, ps), navigiert das Dateisystem, liest Logs',
-      'Verwaltet Benutzer/Dienste via systemd, nutzt Paketmanager, bearbeitet Konfigdateien',
-      'Konfiguriert und wartet Server selbstständig: Backup, Monitoring, Netzwerk-Grundlagen',
-      'Automatisiert Aufgaben per Skript, Security-Hardening, Performance-Tuning, Kernel-Parameter',
-      'Designt Server-Landschaften, löst komplexe Systemprobleme, tiefes Kernel- und Performance-Know-how',
+      'Grundbefehle & Navigation (ls, cd), Dateisystem-Struktur verstehen, Logfiles lesen',
+      'Benutzer- & Diensteverwaltung (systemd), Paketmanagement, Standard-Konfigurationen',
+      'Selbstständige Wartung, Backup-Integration, Netzwerk-Grundlagen, Troubleshooting',
+      'Automatisierung (Scripting), Security-Hardening, Performance-Optimierung, Kernel-Parameter',
+      'Design komplexer Server-Landschaften, Architektur-Entscheidungen, High-Availability'
     ],
     'Netzwerk & Firewall' => [
-      'Kennt IP-Adressen/Subnetting, nutzt ping/traceroute, versteht DNS-Grundlagen',
-      'Konfiguriert VLANs und einfache Firewall-Regeln, versteht Routing-Grundlagen',
-      'Implementiert Netzwerkstrukturen, verwaltet Switch/Router-Konfigurationen selbstständig',
-      'Designt komplexe Topologien, BGP/OSPF-Kenntnisse, Firewall-Policies, VPN-Infrastrukturen',
-      'Vollständiges Netzwerk-Design, Security-Audits, Carrier-Grade-Kenntnisse, Deep Packet Inspection',
+      'IP-Grundlagen (IPv4/v6, Subnetting), DNS-Verständnis, Tools wie ping/traceroute',
+      'Konfiguration einfacher VLANs, Standard-Firewallregeln, WLAN-Basis-Setup',
+      'Implementierung von Netzwerk-Segmenten, Routing-Steuerung, VPN-Konfiguration',
+      'Design komplexer Topologien (BGP/OSPF), Advanced Firewall Policies, QoS',
+      'Gesamtheitliche Netzwerk-Architektur, Enterprise-Security-Design, SDN-Konzepte'
     ],
     'Virtualisierung & Containerisierung' => [
-      'Kennt Konzepte von VMs und Containern (Docker), kann fertige Container starten/stoppen',
-      'Erstellt eigene Docker-Images, schreibt einfache docker-compose Files, verwaltet Basis-VMs',
-      'Administriert Virtualisierungs-Cluster (Proxmox/vSphere) und baut Multi-Container-Setups',
-      'Kubernetes-Grundlagen (K8s), Live-Migrationen, Ceph-Storage, CI/CD-Integration von Containern',
-      'Designt komplexe K8s/Virtualisierungs-Infrastrukturen, Cluster-Architektur, Kapazitätsplanung',
+      'Konzepte von VMs & Containern verstehen, Start/Stop von Standard-Instanzen',
+      'Erstellung einfacher Docker-Images, Docker-Compose, Basis-Verwaltung von VMs',
+      'Administration von Clustern (Proxmox/vSphere), Ressourcen-Management, Snapshots',
+      'Orchestrierung (Kubernetes Basis), Infrastructure as Code (IaC), Performance-Tuning',
+      'Design hochverfügbarer Cloud-Native-Infrastrukturen, K8s-Architektur, Storage-Backends'
     ],
     'Storage & Backup Management' => [
-      'Kann Laufwerke einbinden, kennt RAID-Konzepte, bedient bestehende Backups',
-      'Konfiguriert NFS/SMB-Shares, richtet automatisierte Backup-Jobs ein (Veeam, PBS)',
-      'Betreibt Storage-Cluster (z. B. Ceph), Kapazitätsplanung, Disaster-Recovery-Tests',
-      'Storage-Tiering, Performance-Tuning für IOPS-kritische Systeme, Replikation über Standorte',
-      'Enterprise-Storage-Architektur, vollständiges Lifecycle-Management und BCM',
+      'Laufwerke einbinden, RAID-Grundlagen verstehen, bestehende Backups bedienen',
+      'NFS/SMB-Shares verwalten, Einrichtung einfacher Backup-Jobs (Veeam, PBS)',
+      'Betrieb von Storage-Clustern, Kapazitätsplanung, Recovery-Tests, Monitoring',
+      'Storage-Tiering, Replikations-Szenarien, Optimierung für IOPS-kritische Systeme',
+      'Enterprise-Storage-Architektur, BCM-Strategien, Disaster Recovery Gesamtdesign'
     ],
     'IAM & Directory Services' => [
-      'Legt Benutzer an, verwaltet einfache Gruppenrechte, versteht Passwort-Policies',
-      'Administriert Active Directory / LDAP, konfiguriert Gruppenrichtlinien (GPOs)',
-      'Integriert Systeme in IAM-Lösungen, implementiert Single-Sign-On (OAuth/SAML)',
-      'Baut Identity-Federations (z. B. SWITCHaai) auf, Role-Based Access Control',
-      'Designt vollständige Identity-Landschaften, Zero-Trust-Architektur',
+      'Benutzeranlage, Passwort-Resets, Gruppenrechte-Verständnis',
+      'Administration von AD/LDAP, Konfiguration von Gruppenrichtlinien (GPOs)',
+      'Integration von Systemen in IAM-Lösungen, SSO-Grundlagen (OAuth/SAML)',
+      'Identity Federation (SWITCHaai), Role-Based Access Control (RBAC) Design',
+      'Architektur von Identity-Landschaften, Zero-Trust-Konzepte, Lifecycle-Management'
     ],
     'Cloud & DevOps' => [
-      'Versteht Cloud-Konzepte (IaaS/PaaS/SaaS), kann bestehende CI/CD-Pipelines nutzen',
-      'Erstellt Docker-Images, einfache CI/CD-Pipelines, versteht Git-Workflows',
-      'Verwaltet Cloud-Ressourcen, konfiguriert CI/CD selbstständig, Container-Orchestrierung',
-      'Infrastructure as Code (Terraform/Ansible), Kubernetes-Grundlagen, Multi-Cloud-Strategien',
-      'Entwirft DevOps-Plattformen, GitOps, komplexe K8s-Deployments, Platform Engineering',
+      'Verständnis Cloud-Konzepte (IaaS/PaaS), Nutzung bestehender CI-Pipelines',
+      'Basis-Automatisierung, Git-Workflows, Container-Deployments',
+      'Konfiguration von CI/CD-Pipelines, Cloud-Ressourcen-Management',
+      'IaC (Terraform/Ansible), Advanced Orchestration, Monitoring-Integration',
+      'Entwurf von Platform-Engineering-Strategien, Multi-Cloud-Architekturen, GitOps'
     ],
     'Python / Scripting' => [
-      'Liest Skripte, nimmt kleine Anpassungen vor, versteht Grundsyntax (Bash oder Python)',
-      'Schreibt einfache Automatisierungs-Skripte für wiederkehrende Aufgaben',
-      'Robuste Skripte mit Fehlerbehandlung, nutzt Bibliotheken, versteht objektorientierte Konzepte',
-      'Komplexe Automatisierungslösungen, REST-APIs, Testabdeckung, Code-Reviews',
-      'Professionelle Softwareentwicklung, Architekturentscheidungen, Open-Source-Beiträge',
+      'Skripte lesen & kleine Anpassungen vornehmen, Grundsyntax (Bash/Python)',
+      'Schreiben einfacher Automatisierungs-Skripte für Standardaufgaben',
+      'Strukturierte Skripte mit Fehlerbehandlung & Libraries, objektorientierte Basis',
+      'Entwicklung von Tools/REST-APIs, Test-Frameworks, Code-Qualitäts-Standards',
+      'Architektur komplexer Software-Systeme, Framework-Entwicklung, Core-Automatisierung'
     ],
     'Applikations- & Plattformentwicklung' => [
-      'Macht kleine Code-Anpassungen im Frontend (HTML/JS) oder Backend, versteht Basis-Webkonzepte',
-      'Entwickelt selbstständig kleinere Applikationen, Tools oder einfache APIs (Web oder native)',
-      'Baut produktive Full-Stack-Applikationen, Framework-Kenntnisse (z.B. React/Vue, Node/Django)',
-      'Führt Architektur-Entscheidungen für Apps, Microservices, CI/CD-Testing, Skalierbarkeit',
-      'Designt komplexe, institutionsweite Software-Architekturen und Plattform-Ökosysteme',
+      'Kleine Code-Anpassungen (HTML/CSS/JS), Verständnis von Web-Grundlagen',
+      'Entwicklung kleinerer Tools oder isolierter API-Endpunkte',
+      'Umsetzung von Full-Stack-Features, Nutzung von Frameworks (React/Rails/Django)',
+      'Software-Architektur, Testing-Strategien, Skalierbarkeit, Deployment-Optimierung',
+      'Design von Applikations-Ökosystemen, Strategie für technologische Stacks'
     ],
     'Datenbankadministration' => [
-      'Führt einfache SQL-Queries aus (SELECT, INSERT, UPDATE, DELETE)',
-      'Verwaltet Datenbanken, kennt Joins und Indizes, führt Backup/Restore durch',
-      'Optimiert Queries, Replikation, Benutzerverwaltung, arbeitet mit mehreren DB-Systemen',
-      'Performance-Tuning, Hochverfügbarkeit, Sharding, Design komplexer Datenbankstrukturen',
-      'Enterprise-Datenbankdesign, Disaster Recovery, Cross-Platform-Migration, SLA-Garantien',
+      'Einfache SQL-Abfragen (SELECT, UPDATE), Verständnis von Tabellen-Strukturen',
+      'Basis-Verwaltung, Backup/Restore, Indizes & Joins verstehen',
+      'Query-Optimierung, Replikations-Einrichtung, Benutzer- & Rollenkonzepte',
+      'Hochverfügbarkeits-Setups, Sharding, Design komplexer Datenmodelle',
+      'Enterprise-Datenbank-Architektur, strategisches Datenmanagement, Performance-Analysen'
     ],
     'Data Engineering & Analytics' => [
-      'Arbeitet mit exportierten Daten (Excel/CSV), grundlegende Statistik-Kenntnisse',
-      'Schreibt einfache Skripte (R, Python) zur Datenbereinigung und Visualisierung',
-      'Baut ETL-Pipelines auf, integriert Forschungsdaten in zentrale Repositories',
-      'Verwaltet komplexe Data-Warehouses/Data-Lakes, Big-Data-Technologien',
-      'Design wissenschaftlicher Datenarchitekturen, Machine-Learning-Infrastruktur',
+      'Arbeit mit Exporten (CSV/Excel), Grundkenntnisse Statistik & Visualisierung',
+      'Datenbereinigung & einfache Analysen mit Skripten (R/Python)',
+      'Aufbau von ETL-Pipelines, Integration in zentrale Repositories',
+      'Data-Warehouse-Management, Big-Data-Technologien, Automatisierung von Reports',
+      'Design von Daten-Architekturen, Machine-Learning-Infrastruktur, Data-Governance'
     ],
     'IT-Security' => [
-      'Kennt Sicherheitsgrundlagen: starke Passwörter, Updates, Phishing-Erkennung',
-      'Führt einfache Vulnerability-Scans durch, kennt gängige Angriffsvektoren',
-      'Implementiert Sicherheitskonzepte, führt Risikoanalysen durch, konfiguriert IDS/IPS',
-      'Penetration Testing, Security-Audits, Incident Response, SIEM-Betrieb',
-      'Security-Architektur, Red-Team-Fähigkeiten, Compliance (ISO 27001, BSI-Grundschutz)',
+      'Sicherheits-Grundlagen (Passwörter, MFA), Phishing-Prävention, Updates',
+      'Geführte Vulnerability-Scans, Erkennung gängiger Angriffs-Szenarien',
+      'Implementierung von Schutzmaßnahmen, Risikoanalysen, IDS/IPS-Konfiguration',
+      'Penetration Testing, Incident Response Management, Security-Auditierung',
+      'Security-Gesamtstrategie, Compliance-Architektur (ISO 27001), Red-Teaming'
     ],
     'Monitoring & Logging' => [
-      'Liest bestehende Dashboards, versteht grundlegende Metriken und Alert-Meldungen',
-      'Erstellt einfache Alerts, kennt Prometheus/Grafana oder Zabbix-Grundlagen',
-      'Konfiguriert Monitoring-Systeme, erstellt komplexe Dashboards, Log-Aggregation',
-      'Entwirft Monitoring-Strategien, SLO/SLA-Definition, Distributed Tracing',
-      'Vollständige Observability-Plattform, Performance-Engineering, Anomalie-Detektion',
+      'Dashboards lesen, Verständnis von Metriken & Alert-Status',
+      'Erstellung einfacher Alerts & Dashboards (Grafana/Prometheus)',
+      'System-Konfiguration, Log-Aggregation (ELK/Graylog), komplexes Alerting',
+      'Design von Monitoring-Strategien, SLO/SLA-Tracking, Distributed Tracing',
+      'Vollständige Observability-Plattform, Predictive Analytics, Performance-Design'
     ],
     'Helpdesk & User Support' => [
-      'Beantwortet einfache Anfragen, eskaliert bei komplexeren Problemen zuverlässig',
-      'Löst häufige Probleme selbstständig, dokumentiert Lösungen im Ticketsystem',
-      'Bearbeitet komplexe User-Probleme, ITIL-Kenntnisse, führt Schulungen durch',
-      'Optimiert Support-Prozesse, baut Wissensdatenbanken auf, koordiniert das Team',
-      'Strategischer IT-Support, SLA-Design, Change-Management, Service-Desk-Strategie',
+      'Erfassung & Bearbeitung einfacher Anfragen, korrekte Eskalation',
+      'Selbstständige Lösung von Standard-Problemen, Ticket-Dokumentation',
+      'Bearbeitung komplexer Anfragen, Training von Usern, ITIL-Grundlagen',
+      'Optimierung von Support-Workflows, Wissensbasis-Aufbau, Team-Koordination',
+      'Strategischer Service-Desk, SLA-Design, Change-Management Steuerung'
     ],
     'Dokumentation & Wissensmanagement' => [
-      'Liest und nutzt vorhandene Dokumentation effektiv, gibt Feedback zu Lücken',
-      'Schreibt verständliche How-Tos und Anleitungen für häufige Aufgaben',
-      'Erstellt strukturierte Dokumentationskonzepte, pflegt Wikis aktiv und konsistent',
-      'Baut Wissensmanagement-Systeme auf, Versionskontrolle für Dokumentation, Qualitätssicherung',
-      'Wissensmanagement-Strategie, Standardisierung, Knowledge-Community, institutionelles Gedächtnis',
+      'Nutzung der Dokumentation, Feedback zu Lücken geben',
+      'Erstellung verständlicher How-Tos für Standard-Tasks',
+      'Strukturierte Dokumentations-Konzepte, Wiki-Pflege, Konsistenz-Prüfung',
+      'Aufbau von Knowledge-Management-Systemen, Versionierung, QS-Standards',
+      'Wissensmanagement-Strategie, Etablierung einer Dokumentations-Kultur'
     ],
     'IT-Projektmanagement' => [
-      'Arbeitet in Projekten mit, versteht grundlegende Projektmanagement-Methoden',
-      'Leitet kleine Projekte selbstständig, erstellt Zeit- und Ressourcenpläne',
-      'Verantwortet mittlere bis grosse IT-Projekte, Stakeholder-Management, Risikoanalyse',
-      'Program-Management, steuert komplexe Projekt-Portfolios, Budgetverantwortung',
-      'Strategisches Portfolio-Management, prägt die Projektkultur der gesamten Organisation',
+      'Mitarbeit in Projekten, Verständnis von Phasen & Meilensteinen',
+      'Leitung kleinerer Teilprojekte, Zeit- & Ressourcenplanung',
+      'Steuerung komplexer Projekte, Stakeholder-Management, Risiko-Controlling',
+      'Programm-Management, Portfolio-Steuerung, Budget-Verantwortung',
+      'Strategisches Projekt-Portfolio, Etablierung von PM-Standards'
     ],
     'Kommunikation' => [
-      'Formuliert einfache Sachverhalte klar und verständlich, hört aktiv zu',
-      'Kommuniziert proaktiv, gibt konstruktives Feedback, passt Stil an Zielgruppe an',
-      'Führt schwierige Gespräche souverän, vermittelt komplexe Themen zielgruppengerecht',
-      'Gestaltet Kommunikationsstrukturen im Team, fördert offene Gesprächskultur',
-      'Exzellente interne & externe Kommunikation, prägt die Kommunikationskultur der Organisation',
+      'Klare Formulierung einfacher Sachverhalte, aktives Zuhören',
+      'Proaktive Information, konstruktives Feedback, Zielgruppen-Anpassung',
+      'Souveräne Führung schwieriger Gespräche, Vermittlung komplexer Inhalte',
+      'Gestaltung der Team-Kommunikationswege, Moderation von Konfliktgesprächen',
+      'Strategische Kommunikation, Repräsentation der IT-Interessen auf Leitungsebene'
     ],
     'Teamarbeit & Kollaboration' => [
-      'Arbeitet zuverlässig im Team mit, hält Absprachen ein',
-      'Bringt eigene Ideen konstruktiv ein, unterstützt Kolleg:innen aktiv',
-      'Fördert Zusammenarbeit über Teamgrenzen hinweg, koordiniert gemeinsame Aufgaben',
-      'Baut cross-funktionale Zusammenarbeit auf, löst Reibungen zwischen Teams',
-      'Schafft eine starke Kollaborationskultur, vernetzt Fachbereiche strategisch',
+      'Zuverlässige Zusammenarbeit, Einhaltung von Team-Absprachen',
+      'Unterstützung von Kollegen, aktive Einbringung eigener Ideen',
+      'Förderung fachübergreifender Kooperation, Koordination gemeinsamer Aufgaben',
+      'Aufbau cross-funktionaler Workflows, Lösung von Schnittstellen-Problemen',
+      'Kultur-Design, Vernetzung von Fachbereichen, strategische Kollaboration'
     ],
     'Selbstorganisation & Zeitmanagement' => [
-      'Erledigt Aufgaben zuverlässig mit klaren Vorgaben und Deadlines',
-      'Priorisiert selbstständig, strukturiert Arbeitstag und hält Fristen ein',
-      'Verwaltet parallele Aufgaben und Projekte effizient, passt Prioritäten dynamisch an',
-      'Entwickelt persönliche Systeme für komplexe Arbeitslast, coacht andere beim Zeitmanagement',
-      'Exzellente Selbststeuerung auch unter hohem Druck, Vorbild für effizientes Arbeiten',
+      'Erledigung von Aufgaben nach Priorität & Deadline',
+      'Eigenständige Strukturierung des Arbeitstages, proaktives Zeit-Monitoring',
+      'Management paralleler Projekte, dynamische Priorisierung unter Last',
+      'Entwicklung von Systemen für komplexe Workloads, Coaching anderer',
+      'Exzellente Selbststeuerung, Effizienz-Vorbild, Krisen-Resilienz'
     ],
     'Konfliktfähigkeit' => [
-      'Erkennt Spannungen und spricht Probleme an, ohne Eskalation zu verursachen',
-      'Führt sachliche Konfliktgespräche, sucht aktiv nach gemeinsamen Lösungen',
-      'Moderiert Konflikte zwischen Dritten, findet tragfähige Kompromisse',
-      'Deeskaliert auch festgefahrene Situationen, etabliert konstruktive Streitkultur',
-      'Systemisches Konfliktmanagement, entwickelt Organisationsstrukturen die Konflikte reduzieren',
+      'Erkennen von Spannungen, sachliche Ansprache von Problemen',
+      'Aktive Suche nach Konsens, professionelle Deeskalation',
+      'Moderation von Konflikten zwischen Dritten, Erarbeitung von Kompromissen',
+      'Etablierung einer konstruktiven Streitkultur, Mediation bei Blockaden',
+      'Systemisches Konfliktmanagement, Design reibungsarmer Organisationsformen'
     ],
     'Lernbereitschaft & Adaptabilität' => [
-      'Offen für neue Aufgaben, ergreift Lernchancen wenn sie angeboten werden',
-      'Eignet sich neue Themen selbstständig an, passt sich veränderten Anforderungen an',
-      'Lernt kontinuierlich proaktiv, teilt Wissen im Team und regt andere zum Lernen an',
-      'Treibt organisationales Lernen voran, baut neue Kompetenzen strategisch auf',
-      'Gestaltet Lernkultur der Organisation, antizipiert Kompetenzbedarfe frühzeitig',
+      'Offenheit für neue Themen, Nutzung angebotener Fortbildungen',
+      'Selbstständige Einarbeitung in neue Technologien & Prozesse',
+      'Aktiver Wissenstransfer im Team, Anstoß von Lern-Initiativen',
+      'Strategischer Aufbau neuer Kompetenzfelder, Adaption von Trends',
+      'Gestaltung der Lernkultur, Antizipation künftiger Skill-Bedarfe'
     ],
     'Führungskompetenz' => [
-      'Übernimmt Verantwortung für eigene Aufgaben, unterstützt das Team',
-      'Leitet kleine Teams oder Arbeitspakete, gibt klare Orientierung',
-      'Führt Teams eigenverantwortlich, entwickelt Mitarbeitende gezielt weiter',
-      'Strategische Führung, gestaltet Organisationseinheiten und Führungskultur',
-      'Exzellente Führungspersönlichkeit, entwickelt Führungskräfte und prägt die Unternehmenskultur',
+      'Übernahme von Eigenverantwortung, Unterstützung der Teamziele',
+      'Leitung von Arbeitsgruppen oder kleinen Fach-Teams, Orientierung geben',
+      'Eigenverantwortliche Teamführung, gezielte Mitarbeiter-Entwicklung',
+      'Strategische Leitung, Gestaltung von Organisationseinheiten & Kultur',
+      'Entwicklung von Führungskräften, Etablierung moderner Management-Frameworks'
     ],
     'Präsentation & Moderation' => [
-      'Hält einfache Kurzpräsentationen vor bekanntem Publikum',
-      'Präsentiert Themen strukturiert, beantwortet Fragen sicher',
-      'Gestaltet überzeugende Präsentationen für verschiedene Zielgruppen, moderiert Meetings',
-      'Hält Vorträge auf Fachveranstaltungen, moderiert Workshops und grössere Gruppen',
-      'Keynote-Qualität, exzellente Moderation komplexer Formate und grosser Veranstaltungen',
-    ],
+      'Strukturierte Kurzpräsentationen vor dem Team',
+      'Sichere Darstellung von Fachthemen, Beantwortung von Rückfragen',
+      'Überzeugende Präsentationen für diverse Zielgruppen, Meeting-Moderation',
+      'Workshops leiten, Vorträge auf Fachveranstaltungen, Storytelling',
+      'Exzellente Moderation komplexer Formate, Repräsentation bei Keynotes'
+    ]
   }.freeze
+
 
   def self.seed_defaults!
     DEFAULTS.each_with_index do |attrs, i|
@@ -289,9 +273,9 @@ class SubskillSkill < ActiveRecord::Base
       kids = by_parent[skill.id] || []
       if kids.any?
         _score_node(skill.id, by_parent, us_map, scores)
-        ws       = kids.map { |c| [c.weight.to_f, scores[c.id] || 0.0] }
-        total_w  = ws.sum { |w, _| w }
-        scores[skill.id] = total_w.zero? ? 0.0 : ws.sum { |w, s| w * s } / total_w
+        # Average of children scores (ignoring weight)
+        child_scores = kids.map { |c| scores[c.id] || 0.0 }
+        scores[skill.id] = child_scores.any? ? child_scores.sum / child_scores.size : 0.0
       else
         scores[skill.id] = us_map[skill.id]&.level.to_f || 0.0
       end
