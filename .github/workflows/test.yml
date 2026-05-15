@@ -13,6 +13,9 @@ jobs:
       matrix:
         redmine: ['5.1-stable', '6.0-stable']
         ruby: ['3.2', '3.3']
+        exclude:
+          - redmine: '5.1-stable'
+            ruby: '3.3'
 
     steps:
     - name: Checkout Plugin
