@@ -4,7 +4,7 @@
 
 <h2>
   <% if @target_user == User.current %>Meine Skills
-  <% else %>Skills: <%= @target_user.name %><% end %>
+  <% else %><%= t(:label_skill_profile_for, name: @target_user.name) %><% end %>
 </h2>
 
 <div id="sk-save-indicator" class="sk-save-indicator"></div>
@@ -13,7 +13,7 @@
                                               update_single_skill_subskills_path(user_id: @target_user.id) %>
 
 <p class="sk-intro-sm">
-  <a href="<%= url_for(controller: 'users', action: 'show', id: @target_user.id) %>">← Zurück zum Profil</a>
+  <a href="<%= url_for(controller: 'users', action: 'show', id: @target_user.id) %>"><%= t(:label_back_to_profile) %></a>
 </p>
 
 <%# ── Helper: dot bar ────────────────────────────────────────────────────── %>
@@ -38,7 +38,7 @@
           <% end %>
         </span>
         <%# Aggregate dots (muted) %>
-        <span class="sk-agg-dots" title="Aggregierter Score: <%= sprintf('%.1f', agg) %>">
+        <span class="sk-agg-dots" title="<%= t(:label_aggregated_score).split(':').first %>: <%= sprintf('%.1f', agg) %>">
           <% (1..5).each do |l| %>
             <% c = agg_r >= l ? dot_colors[agg_r] : '#ddd' %>
             <span class="sk-agg-dot" style="background:<%= c %>;border-color:<%= c %>;"></span>
@@ -84,7 +84,7 @@
                             class="sk-star-btn <%= 'sk-star-btn--active' if star %>"
                             id="sk-star-<%= cs.id %>"
                             data-skill-id="<%= cs.id %>"
-                            title="Lernziel"
+                            title="<%= t(:label_learning_goal) %>"
                             onclick="skToggleStar(this)"
                             style="margin-left:4px;"></button>
                   <% end %>
@@ -99,7 +99,7 @@
                                class="sk-endorse-checkbox-only" 
                                <%= 'checked' if i_endorsed %>
                                onclick="skToggleEndorseCheckboxOnly(this, <%= cs.id %>)" 
-                               title="<%= i_endorsed ? 'Bestätigung entfernen' : 'Skill bestätigen' %>" />
+                               title="<%= i_endorsed ? '<%= t(:label_remove_endorsement) %>' : '<%= t(:label_add_endorsement) %>' %>" />
                       <% else %>
                         <div class="sk-endorse-full-btn readonly <%= 'has-count has-others' if endorse_count > 0 %>">
                           <img src="/plugin_assets/redmine_subskills/images/endorse.svg" class="sk-endorse-icon" />
@@ -153,7 +153,7 @@
                     class="sk-star-btn <%= 'sk-star-btn--active' if starred %>"
                     id="sk-star-<%= skill.id %>"
                     data-skill-id="<%= skill.id %>"
-                    title="Lernziel"
+                    title="<%= t(:label_learning_goal) %>"
                     onclick="skToggleStar(this)"
                     style="margin-left:4px;"></button>
           <% end %>
@@ -169,7 +169,7 @@
                        class="sk-endorse-checkbox-only" 
                        <%= 'checked' if i_endorsed %>
                        onclick="skToggleEndorseCheckboxOnly(this, <%= skill.id %>)" 
-                       title="<%= i_endorsed ? 'Bestätigung entfernen' : 'Skill bestätigen' %>" />
+                       title="<%= i_endorsed ? '<%= t(:label_remove_endorsement) %>' : '<%= t(:label_add_endorsement) %>' %>" />
               <% else %>
                 <div class="sk-endorse-full-btn readonly <%= 'has-count has-others' if endorse_count > 0 %>">
                   <img src="/plugin_assets/redmine_subskills/images/endorse.svg" class="sk-endorse-icon" />
@@ -220,7 +220,7 @@ function skSelectLevel(skillId, level) {
   // Warning if endorsements exist
   const count = parseInt(block.dataset.endorseCount || 0);
   if (count > 0) {
-    if (!confirm('Du hast bereits Bestätigungen für diesen Skill erhalten. Wenn du dein Level änderst, werden diese archiviert und sind nicht mehr sichtbar. Fortfahren?')) {
+    if (!confirm('<%= t(:label_endorsement_warning) %>')) {
       return;
     }
   }
@@ -263,7 +263,7 @@ function skCompactSelect(skillId, level, btn) {
   // Warning if endorsements exist
   const count = parseInt(row.dataset.endorseCount || 0);
   if (count > 0) {
-    if (!confirm('Du hast bereits Bestätigungen für diesen Skill erhalten. Wenn du dein Level änderst, werden diese archiviert und sind nicht mehr sichtbar. Fortfahren?')) {
+    if (!confirm('<%= t(:label_endorsement_warning) %>')) {
       return;
     }
   }
@@ -352,7 +352,7 @@ function skToggleEndorse(btn, skillId) {
       wrap.classList.add('active');
       wrap.classList.remove('has-others');
     }
-    btn.title = 'Bestätigung entfernen';
+    btn.title = '<%= t(:label_remove_endorsement) %>';
   } else {
     currentCount = Math.max(0, currentCount - 1);
     if(wrap) {
@@ -360,7 +360,7 @@ function skToggleEndorse(btn, skillId) {
       if (currentCount > 0) wrap.classList.add('has-others');
       else wrap.classList.remove('has-others');
     }
-    btn.title = 'Skill bestätigen';
+    btn.title = '<%= t(:label_add_endorsement) %>';
   }
   if (countSpan) countSpan.textContent = currentCount > 0 ? currentCount : "";
 
@@ -384,22 +384,22 @@ function skToggleEndorse(btn, skillId) {
           // Sync with server response
           if (countSpan) countSpan.textContent = d.count > 0 ? d.count : "";
         } else {
-          alert('Fehler: ' + (d.error || 'Unbekannter Fehler'));
+          alert('<%= t(:label_error).split(':').first %>: ' + (d.error || '<%= t(:label_error_unknown) %>'));
           btn.checked = !isChecked;
         }
       } else {
-        alert('Server-Fehler: ' + r.status);
+        alert('<%= t(:label_error_server).split(':').first %>: ' + r.status);
       }
     }).catch(err => {
       console.error(err);
       btn.checked = !isChecked;
-      alert('Verbindungsfehler: ' + err.message);
+      alert('<%= t(:label_error_connection).split(':').first %>: ' + err.message);
     });
 }
 
 function skToggleEndorseCheckboxOnly(btn, skillId) {
   const isChecked = btn.checked;
-  btn.title = isChecked ? 'Bestätigung entfernen' : 'Skill bestätigen';
+  btn.title = isChecked ? '<%= t(:label_remove_endorsement) %>' : '<%= t(:label_add_endorsement) %>';
 
   const block = btn.closest('.sk-skill-block');
   let originalCount = 0;
@@ -426,24 +426,24 @@ function skToggleEndorseCheckboxOnly(btn, skillId) {
       if (contentType && contentType.includes('application/json')) {
         const d = await r.json();
         if (!r.ok || !d.ok) {
-          alert('Fehler: ' + (d.error || 'Unbekannter Fehler'));
+          alert('<%= t(:label_error).split(':').first %>: ' + (d.error || '<%= t(:label_error_unknown) %>'));
           btn.checked = !isChecked;
-          btn.title = btn.checked ? 'Bestätigung entfernen' : 'Skill bestätigen';
+          btn.title = btn.checked ? '<%= t(:label_remove_endorsement) %>' : '<%= t(:label_add_endorsement) %>';
           if (block) block.setAttribute('data-endorse-count', originalCount);
         } else {
           // Sync with exact server count
           if (block) block.setAttribute('data-endorse-count', d.count);
         }
       } else {
-        alert('Server-Fehler: ' + r.status);
+        alert('<%= t(:label_error_server).split(':').first %>: ' + r.status);
         if (block) block.setAttribute('data-endorse-count', originalCount);
       }
     }).catch(err => {
       console.error(err);
       btn.checked = !isChecked;
-      btn.title = btn.checked ? 'Bestätigung entfernen' : 'Skill bestätigen';
+      btn.title = btn.checked ? '<%= t(:label_remove_endorsement) %>' : '<%= t(:label_add_endorsement) %>';
       if (block) block.setAttribute('data-endorse-count', originalCount);
-      alert('Verbindungsfehler: ' + err.message);
+      alert('<%= t(:label_error_connection).split(':').first %>: ' + err.message);
     });
 }
 </script>

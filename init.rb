@@ -25,33 +25,33 @@ Redmine::Plugin.register :redmine_subskills do
 
   menu :application_menu, :sk_katalog,
        { controller: 'subskills', action: 'katalog' },
-       caption: 'Rollen & Skills',
+       caption: :label_roles_and_skills,
        if: sk_section
 
   menu :application_menu, :sk_my_skills,
        { controller: 'subskills', action: 'my_skills_current' },
-       caption: 'Meine Skills',
+       caption: :label_my_skills,
        if: sk_section
 
   menu :application_menu, :sk_my_rollen,
        { controller: 'subskills', action: 'my_rollen_current' },
-       caption: 'Rollen-Passung',
+       caption: :label_my_role_match,
        if: sk_section
 
   menu :application_menu, :sk_matrix,
        { controller: 'subskills', action: 'index' },
-       caption: 'Skill-Matrix Team',
+       caption: :label_skill_matrix_team,
        if: sk_section
 
   menu :application_menu, :sk_rollen_team,
        { controller: 'subskills_roles', action: 'index' },
-       caption: 'Rollen-Passung Team',
+       caption: :label_team_role_match,
        if: sk_section
 
   # ── Admin-Menü ───────────────────────────────────────────────
   menu :admin_menu, :subskills_admin,
        { controller: 'subskills_admin', action: 'index' },
-       caption: 'Skills',
+       caption: :label_subskills,
        before:  :trackers,
        html: { class: 'icon' }
 end

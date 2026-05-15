@@ -2,7 +2,7 @@
   <%= stylesheet_link_tag 'subskills', plugin: 'redmine_subskills' %>
 <% end %>
 
-<h2>Skills</h2>
+<h2><%= t(:label_subskills) %></h2>
 <% current_tab = :my_rollen %>
 <%= render partial: 'subskills/tabs', locals: { current_tab: current_tab } %>
 
