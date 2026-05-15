@@ -2,20 +2,35 @@ class SubskillsController < ApplicationController
   before_action :require_login
   before_action  { Thread.current[:sk_section] = true  }
   after_action   { Thread.current[:sk_section] = nil   }
-  before_action :find_target_user,   only: [:my_skills, :my_rollen, :update_single_skill]
+  before_action :find_target_user,   only: [:my_skills, :my_rollen, :update_single_skill, :toggle_endorsement]
   before_action :use_current_user,   only: [:my_skills_current, :my_rollen_current,
-                                            :update_single_skill_current]
+                                             :update_single_skill_current]
 
   # GET /subskills – Team Skill-Matrix (leaf skills only)
   def index
     @tree_rows  = SubskillSkill.active.tree_rows
     @leaf_skills = SubskillSkill.active.leaves.order(:position, :name)
-    @users       = User.active.sort_by(&:name)
+    @users       = User.active.to_a.select(&:visible?).sort_by(&:name)
 
-    all_user_skills = SubskillUserSkill.where(user_id: @users.map(&:id))
+    all_user_skills = SubskillUserSkill.where(user_id: @users.map(&:id)).includes(:endorsements)
     @matrix = all_user_skills.each_with_object({}) do |us, h|
       h[us.user_id] ||= {}
-      h[us.user_id][us.subskill_skill_id] = { level: us.level, learn_priority: us.learn_priority }
+      h[us.user_id][us.subskill_skill_id] = { 
+        level: us.level, 
+        learn_priority: us.learn_priority, 
+        endorse_count: us.endorsements.active.size 
+      }
+    end
+
+    # Project role mapping for matrix footer
+    @project = Project.find(params[:project_id]) if params[:project_id]
+    if @project
+      @user_roles_map = @users.each_with_object({}) do |u, h|
+        roles = u.roles_for_project(@project).map(&:name).sort
+        h[u.id] = roles.join(', ')
+      end
+    else
+      @user_roles_map = {}
     end
   end
 
@@ -31,7 +46,7 @@ class SubskillsController < ApplicationController
     @target_user = User.current
     @tree_rows   = SubskillSkill.active.tree_rows
     @score_map   = SubskillSkill.active.compute_scores_for_user(@target_user.id)
-    @user_skills = SubskillUserSkill.where(user_id: @target_user.id).index_by(&:subskill_skill_id)
+    @user_skills = SubskillUserSkill.where(user_id: @target_user.id).includes(:endorsements).index_by(&:subskill_skill_id)
     @editable    = true
 
     all_leaf_ids = SubskillSkill.active.leaves.pluck(:id)
@@ -69,8 +84,18 @@ class SubskillsController < ApplicationController
     @tree_rows   = SubskillSkill.active.tree_rows
     @score_map   = SubskillSkill.active.compute_scores_for_user(@target_user.id)
     @user_skills = SubskillUserSkill.where(user_id: @target_user.id)
+                                    .includes(:endorsements)
                                     .index_by(&:subskill_skill_id)
     @editable    = (User.current == @target_user) || User.current.admin?
+
+    if @user_skills.any? && User.current != @target_user
+      @my_endorsements = SubskillEndorsement.active.where(
+        subskill_user_skill_id: @user_skills.values.map(&:id),
+        endorser_id: User.current.id
+      ).pluck(:subskill_user_skill_id)
+    else
+      @my_endorsements = []
+    end
 
     all_leaf_ids = SubskillSkill.active.leaves.pluck(:id)
     descs = SubskillLevelDescription.where(subskill_skill_id: all_leaf_ids)
@@ -116,6 +141,38 @@ class SubskillsController < ApplicationController
     render json: { ok: false, error: e.message }, status: 422
   end
 
+  # POST /subskills/user/:user_id/endorse
+  def toggle_endorsement
+    skill_id = params[:skill_id].to_i
+    
+    us = SubskillUserSkill.find_by(user_id: @target_user.id, subskill_skill_id: skill_id)
+    unless us
+      render json: { ok: false, error: 'Skill not reported by user' }, status: 404
+      return
+    end
+
+    if User.current == @target_user
+      render json: { ok: false, error: 'Cannot endorse yourself' }, status: 403
+      return
+    end
+
+    endorsement = SubskillEndorsement.find_by(subskill_user_skill_id: us.id, endorser_id: User.current.id)
+    
+    if endorsement
+      endorsement.destroy
+      action = 'removed'
+    else
+      SubskillEndorsement.create!(subskill_user_skill_id: us.id, endorser_id: User.current.id)
+      action = 'added'
+    end
+
+    count = SubskillEndorsement.active.where(subskill_user_skill_id: us.id).count
+
+    render json: { ok: true, action: action, count: count }
+  rescue => e
+    render json: { ok: false, error: e.message }, status: 422
+  end
+
   private
 
   def use_current_user
@@ -124,6 +181,9 @@ class SubskillsController < ApplicationController
 
   def find_target_user
     @target_user = params[:user_id] ? User.find(params[:user_id]) : User.current
+    unless @target_user == User.current || @target_user.visible?
+      render_403
+    end
   rescue ActiveRecord::RecordNotFound
     render_404
   end

@@ -17,7 +17,7 @@
 </p>
 
 <%# ── Helper: dot bar ────────────────────────────────────────────────────── %>
-<% dot_colors = ['#aaa','#90b8d8','#5b9ec9','#2e78b7','#1a5c99','#0d3d6b'] %>
+<% dot_colors = ['#ccc', '#e3f2fd', '#90caf9', '#50b1ff', '#1e88e5', '#0d47a1'] %>
 
 <%# ── Render tree ─────────────────────────────────────────────────────────── %>
 <% @tree_rows.each do |row| %>
@@ -73,22 +73,40 @@
                  data-save-url="<%= save_url %>"
                  data-level="<%= lvl %>"
                  data-learn-priority="<%= us&.learn_priority.to_i || 0 %>"
+                 data-endorse-count="<%= us&.endorsements&.active&.count || 0 %>"
                  style="padding-left:<%= (depth + 1) * 16 %>px;">
               <div class="sk-skill-header">
-                <span class="sk-skill-name">
+                <span class="sk-skill-name" style="display:flex; align-items:center;">
                   <%= cs.name %>
-                  <% if cs.weight && cs.weight.to_f != 1.0 %>
-                    <span class="sk-weight-tag">
-                      (×<%= number_with_precision(cs.weight, precision: 1, strip_insignificant_zeros: true) %>)
-                    </span>
-                  <% end %>
-                  <% if @editable %>
+                  
+                                    <% if @editable %>
                     <button type="button"
                             class="sk-star-btn <%= 'sk-star-btn--active' if star %>"
                             id="sk-star-<%= cs.id %>"
                             data-skill-id="<%= cs.id %>"
                             title="Lernziel"
-                            onclick="skToggleStar(this)"><%= star ? '★' : '☆' %></button>
+                            onclick="skToggleStar(this)"
+                            style="margin-left:4px;"></button>
+                  <% end %>
+
+                  <%# Endorsements %>
+                  <% if us && us.level > 0 %>
+                    <% endorse_count = us.endorsements.size %>
+                    <% i_endorsed = @my_endorsements&.include?(us.id) %>
+                    <span class="sk-endorse-wrap" style="<%= @editable ? '' : 'margin-left:auto;' %> display:inline-flex;">
+                      <% if User.current != @target_user %>
+                        <input type="checkbox" 
+                               class="sk-endorse-checkbox-only" 
+                               <%= 'checked' if i_endorsed %>
+                               onclick="skToggleEndorseCheckboxOnly(this, <%= cs.id %>)" 
+                               title="<%= i_endorsed ? 'Bestätigung entfernen' : 'Skill bestätigen' %>" />
+                      <% else %>
+                        <div class="sk-endorse-full-btn readonly <%= 'has-count has-others' if endorse_count > 0 %>">
+                          <img src="/plugin_assets/redmine_subskills/images/endorse.svg" class="sk-endorse-icon" />
+                          <span class="sk-endorse-count" id="sk-endorse-count-<%= cs.id %>"><%= endorse_count > 0 ? endorse_count : "" %></span>
+                        </div>
+                      <% end %>
+                    </span>
                   <% end %>
                 </span>
               </div>
@@ -124,17 +142,41 @@
          data-skill-id="<%= skill.id %>"
          data-save-url="<%= save_url %>"
          data-level="<%= current_level %>"
-         data-learn-priority="<%= learn_prio %>">
+         data-learn-priority="<%= learn_prio %>"
+         data-endorse-count="<%= us&.endorsements&.active&.count || 0 %>">
       <div class="sk-skill-header">
-        <span class="sk-skill-name">
+        <span class="sk-skill-name" style="display:flex; align-items:center;">
           <%= skill.name %>
-          <% if @editable %>
+
+                    <% if @editable %>
             <button type="button"
                     class="sk-star-btn <%= 'sk-star-btn--active' if starred %>"
                     id="sk-star-<%= skill.id %>"
                     data-skill-id="<%= skill.id %>"
                     title="Lernziel"
-                    onclick="skToggleStar(this)"><%= starred ? '★' : '☆' %></button>
+                    onclick="skToggleStar(this)"
+                    style="margin-left:4px;"></button>
+          <% end %>
+
+          <%# Endorsements %>
+          <% us = @user_skills[skill.id] %>
+          <% if us && us.level > 0 %>
+            <% endorse_count = us.endorsements.size %>
+            <% i_endorsed = @my_endorsements&.include?(us.id) %>
+            <span class="sk-endorse-wrap" style="<%= @editable ? '' : 'margin-left:auto;' %> display:inline-flex;">
+              <% if User.current != @target_user %>
+                <input type="checkbox" 
+                       class="sk-endorse-checkbox-only" 
+                       <%= 'checked' if i_endorsed %>
+                       onclick="skToggleEndorseCheckboxOnly(this, <%= skill.id %>)" 
+                       title="<%= i_endorsed ? 'Bestätigung entfernen' : 'Skill bestätigen' %>" />
+              <% else %>
+                <div class="sk-endorse-full-btn readonly <%= 'has-count has-others' if endorse_count > 0 %>">
+                  <img src="/plugin_assets/redmine_subskills/images/endorse.svg" class="sk-endorse-icon" />
+                  <span class="sk-endorse-count" id="sk-endorse-count-<%= skill.id %>"><%= endorse_count > 0 ? endorse_count : "" %></span>
+                </div>
+              <% end %>
+            </span>
           <% end %>
         </span>
       </div>
@@ -172,7 +214,27 @@ function getBlock(id) { return document.querySelector(`.sk-skill-block[data-skil
 
 function skSelectLevel(skillId, level) {
   const block = getBlock(skillId); if (!block) return;
+  const oldLevel = parseInt(block.dataset.level);
+  if (oldLevel === level) return;
+
+  // Warning if endorsements exist
+  const count = parseInt(block.dataset.endorseCount || 0);
+  if (count > 0) {
+    if (!confirm('Du hast bereits Bestätigungen für diesen Skill erhalten. Wenn du dein Level änderst, werden diese archiviert und sind nicht mehr sichtbar. Fortfahren?')) {
+      return;
+    }
+  }
+
   block.dataset.level = level;
+  // If level changed, reset count locally (as they will be archived in DB)
+  if (count > 0) {
+    block.dataset.endorseCount = 0;
+    const countSpan = block.querySelector('.sk-endorse-count');
+    if (countSpan) countSpan.textContent = '';
+    const icon = block.querySelector('.sk-endorsements img');
+    if (icon) icon.style.filter = 'grayscale(1) opacity(0.3)';
+  }
+
   for (let l = 0; l <= 5; l++) {
     const row = document.getElementById('sk-lrow-' + skillId + '-' + l); if (!row) continue;
     row.classList.toggle('sk-level-row--active', l === level);
@@ -186,7 +248,6 @@ function skToggleStar(btn) {
   const block = getBlock(skillId);
   const active = btn.classList.contains('sk-star-btn--active');
   btn.classList.toggle('sk-star-btn--active', !active);
-  btn.textContent = active ? '☆' : '★';
   const prio = active ? 0 : 1;
   block.dataset.learnPriority = prio;
   saveSkill(skillId, parseInt(block.dataset.level), prio);
@@ -196,18 +257,37 @@ function skToggleStar(btn) {
 function skCompactSelect(skillId, level, btn) {
   const row = btn.closest('tr[data-skill-id]');
   if (!row) return;
+  const oldLevel = parseInt(row.dataset.level || 0);
+  if (oldLevel === level) return;
+
+  // Warning if endorsements exist
+  const count = parseInt(row.dataset.endorseCount || 0);
+  if (count > 0) {
+    if (!confirm('Du hast bereits Bestätigungen für diesen Skill erhalten. Wenn du dein Level änderst, werden diese archiviert und sind nicht mehr sichtbar. Fortfahren?')) {
+      return;
+    }
+  }
+
   row.dataset.level = level;
+  // Reset count locally
+  if (count > 0) {
+    row.dataset.endorseCount = 0;
+    const countSpan = row.querySelector('.sk-endorse-count');
+    if (countSpan) countSpan.textContent = '';
+    const icon = row.querySelector('.sk-endorsements img');
+    if (icon) icon.style.filter = 'grayscale(1) opacity(0.3)';
+  }
 
   // Update all dot buttons in this row
   row.querySelectorAll('button[onclick^="skCompactSelect"]').forEach(function(b, i) {
     const l = i; // 0..5
     const active = (l === level);
-    const colors = ['','#90b8d8','#5b9ec9','#2e78b7','#1a5c99','#0d3d6b'];
+    const colors = ['','#e3f2fd','#90caf9','#50b1ff','#1e88e5','#0d47a1'];
     const dc = colors[l] || '#ddd';
     if (l === 0) {
-      b.style.background = active ? '#aaa' : '#eee';
+      b.style.background = active ? '#ccc' : '#eee';
       b.style.border = '1px solid #ccc';
-      b.style.boxShadow = active ? '0 0 0 2px #aaa' : 'none';
+      b.style.boxShadow = active ? '0 0 0 2px #ccc' : 'none';
     } else {
       b.style.background = active ? dc : 'transparent';
       b.style.border = '1px solid ' + dc;
@@ -229,8 +309,6 @@ function skCompactStar(skillId, btn) {
   if (!row) return;
   const active = btn.classList.contains('sk-star-btn--active');
   btn.classList.toggle('sk-star-btn--active', !active);
-  btn.textContent = active ? '☆' : '★';
-  btn.style.color = active ? '#ccc' : '#e53935';
   const prio = active ? 0 : 1;
   row.dataset.learnPriority = prio;
   saveSkill(skillId, parseInt(row.dataset.level || 0), prio, row.dataset.saveUrl);
@@ -259,3 +337,113 @@ function showIndicator(msg, ok) {
 }
 </script>
 <% end %>
+
+<script>
+function skToggleEndorse(btn, skillId) {
+  const wrap = btn.closest('.sk-endorse-full-btn');
+  const countSpan = wrap ? wrap.querySelector('.sk-endorse-count') : null;
+  const isChecked = btn.checked;
+  
+  // Optimistic UI update
+  let currentCount = parseInt(countSpan?.textContent || '0', 10);
+  if (isChecked) {
+    currentCount++;
+    if(wrap) {
+      wrap.classList.add('active');
+      wrap.classList.remove('has-others');
+    }
+    btn.title = 'Bestätigung entfernen';
+  } else {
+    currentCount = Math.max(0, currentCount - 1);
+    if(wrap) {
+      wrap.classList.remove('active');
+      if (currentCount > 0) wrap.classList.add('has-others');
+      else wrap.classList.remove('has-others');
+    }
+    btn.title = 'Skill bestätigen';
+  }
+  if (countSpan) countSpan.textContent = currentCount > 0 ? currentCount : "";
+
+  const url = '<%= toggle_endorsement_subskills_path(user_id: @target_user.id) %>';
+  const token = document.querySelector('meta[name="csrf-token"]')?.content || 
+                document.querySelector('input[name="authenticity_token"]')?.value || '';
+
+  fetch(url, {
+    method: 'POST',
+    headers: { 
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'X-CSRF-Token': token, 
+      'X-Requested-With': 'XMLHttpRequest' 
+    },
+    body: `skill_id=${skillId}`
+  }).then(async r => {
+      const contentType = r.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const d = await r.json();
+        if (r.ok && d.ok) {
+          // Sync with server response
+          if (countSpan) countSpan.textContent = d.count > 0 ? d.count : "";
+        } else {
+          alert('Fehler: ' + (d.error || 'Unbekannter Fehler'));
+          btn.checked = !isChecked;
+        }
+      } else {
+        alert('Server-Fehler: ' + r.status);
+      }
+    }).catch(err => {
+      console.error(err);
+      btn.checked = !isChecked;
+      alert('Verbindungsfehler: ' + err.message);
+    });
+}
+
+function skToggleEndorseCheckboxOnly(btn, skillId) {
+  const isChecked = btn.checked;
+  btn.title = isChecked ? 'Bestätigung entfernen' : 'Skill bestätigen';
+
+  const block = btn.closest('.sk-skill-block');
+  let originalCount = 0;
+  if (block) {
+    originalCount = parseInt(block.getAttribute('data-endorse-count') || '0', 10);
+    const newCount = isChecked ? originalCount + 1 : Math.max(0, originalCount - 1);
+    block.setAttribute('data-endorse-count', newCount);
+  }
+
+  const url = '<%= toggle_endorsement_subskills_path(user_id: @target_user.id) %>';
+  const token = document.querySelector('meta[name="csrf-token"]')?.content || 
+                document.querySelector('input[name="authenticity_token"]')?.value || '';
+
+  fetch(url, {
+    method: 'POST',
+    headers: { 
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'X-CSRF-Token': token, 
+      'X-Requested-With': 'XMLHttpRequest' 
+    },
+    body: `skill_id=${skillId}`
+  }).then(async r => {
+      const contentType = r.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const d = await r.json();
+        if (!r.ok || !d.ok) {
+          alert('Fehler: ' + (d.error || 'Unbekannter Fehler'));
+          btn.checked = !isChecked;
+          btn.title = btn.checked ? 'Bestätigung entfernen' : 'Skill bestätigen';
+          if (block) block.setAttribute('data-endorse-count', originalCount);
+        } else {
+          // Sync with exact server count
+          if (block) block.setAttribute('data-endorse-count', d.count);
+        }
+      } else {
+        alert('Server-Fehler: ' + r.status);
+        if (block) block.setAttribute('data-endorse-count', originalCount);
+      }
+    }).catch(err => {
+      console.error(err);
+      btn.checked = !isChecked;
+      btn.title = btn.checked ? 'Bestätigung entfernen' : 'Skill bestätigen';
+      if (block) block.setAttribute('data-endorse-count', originalCount);
+      alert('Verbindungsfehler: ' + err.message);
+    });
+}
+</script>

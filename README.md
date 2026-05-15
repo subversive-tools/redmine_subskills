@@ -1,9 +1,10 @@
-# Redmine Sub-Skills Plugin
+# Redmine Subskills Plugin
 
 > Empower your team with intelligent skill tracking and role matching directly in Redmine.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Redmine Version](https://img.shields.io/badge/Redmine-4.0%2B-red.svg)](https://www.redmine.org/)
+![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)
+![Redmine](https://img.shields.io/badge/Redmine-4.0%2B-red.svg?logo=redmine)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
 
 ## ✦ What is Sub-Skills?
 

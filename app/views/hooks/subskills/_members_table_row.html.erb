@@ -1,0 +1,59 @@
+<%
+  user = member.principal
+  return '' unless user.is_a?(User)
+
+  # Find Project-wide skill requirements
+  project_role = SubskillProjectRole.find_by(project_id: project.id)
+  
+  badge = if project_role
+    # Compute scores for user
+    user_skills_map = SubskillSkill.compute_scores_for_user(user.id)
+    score   = project_role.fit_score(user_skills_map)
+    details = project_role.fit_details(user_skills_map)
+    
+    if details.empty?
+      "<span class=\"sk-fit-badge\" style=\"color:#999; font-style:italic;\">0%</span>"
+    else
+      imp_labels = { 1 => 'Hilfreich', 2 => 'Wichtig', 3 => 'Erforderlich' }
+      detail_lines = details.map do |d|
+        level_text = SubskillUserSkill::LEVELS[d[:user_level].to_i][:label] rescue d[:user_level].to_i
+        "• #{d[:skill_name]}: IST #{d[:user_level].to_i} (#{level_text}) | SOLL #{imp_labels[d[:req_imp]]}"
+      end
+      tooltip = detail_lines.join("\n").gsub('"', '&quot;')
+      color = score >= 80 ? '#2e7d32' : (score >= 50 ? '#f9a825' : '#c62828')
+      "<span class=\"sk-fit-badge\" title=\"#{tooltip}\" style=\"color:#{color}; font-weight:bold; cursor:help;\">#{score}%</span>"
+    end
+  else
+    "<span class=\"sk-fit-badge\" style=\"color:#ccc;\" title=\"Keine Anforderungen für dieses Projekt definiert\">?</span>"
+  end
+%>
+
+<script>
+(function() {
+  const user = "<%= user.login %>";
+  console.log("RedmineSubskills: Row script running for " + user);
+  const badgeHtml = <%= badge.to_json.html_safe %>;
+  const scriptTag = document.currentScript;
+  const row = scriptTag ? scriptTag.closest("tr") : null;
+  
+  if (row) {
+    if (!row.querySelector(".sk-td-fit")) {
+      const td = document.createElement("td");
+      td.className = "sk-td-fit";
+      td.style.textAlign = "center";
+      td.innerHTML = badgeHtml;
+      
+      const rolesTd = row.querySelector("td.roles") || row.cells[1];
+      if (rolesTd && rolesTd.nextElementSibling) {
+        row.insertBefore(td, rolesTd.nextElementSibling);
+      } else {
+        const btnTd = row.querySelector("td.buttons");
+        if (btnTd) row.insertBefore(td, btnTd);
+        else row.appendChild(td);
+      }
+    }
+  } else {
+    console.error("RedmineSubskills: Could not find TR for " + user);
+  }
+})();
+</script>

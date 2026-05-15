@@ -18,6 +18,7 @@ RedmineApp::Application.routes.draw do
   get  '/subskills/user/:user_id',            to: 'subskills#my_skills',           as: 'user_skills_subskills'
   get  '/subskills/user/:user_id/rollen',     to: 'subskills#my_rollen',           as: 'my_rollen_subskills'
   post '/subskills/user/:user_id/skill',      to: 'subskills#update_single_skill', as: 'update_single_skill_subskills'
+  post '/subskills/user/:user_id/endorse',    to: 'subskills#toggle_endorsement',  as: 'toggle_endorsement_subskills'
 
   # Admin: Skill catalog management
   get    '/subskills/admin',            to: 'subskills_admin#index',   as: 'subskills_admin_index'

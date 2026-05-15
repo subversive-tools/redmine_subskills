@@ -53,12 +53,12 @@ body.subskills-active-page #main-menu { display: none !important; }
 
 /* Cell backgrounds – subtle tint only */
 .sk-level-cell { text-align: center; vertical-align: middle; }
-.sk-level-0 .sk-badge { background: #aaa; }
-.sk-level-1 .sk-badge { background: #90b8d8; }
-.sk-level-2 .sk-badge { background: #5b9ec9; }
-.sk-level-3 .sk-badge { background: #2e78b7; }
-.sk-level-4 .sk-badge { background: #1a5c99; }
-.sk-level-5 .sk-badge { background: #0d3d6b; }
+.sk-level-0 .sk-badge { background: #ccc; }
+.sk-level-1 .sk-badge { background: #e3f2fd; color: #1e88e5; }
+.sk-level-2 .sk-badge { background: #90caf9; }
+.sk-level-3 .sk-badge { background: #42a5f5; }
+.sk-level-4 .sk-badge { background: #1e88e5; }
+.sk-level-5 .sk-badge { background: #0d47a1; }
 
 /* ── Legend ───────────────────────────────────────────────── */
 .subskills-legend {
@@ -146,28 +146,43 @@ body.subskills-active-page #main-menu { display: none !important; }
 
 /* Active state per level */
 .sk-option-btn.sk-option-btn--active { margin-left: -0.2rem; }
-.sk-option-btn--active.sk-level-0 { background: #aaa;    border-color: #888;    color: #fff; }
-.sk-option-btn--active.sk-level-1 { background: #90b8d8; border-color: #6a9ec0; color: #fff; }
-.sk-option-btn--active.sk-level-2 { background: #5b9ec9; border-color: #3a80ad; color: #fff; }
-.sk-option-btn--active.sk-level-3 { background: #2e78b7; border-color: #1f5e96; color: #fff; }
-.sk-option-btn--active.sk-level-4 { background: #1a5c99; border-color: #0f4278; color: #fff; }
-.sk-option-btn--active.sk-level-5 { background: #0d3d6b; border-color: #061e35; color: #fff; }
+.sk-option-btn--active.sk-level-0 { background: #ccc;    border-color: #bbb;    color: #fff; }
+.sk-option-btn--active.sk-level-1 { background: #e3f2fd; border-color: #90caf9; color: #67b8ff; }
+.sk-option-btn--active.sk-level-2 { background: #90caf9; border-color: #64b5f6; color: #fff; }
+.sk-option-btn--active.sk-level-3 { background: #50b1ff; border-color: #1e88e5; color: #fff; }
+.sk-option-btn--active.sk-level-4 { background: #1e88e5; border-color: #1565c0; color: #fff; }
+.sk-option-btn--active.sk-level-5 { background: #0d47a1; border-color: #0a3d8a; color: #fff; }
 
-/* ── Star toggle (Lernziel) ───────────────────────────────── */
+/* ── Target toggle (Lernziel) ─────────────────────────────── */
 .sk-star-btn {
   background: none;
   border: none;
-  font-size: 0.95rem;
-  color: #bbb;
+  width: 16px; height: 16px;
+  padding: 0;
   cursor: pointer;
-  padding: 0 2px;
   line-height: 1;
-  transition: color .15s, transform .1s;
+  transition: opacity .15s, transform .1s;
   flex-shrink: 0;
+  opacity: 0.3;
+  display: inline-block;
+  background-image: url(../images/target.svg);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  font-size: 0; /* hide text fallback */
+  vertical-align: middle;
+  filter: grayscale(1);
 }
 
-.sk-star-btn:hover { color: #e53935; transform: scale(1.15); }
-.sk-star-btn--active { color: #e53935; }
+.sk-star-btn:hover { 
+  opacity: 1; 
+  transform: scale(1.15); 
+  filter: invert(28%) sepia(93%) saturate(1652%) hue-rotate(344deg) brightness(91%) contrast(97%); /* #e53935 */
+}
+.sk-star-btn--active { 
+  opacity: 1; 
+  filter: invert(28%) sepia(93%) saturate(1652%) hue-rotate(344deg) brightness(91%) contrast(97%); /* #e53935 */
+}
 
 /* ── Level description rows ───────────────────────────────── */
 .sk-level-all {
@@ -230,12 +245,12 @@ body.subskills-active-page #main-menu { display: none !important; }
 }
 
 .sk-bar-fill { height: 100%; border-radius: 4px; }
-.sk-bar-fill.sk-level-0 { background: #aaa; }
-.sk-bar-fill.sk-level-1 { background: #90b8d8; }
-.sk-bar-fill.sk-level-2 { background: #5b9ec9; }
-.sk-bar-fill.sk-level-3 { background: #2e78b7; }
-.sk-bar-fill.sk-level-4 { background: #1a5c99; }
-.sk-bar-fill.sk-level-5 { background: #0d3d6b; }
+.sk-bar-fill.sk-level-0 { background: #ccc; }
+.sk-bar-fill.sk-level-1 { background: #e3f2fd; }
+.sk-bar-fill.sk-level-2 { background: #90caf9; }
+.sk-bar-fill.sk-level-3 { background: #42a5f5; }
+.sk-bar-fill.sk-level-4 { background: #1e88e5; }
+.sk-bar-fill.sk-level-5 { background: #0d47a1; }
 
 /* ── Profile tab section ──────────────────────────────────── */
 .subskills-profile-section {
@@ -527,16 +542,18 @@ td.fit-low  { color: #8d1f00; }
 .psk-scroll         { overflow-x: auto; }
 
 #psk-table th.name  { text-align: left; }
+.psk-skill-name     { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+                      overflow: hidden; max-width: 250px; line-height: 1.2; }
 
 .psk-th-req         { width: 120px; }
 .psk-th-user        { width: 56px; max-width: 56px; text-align: center; font-weight: normal;
                       font-size: 0.78rem; white-space: nowrap; overflow: hidden;
-                      text-overflow: ellipsis; border-left: 1px solid #e0e0e0; }
+                      text-overflow: ellipsis; }
 .psk-user-lastname  { font-size: 0.7rem; color: #888; }
 
 .psk-passung-row    { background: #f8f8f8; border-bottom: 2px solid #ddd; }
 .psk-passung-label  { font-size: 0.78rem; color: #666; padding: 4px 6px; font-style: italic; text-align: right; }
-.psk-score-cell     { text-align: center; padding: 4px 2px; border-left: 1px solid #e0e0e0; }
+.psk-score-cell     { text-align: center; padding: 4px 2px; }
 .psk-score-badge    { display: inline-block; border-radius: 3px; font-size: 0.8rem;
                       font-weight: 600; padding: 1px 6px; white-space: nowrap; }
 .psk-score-high     { background: #d4edda; }
@@ -549,19 +566,54 @@ td.fit-low  { color: #8d1f00; }
 .psk-imp-badge      { padding: 2px 8px; border-radius: 3px; font-size: 0.78rem;
                       color: #333; white-space: nowrap; }
 
-.psk-td-level       { text-align: center; padding: 3px 2px; border-left: 1px solid #e0e0e0; }
+.psk-td-level       { text-align: center; padding: 3px 2px; }
 .psk-level-wrap     { position: relative; display: inline-block; }
-.psk-star-badge     { position: absolute; top: -9px; right: -11px; color: #e53935;
-                      font-size: 1.2rem; line-height: 1; }
+
+/* Matrix specific button size reduction (~5-7%) */
+#psk-table .sk-option-btn {
+  width: 26px;
+  height: 26px;
+  font-size: 0.75rem;
+}
+
+.psk-star-badge     { position: absolute; top: -7px; right: -9px;
+                      width: 11px; height: 11px;
+                      background: url(../images/target.svg) no-repeat center;
+                      background-size: contain;
+                      filter: invert(28%) sepia(93%) saturate(1652%) hue-rotate(344deg) brightness(91%) contrast(97%); /* #e53935 */
+                      font-size: 0; line-height: 0; overflow: hidden; }
+.psk-endorse-badge  { position: absolute; bottom: -1px; right: -10px; 
+                      width: 12px; height: 12px; 
+                      display: flex; align-items: center; justify-content: center; }
+.psk-endorse-badge::after {
+                      content: ''; display: block; width: 100%; height: 100%;
+                      background: url(../images/endorse.svg) no-repeat center;
+                      background-size: contain; 
+                      filter: invert(34%) sepia(69%) saturate(518%) hue-rotate(76deg) brightness(93%) contrast(93%); /* #2e7d32 Green */
+                    }
 .psk-no-level       { color: #ccc; font-size: 0.85rem; }
 
 .psk-row-active     { background: #fffbe6 !important; }
 .psk-row-clickable  { cursor: pointer; }
 
+/* Structural highlighting in matrix */
+#psk-table tr.parent {
+  background-color: #f8f8f8 !important;
+}
+#psk-table tr.parent td.name {
+  font-weight: 600;
+}
+#psk-table tr.leaf {
+  background-color: #ffffff !important;
+}
+
 /* ── Add-member row & modal ───────────────────────────────── */
-#psk-add-member-row td        { border-top: 2px solid #e0e0e0; background: #fafafa;
+#psk-roles-row td,
+#psk-add-member-row td        { border-top: 1px solid #e0e0e0; background: #f8f8f8 !important;
                                 padding: 6px 4px; }
 .psk-add-member-label         { font-size: 0.78rem; color: #888; font-style: italic; }
+.psk-roles-text               { font-size: 0.72rem; color: #555; line-height: 1.2;
+                                word-wrap: break-word; max-width: 56px; margin: 0 auto; }
 
 .psk-add-member-btn           { background: none; border: 1px solid #c8d8e8;
                                 border-radius: 50%; width: 22px; height: 22px;
@@ -594,8 +646,20 @@ td.fit-low  { color: #8d1f00; }
    Utility classes – replaces all inline styles in templates
    ============================================================= */
 
-/* ── Initially hidden elements ─────────────────────────────── */
-#sk-save-indicator { display: none; }
+.sk-btn-edit-svg {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+  color: #169;
+}
+.sk-btn-edit-svg:hover {
+  text-decoration: underline;
+}
+.sk-btn-edit-svg svg.sk-svg-icon {
+  fill: currentColor;
+  stroke: none;
+}
 #sk-toast          { display: none; }
 #psk-member-modal  { display: none; }
 
@@ -664,11 +728,19 @@ td.fit-low  { color: #8d1f00; }
 .sk-level-desc             { font-size: 0.75rem; color: #bbb; padding-left: 6px; margin-top: 1px; min-height: 1em; }
 .sk-row-divider            { border-bottom: 1px solid #f5f5f5; }
 .sk-td-center-top          { text-align: center; padding: 4px 8px; vertical-align: top; padding-top: 6px; }
-.sk-td-star-col            { text-align: center; padding: 4px; vertical-align: top; padding-top: 1px; }
+.sk-td-star-col            { text-align: center; padding: 4px; vertical-align: top; padding-top: 4px; }
 .sk-flex-dots              { display: inline-flex; gap: 4px; align-items: center; }
 .sk-dot                    { display: inline-block; width: 12px; height: 12px; border-radius: 50%; }
-.sk-star-red               { color: #e53935; font-size: 1rem; }
-.sk-star-mini              { font-size: 0.7rem; }
+.sk-star-red               { display: inline-block; width: 14px; height: 14px;
+                             background: url(../images/target.svg) no-repeat center;
+                             background-size: contain;
+                             filter: invert(28%) sepia(93%) saturate(1652%) hue-rotate(344deg) brightness(91%) contrast(97%);
+                             vertical-align: middle; font-size: 0; overflow: hidden; }
+.sk-star-mini              { display: inline-block; width: 10px; height: 10px;
+                             background: url(../images/target.svg) no-repeat center;
+                             background-size: contain;
+                             filter: invert(28%) sepia(93%) saturate(1652%) hue-rotate(344deg) brightness(91%) contrast(97%);
+                             vertical-align: middle; font-size: 0; overflow: hidden; }
 
 /* ── my_skills group containers ─────────────────────────────── */
 .sk-group-header    { display: flex; align-items: center; gap: 10px;
@@ -676,6 +748,7 @@ td.fit-low  { color: #8d1f00; }
 .sk-skill-title     { font-weight: 700; color: #333; flex: 1; }
 .sk-skill-title--root { font-size: 0.95rem; }
 .sk-skill-title--sub  { font-size: 0.88rem; }
+.sk-skill-name      { font-weight: normal; }
 .sk-help-abbr       { cursor: help; font-size: 0.75rem; color: #999;
                       border-bottom: 1px dotted #999; margin-left: 4px; }
 .sk-agg-dots        { display: inline-flex; gap: 3px; }
@@ -701,3 +774,113 @@ td.fit-low  { color: #8d1f00; }
 
 /* ── project_skills misc ─────────────────────────────────────── */
 .sk-submit-mt { margin-top: 16px; }
+
+/* ── Endorsements ────────────────────────────────────────────── */
+.sk-endorse-full-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  padding: 0px 4px;
+  border-radius: 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #333;
+  margin-top: 0px;
+}
+
+.sk-endorse-full-btn.readonly {
+  opacity: 0.8;
+}
+
+.sk-endorse-full-btn.readonly:not(.has-count) {
+  display: none;
+}
+
+.sk-endorse-icon {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  transition: filter 0.2s ease;
+  /* Default: No one endorsed -> Light Gray */
+  filter: invert(80%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(90%);
+}
+
+/* Has endorsements from others */
+.sk-endorse-full-btn.has-others .sk-endorse-icon {
+  filter: invert(34%) sepia(69%) saturate(518%) hue-rotate(76deg) brightness(93%) contrast(93%); /* Green */
+}
+
+/* Endorsed by ME (active) */
+.sk-endorse-full-btn.active .sk-endorse-icon {
+  filter: invert(34%) sepia(69%) saturate(518%) hue-rotate(76deg) brightness(93%) contrast(93%); /* Green */
+}
+
+.sk-endorse-count {
+  min-width: 10px;
+  text-align: right;
+}
+
+/* Checkbox specific styles (optional, can just use native) */
+.sk-endorse-checkbox {
+  margin: 0 !important;
+  cursor: pointer;
+}
+
+.sk-endorse-checkbox-only {
+  margin: 0 !important;
+  cursor: pointer;
+  transform: scale(0.9);
+  accent-color: #2e7d32;
+  position: relative;
+  top: -3px;
+}
+
+/* Vertical border between Lernziel and Bestätigung */
+.sk-profile-th--endorse,
+.sk-td-endorse-col {
+  border-left: 1px solid #e0e0e0;
+}
+
+/* Row highlighting based on endorsement count */
+tr.sk-row-divider[data-endorse-count]:not([data-endorse-count="0"]),
+.sk-skill-block[data-endorse-count]:not([data-endorse-count="0"]) {
+  background-color: #00ff0005 !important;
+}
+
+.sk-endorse-mini {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: #2e7d32;
+  font-weight: 700;
+  background: #f1f8e9;
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  border: 1px solid #dcedc8;
+  position: relative;
+  top: -1px;
+}
+
+.sk-endorse-mini::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background-image: url(../images/endorse.svg);
+  background-repeat: no-repeat;
+  background-size: contain;
+  filter: invert(34%) sepia(69%) saturate(518%) hue-rotate(76deg) brightness(93%) contrast(93%); /* Matches #2e7d32 */
+}
+
+/* ── Context Menu ────────────────────────────────────────────── */
+.sk-row:hover { cursor: context-menu; }
+tr.context-menu-selection,
+tr.context-menu-selection:hover {
+  background-color: #507AAA !important;
+  color: #f8f8f8 !important;
+}
+tr.context-menu-selection a {
+  color: #f8f8f8 !important;
+}
