@@ -1,4 +1,4 @@
-class MigrateCategoriesToSkillTree < ActiveRecord::Migration[7.2]
+class MigrateCategoriesToSkillTree < ActiveRecord::Migration[5.2]
   def up
     categories = connection.select_values(
       "SELECT DISTINCT category FROM subskill_skills " \

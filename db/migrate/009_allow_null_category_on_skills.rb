@@ -1,4 +1,4 @@
-class AllowNullCategoryOnSkills < ActiveRecord::Migration[7.2]
+class AllowNullCategoryOnSkills < ActiveRecord::Migration[5.2]
   def up
     change_column_default :subskill_skills, :category, from: nil, to: ''
     change_column_null    :subskill_skills, :category, true
