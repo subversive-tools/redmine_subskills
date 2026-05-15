@@ -2,7 +2,7 @@
   <%= stylesheet_link_tag 'subskills', plugin: 'redmine_subskills' %>
 <% end %>
 
-<h2><%= @skill.new_record? ? 'Neuer Skill' : "Skill bearbeiten: #{@skill.name}" %></h2>
+<h2><%= @skill.new_record? ? '<%= t(:label_new_skill) %>' : "Skill bearbeiten: #{@skill.name}" %></h2>
 
 <%= form_with model: @skill,
               url: @skill.new_record? ? subskills_admin_index_path : subskills_admin_path(@skill),
@@ -20,7 +20,7 @@
       <%= f.text_field :name, required: true, size: 50 %>
     </p>
     <p>
-      <%= f.label :category, 'Kategorie', class: 'required' %>
+      <%= f.label :category, '<%= t(:field_category) %>', class: 'required' %>
       <%= f.select :category, @categories, { prompt: '— bitte wählen —' }, required: true %>
     </p>
     <p>
@@ -40,7 +40,7 @@
   </div>
 
   <p>
-    <%= f.submit @skill.new_record? ? 'Erstellen' : 'Speichern', class: 'button-positive' %>
-    <%= link_to 'Abbrechen', subskills_admin_index_path, class: 'button' %>
+    <%= f.submit @skill.new_record? ? '<%= t(:button_create) %>' : '<%= t(:button_save) %>', class: 'button-positive' %>
+    <%= link_to '<%= t(:button_cancel) %>', subskills_admin_index_path, class: 'button' %>
   </p>
 <% end %>

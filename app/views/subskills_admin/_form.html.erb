@@ -3,7 +3,7 @@
 <% end %>
 
 
-<h2><%= @skill.new_record? ? 'Neuer Skill' : "Skill bearbeiten: #{@skill.name}" %></h2>
+<h2><%= @skill.new_record? ? '<%= t(:label_new_skill) %>' : "Skill bearbeiten: #{@skill.name}" %></h2>
 
 <%= form_with model: @skill,
               url: @skill.new_record? ? subskills_admin_index_path : subskills_admin_path(@skill),
@@ -22,7 +22,7 @@
       <%= f.text_field :name, required: true, size: 50 %>
     </p>
     <p>
-      <%= f.label :parent_id, 'Übergeordneter Skill' %>
+      <%= f.label :parent_id, '<%= t(:label_parent_skill) %>' %>
       <%= f.select :parent_id, @parent_options, { include_blank: '— kein (Root-Skill) —' } %>
       <em class="info">Nur Skills wählen, die noch keine Bewertungen haben.</em>
     </p>
@@ -82,7 +82,7 @@
   </div>
 
   <p>
-    <%= f.submit @skill.new_record? ? 'Erstellen' : 'Speichern', class: 'button-positive' %>
-    <%= link_to 'Abbrechen', subskills_admin_index_path, class: 'button' %>
+    <%= f.submit @skill.new_record? ? '<%= t(:button_create) %>' : '<%= t(:button_save) %>', class: 'button-positive' %>
+    <%= link_to '<%= t(:button_cancel) %>', subskills_admin_index_path, class: 'button' %>
   </p>
 <% end %>

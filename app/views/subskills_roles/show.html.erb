@@ -15,8 +15,8 @@
   <thead>
     <tr>
       <th>Kompetenz</th>
-      <th>Kategorie</th>
-      <th>Wichtigkeit</th>
+      <th><%= t(:field_category) %></th>
+      <th><%= t(:label_importance) %></th>
     </tr>
   </thead>
   <tbody>
@@ -37,11 +37,11 @@
 </table>
 
 <!-- Fit-Score Ranking -->
-<h3 class="subskills-category-title">Passung nach Person</h3>
+<h3 class="subskills-category-title"><%= t(:label_match_by_person) %></h3>
 <table class="list sk-table-narrow">
   <thead>
     <tr>
-      <th>Person</th>
+      <th><%= t(:label_person) %></th>
       <th class="sk-th-score-lg">Fit-Score</th>
       <th class="sk-th-pct">%</th>
     </tr>

@@ -5,7 +5,7 @@
 <%# ─── Contextual toolbar ─────────────────────────────────────────────────── %>
 <div class="contextual">
   <%= link_to new_subskills_admin_path, class: 'icon icon-add' do %>
-    <%= sprite_icon('add') %><span class="icon-label">Neuer Skill</span>
+    <%= sprite_icon('add') %><span class="icon-label"><%= t(:label_new_skill) %></span>
   <% end %>
   <span class="drdn sk-drdn-wrap" id="sk-top-drdn">
     <a href="#" class="icon-only icon-actions" title="Aktionen"
@@ -16,12 +16,12 @@
           <%= f.file_field :csv_file, accept: '.csv', style: 'display:none;',
               id: 'sk-csv-input', onchange: 'this.form.submit()' %>
           <label for="sk-csv-input" class="sk-drdn-item icon icon-import">
-            <%= sprite_icon('import') %><span class="icon-label">CSV importieren</span>
+            <%= sprite_icon('import') %><span class="icon-label"><%= t(:label_import_csv) %></span>
           </label>
         <% end %>
       </li>
       <li><%= link_to export_csv_subskills_admin_index_path, class: 'sk-drdn-item icon icon-export' do %>
-          <span class="sk-icon-flip"><%= sprite_icon('import') %></span><span class="icon-label">CSV exportieren</span>
+          <span class="sk-icon-flip"><%= sprite_icon('import') %></span><span class="icon-label"><%= t(:label_export_csv) %></span>
         <% end %></li>
     </ul>
   </span>
@@ -45,8 +45,8 @@
       <th class="checkbox hide-when-print">
         <input type="checkbox" class="toggle-selection" onchange="skCheckAll(this)">
       </th>
-      <th class="name">Name</th>
-      <th class="short_description">Beschreibung</th>
+      <th class="name"><%= t(:field_name) %></th>
+      <th class="short_description"><%= t(:field_description) %></th>
       <th class="buttons"></th>
     </tr>
   </thead>
@@ -74,7 +74,7 @@
             <span class="expander icon-expander open sk-expander"
                   onclick="skToggle(<%= skill.id %>, this)" title="Ein-/Ausklappen"></span>
           <% end %>
-          <span class="sk-name-content"><span class="sk-drag-handle" title="Verschieben (auch auf andere Skills ziehen zum Umhängen)">⠿</span><%= link_to skill.name, edit_subskills_admin_path(skill) %><% if skill.composite? && !is_root %><em class="psk-aggregated"> (aggregiert)</em><% end %></span>
+          <span class="sk-name-content"><span class="sk-drag-handle" title="Verschieben (auch auf andere Skills ziehen zum Umhängen)">⠿</span><%= link_to skill.name, edit_subskills_admin_path(skill) %><% if skill.composite? && !is_root %><em class="psk-aggregated" (<%= t(:label_aggregated) %>)</em><% end %></span>
         </td>
 
         <td class="short_description"><%= skill.description %></td>
@@ -84,17 +84,17 @@
             <a href="#" class="icon-only icon-actions" title="Aktionen"
                onclick="skRowToggle(event,this);return false;"></a>
             <ul class="sk-drdn-items">
-              <li><%= link_to 'Bearbeiten', edit_subskills_admin_path(skill),
+              <li><%= link_to '<%= t(:button_edit) %>', edit_subskills_admin_path(skill),
                           class: 'sk-drdn-item icon icon-edit' %></li>
               <li><%= link_to 'Kopieren', new_subskills_admin_path(copy_from: skill.id),
                           class: 'sk-drdn-item icon icon-copy' %></li>
               <% if skill.can_add_children? %>
-                <li><%= link_to 'Neuer Unter-Skill', new_subskills_admin_path(parent_id: skill.id),
+                <li><%= link_to '<%= t(:label_new_subskill) %>', new_subskills_admin_path(parent_id: skill.id),
                             class: 'sk-drdn-item icon icon-add' %></li>
               <% end %>
               <li class="sk-drdn-sep"></li>
               <li>
-                <%= button_to 'Löschen', subskills_admin_path(skill),
+                <%= button_to '<%= t(:button_delete) %>', subskills_admin_path(skill),
                     method: :delete, class: 'icon icon-del',
                     form_class: 'sk-inline-form',
                     data: { confirm: "Skill '#{skill.name}' wirklich löschen?" } %>

@@ -14,9 +14,9 @@
 <table class="list projects" id="psk-edit-table">
   <thead>
     <tr>
-      <th class="name">Name</th>
-      <th class="short_description">Beschreibung</th>
-      <th class="sk-th-req">Anforderung</th>
+      <th class="name"><%= t(:field_name) %></th>
+      <th class="short_description"><%= t(:field_description) %></th>
+      <th class="sk-th-req"><%= t(:label_requirement) %></th>
     </tr>
   </thead>
   <tbody>
@@ -34,7 +34,7 @@
           <% end %>
           <%= skill.name %>
           <% if skill.composite? && !is_root %>
-            <em class="sk-text-hint">(aggregiert)</em>
+            <em class="sk-text-hint">(<%= t(:label_aggregated) %>)</em>
           <% end %>
         </td>
         <td class="short_description"><%= skill.description %></td>
@@ -58,8 +58,8 @@
 </table>
 
 <p class="sk-submit-mt">
-  <%= submit_tag 'Speichern', class: 'button-positive' %>
-  <%= link_to 'Abbrechen', project_skills_path(@project) %>
+  <%= submit_tag '<%= t(:button_save) %>', class: 'button-positive' %>
+  <%= link_to '<%= t(:button_cancel) %>', project_skills_path(@project) %>
 </p>
 
 <% end %>

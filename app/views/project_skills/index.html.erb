@@ -40,9 +40,9 @@
 <table class="list projects" id="psk-table">
   <thead>
     <tr>
-      <th class="name">Name</th>
-      <th class="short_description">Beschreibung</th>
-      <th class="psk-th-req">Anforderung</th>
+      <th class="name"><%= t(:field_name) %></th>
+      <th class="short_description"><%= t(:field_description) %></th>
+      <th class="psk-th-req"><%= t(:label_requirement) %></th>
       <% @fit_scores.each do |fs| %>
         <th class="psk-th-user" data-user-id="<%= fs[:user].id %>" title="<%= fs[:user].name %>">
           <%= link_to fs[:user].firstname, user_path(fs[:user]) %><br>
@@ -54,7 +54,7 @@
     <tr class="psk-passung-row psk-row-clickable" id="psk-passung-row">
       <td></td>
       <td></td>
-      <td class="psk-passung-label">Passung</td>
+      <td class="psk-passung-label"><%= t(:label_match) %></td>
       <% @fit_scores.each do |fs| %>
         <% pct = fs[:score].to_i %>
         <% badge_cls = pct >= 80 ? 'psk-score-high' : pct >= 50 ? 'psk-score-mid' : 'psk-score-low' %>
@@ -82,7 +82,7 @@
           <% end %>
           <span class="psk-skill-name"><%= skill.name %></span>
           <% if skill.composite? && !is_root %>
-            <em class="psk-aggregated">(aggregiert)</em>
+            <em class="psk-aggregated">(<%= t(:label_aggregated) %>)</em>
           <% end %>
         </td>
         <td class="short_description"><%= skill.description %></td>
@@ -133,7 +133,7 @@
     </tr>
     <% if @can_manage_members %>
     <tr id="psk-add-member-row">
-      <td class="name" colspan="3"><span class="psk-add-member-label">Als Mitglied hinzufügen</span></td>
+      <td class="name" colspan="3"><span class="psk-add-member-label"><%= t(:label_add_as_member) %></span></td>
       <% @fit_scores.each do |fs| %>
         <td class="psk-td-level" data-user-id="<%= fs[:user].id %>">
           <button type="button" class="psk-add-member-btn"
@@ -152,7 +152,7 @@
 <% if @can_manage_members %>
 <div id="psk-member-modal" class="psk-modal-overlay" style="display:none;">
   <div class="psk-modal-box">
-    <h3 class="psk-modal-title">Mitglied hinzufügen</h3>
+    <h3 class="psk-modal-title"><%= t(:label_add_member) %></h3>
     <p class="psk-modal-user"></p>
     <%= form_with url: project_memberships_path(@project), method: :post, local: true,
                   id: 'psk-member-form' do |f| %>
@@ -166,8 +166,8 @@
         </select>
       </div>
       <div class="psk-modal-actions">
-        <%= f.submit 'Hinzufügen', class: 'button-positive' %>
-        <button type="button" id="psk-modal-cancel">Abbrechen</button>
+        <%= f.submit '<%= t(:button_add) %>', class: 'button-positive' %>
+        <button type="button" id="psk-modal-cancel"><%= t(:button_cancel) %></button>
       </div>
     <% end %>
   </div>
