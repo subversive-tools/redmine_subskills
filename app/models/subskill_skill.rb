@@ -11,6 +11,15 @@ class SubskillSkill < ActiveRecord::Base
 
   validates :name,     presence: true, uniqueness: true
   validates :category, presence: true
+  validate  :prevent_self_parenting
+
+  private
+
+  def prevent_self_parenting
+    if parent_id.present? && parent_id == id
+      errors.add(:parent_id, "kann nicht sich selbst als übergeordnet haben")
+    end
+  end
 
   scope :active, -> { where(active: true) }
   scope :roots,  -> { where(parent_id: nil) }
