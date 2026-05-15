@@ -1,0 +1,60 @@
+name: Test Redmine Plugin
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        redmine: ['5.1-stable']
+        ruby: ['3.2']
+
+    steps:
+    - name: Checkout Plugin
+      uses: actions/checkout@v4
+      with:
+        path: plugin_src
+
+    - name: Checkout Redmine
+      uses: actions/checkout@v4
+      with:
+        repository: redmine/redmine
+        ref: ${{ matrix.redmine }}
+        path: redmine
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby }}
+        bundler-cache: false
+
+    - name: Prepare Redmine & Plugin
+      run: |
+        cp -r plugin_src redmine/plugins/redmine_subskills
+        cd redmine
+        cp config/database.yml.example config/database.yml
+        # Configure SQLite for tests
+        sed -i 's/adapter: mysql2/adapter: sqlite3/' config/database.yml
+        sed -i 's/database: redmine_test/database: db\/test.sqlite3/' config/database.yml
+
+    - name: Install Dependencies
+      working-directory: ./redmine
+      run: |
+        bundle config set --local without 'development'
+        bundle install --jobs 4 --retry 3
+
+    - name: Setup Database & Run Tests
+      working-directory: ./redmine
+      env:
+        RAILS_ENV: test
+      run: |
+        bundle exec rake db:create
+        bundle exec rake db:migrate
+        bundle exec rake redmine:plugins:migrate
+        # Run plugin tests
+        bundle exec rake redmine:plugins:test NAME=redmine_subskills
