@@ -4,9 +4,7 @@
 
 <%# ─── Contextual toolbar ─────────────────────────────────────────────────── %>
 <div class="contextual">
-  <%= link_to new_subskills_admin_path, class: 'icon icon-add' do %>
-    <%= sprite_icon('add') %><span class="icon-label"><%= t(:label_new_skill) %></span>
-  <% end %>
+  <%= link_to t(:label_new_skill), new_subskills_admin_path, class: 'icon icon-add' %>
   <span class="drdn sk-drdn-wrap" id="sk-top-drdn">
     <a href="#" class="icon-only icon-actions" title="<%= t(:label_actions) %>"
        onclick="skDrdnToggle(event,'sk-top-drdn');return false;"></a>
@@ -15,14 +13,12 @@
         <%= form_with url: import_csv_subskills_admin_index_path, multipart: true, local: true do |f| %>
           <%= f.file_field :csv_file, accept: '.csv', style: 'display:none;',
               id: 'sk-csv-input', onchange: 'this.form.submit()' %>
-          <label for="sk-csv-input" class="sk-drdn-item icon icon-import">
-            <%= sprite_icon('import') %><span class="icon-label"><%= t(:label_import_csv) %></span>
+          <label for="sk-csv-input" class="sk-drdn-item icon icon-attachment">
+            <%= t(:label_import_csv) %>
           </label>
         <% end %>
       </li>
-      <li><%= link_to export_csv_subskills_admin_index_path, class: 'sk-drdn-item icon icon-export' do %>
-          <span class="sk-icon-flip"><%= sprite_icon('import') %></span><span class="icon-label"><%= t(:label_export_csv) %></span>
-        <% end %></li>
+      <li><%= link_to t(:label_export_csv), export_csv_subskills_admin_index_path, class: 'sk-drdn-item icon icon-download' %></li>
     </ul>
   </span>
 </div>
