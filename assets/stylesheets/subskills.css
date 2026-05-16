@@ -468,16 +468,13 @@ td.fit-low  { color: #8d1f00; }
   transform: translateY(-50%);
   width: 16px;
   height: 16px;
-  background-image: url(../images/skills.svg);
-  background-repeat: no-repeat;
-  background-size: 16px 16px;
-}
-
-#admin-menu a.subskills-admin.selected::before,
-#admin-menu a.subskills_admin.selected::before,
-#admin-menu li.selected a.subskills-admin::before,
-#admin-menu li.selected a.subskills_admin::before {
-  filter: brightness(0) invert(1);
+  background-color: currentColor;
+  -webkit-mask-image: url(../images/skills.svg);
+  mask-image: url(../images/skills.svg);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 16px 16px;
+  mask-size: 16px 16px;
 }
 
 /* Flip icon 180° (used for export = inverted import arrow) */
