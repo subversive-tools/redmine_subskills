@@ -74,7 +74,7 @@
             <span class="expander icon-expander open sk-expander"
                   onclick="skToggle(<%= skill.id %>, this)" title="Ein-/Ausklappen"></span>
           <% end %>
-          <span class="sk-name-content"><span class="sk-drag-handle" title="Verschieben (auch auf andere Skills ziehen zum Umhängen)">⠿</span><%= link_to skill.name, edit_subskills_admin_path(skill) %><% if skill.composite? && !is_root %><em class="psk-aggregated" (<%= t(:label_aggregated) %>)</em><% end %></span>
+          <span class="sk-name-content"><span class="sk-drag-handle" title="Verschieben (auch auf andere Skills ziehen zum Umhängen)">⠿</span><%= link_to skill.name, edit_subskills_admin_path(skill) %><% if skill.composite? && !is_root %><em class="psk-aggregated"> (<%= t(:label_aggregated) %>)</em><% end %></span>
         </td>
 
         <td class="short_description"><%= skill.description %></td>
