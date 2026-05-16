@@ -57,8 +57,8 @@
     </tr>
     <%# Passung summary row — click to restore passung order %>
     <tr class="psk-passung-row psk-row-clickable" id="psk-passung-row">
-      <td></td>
-      <td></td>
+      <td class="name"></td>
+      <td class="short_description"></td>
       <td class="psk-passung-label"><%= t(:label_match) %></td>
       <% @fit_scores.each do |fs| %>
         <% pct = fs[:score].to_i %>
