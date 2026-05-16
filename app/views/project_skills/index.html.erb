@@ -127,7 +127,9 @@
   </tbody>
   <tfoot>
     <tr id="psk-roles-row">
-      <td class="name" colspan="3"><span class="psk-add-member-label"><%= t(:label_add_as_member_with_dots) %></span></td>
+      <td class="name"><span class="psk-add-member-label"><%= t(:label_add_as_member_with_dots) %></span></td>
+      <td class="short_description"></td>
+      <td class="psk-td-req"></td>
       <% @fit_scores.each do |fs| %>
         <td class="psk-td-level" data-user-id="<%= fs[:user].id %>" data-is-member="<%= @user_roles_map.key?(fs[:user].id) ? 'true' : 'false' %>">
           <div class="psk-roles-text" title="<%= @user_roles_map[fs[:user].id] %>">
@@ -138,7 +140,9 @@
     </tr>
     <% if @can_manage_members %>
     <tr id="psk-add-member-row">
-      <td class="name" colspan="3"><span class="psk-add-member-label"><%= t(:label_add_as_member) %></span></td>
+      <td class="name"><span class="psk-add-member-label"><%= t(:label_add_as_member) %></span></td>
+      <td class="short_description"></td>
+      <td class="psk-td-req"></td>
       <% @fit_scores.each do |fs| %>
         <td class="psk-td-level" data-user-id="<%= fs[:user].id %>" data-is-member="<%= @user_roles_map.key?(fs[:user].id) ? 'true' : 'false' %>">
           <button type="button" class="psk-add-member-btn"
