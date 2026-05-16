@@ -16,8 +16,20 @@ class SubskillUserSkill < ActiveRecord::Base
   }.freeze
 
   def self.level_label(level)
-    lines = (Setting.plugin_redmine_subskills['default_level_labels'] || "").split("\n").map(&:strip)
-    lines[level].presence || "Level #{level}"
+    labels = Setting.plugin_redmine_subskills['default_level_labels']
+    if labels.blank?
+      labels = {
+        '0' => 'Keine Kenntnisse',
+        '1' => 'Grundkenntnisse',
+        '2' => 'Anwender / Basic',
+        '3' => 'Fortgeschritten',
+        '4' => 'Spezialist',
+        '5' => 'Experte'
+      }
+    elsif labels.is_a?(String)
+      labels = labels.split("\n").map(&:strip).each_with_index.map { |l, i| [i.to_s, l] }.to_h
+    end
+    (labels[level.to_s].presence || labels[level].presence) || "Level #{level}"
   end
 
   validates :user_id, presence: true

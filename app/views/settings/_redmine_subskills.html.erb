@@ -44,8 +44,17 @@
     <em class="info" style="display:block; margin-top: 5px; margin-bottom: 15px;"><%= t(:text_default_level_labels_info) %></em>
     
     <% 
-      labels = @settings['default_level_labels'] || {}
-      if labels.is_a?(String)
+      labels = @settings['default_level_labels']
+      if labels.blank?
+        labels = {
+          '0' => 'Keine Kenntnisse',
+          '1' => 'Grundkenntnisse',
+          '2' => 'Anwender / Basic',
+          '3' => 'Fortgeschritten',
+          '4' => 'Spezialist',
+          '5' => 'Experte'
+        }
+      elsif labels.is_a?(String)
         labels = labels.split("\n").map(&:strip).each_with_index.map { |l, i| [i.to_s, l] }.to_h
       end
     %>
