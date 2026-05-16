@@ -60,7 +60,14 @@ Redmine::Plugin.register :redmine_subskills do
   # ── Plugin-Settings ───────────────────────────────────────────
   settings default: {
     'levels_count' => '5',
-    'default_level_labels' => "Keine Kenntnisse\nGrundkenntnisse\nAnwender / Basic\nFortgeschritten\nSpezialist\nExperte",
+    'default_level_labels' => {
+      '0' => 'Keine Kenntnisse',
+      '1' => 'Grundkenntnisse',
+      '2' => 'Anwender / Basic',
+      '3' => 'Fortgeschritten',
+      '4' => 'Spezialist',
+      '5' => 'Experte'
+    },
     'fit_success_threshold' => '70',
     'fit_warning_threshold' => '40',
     'enable_endorsements' => '1',
