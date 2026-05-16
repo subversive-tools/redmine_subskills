@@ -36,7 +36,7 @@
             <em class="sk-text-hint">(<%= t(:label_aggregated) %>)</em>
           <% end %>
         </td>
-        <td class="short_description"><div class="sk-desc-clamp"><%= skill.description %></div></td>
+        <td class="short_description"><%= skill.description %></td>
         <td>
           <% if skill.children.none? %>
             <%# Only leaf skills get a dropdown %>

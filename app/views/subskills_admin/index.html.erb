@@ -91,7 +91,7 @@
           <span class="sk-name-content"><span class="sk-drag-handle" title="<%= t(:label_drag_to_reorder) %>">⠿</span><%= link_to skill.name, edit_subskills_admin_path(skill) %><% if skill.composite? && !is_root %><em class="psk-aggregated"> (<%= t(:label_aggregated) %>)</em><% end %></span>
         </td>
 
-        <td class="short_description"><div class="sk-desc-clamp"><%= skill.description %></div></td>
+        <td class="short_description"><%= skill.description %></td>
 
         <td class="buttons">
           <span class="sk-drdn-cell">
