@@ -53,32 +53,156 @@
   <% end %>
 
   <% unless @skill.composite? %>
-  <h3 class="sk-admin-h3"><%= t(:label_level_descriptions, default: 'Level-Beschreibungen') %></h3>
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+    <h3 class="sk-admin-h3" style="margin:0;"><%= t(:label_level_descriptions, default: 'Level-Beschreibungen') %></h3>
+    <a href="#" onclick="skAddLevelRow(event); return false;" class="icon icon-add"><%= t(:button_add, default: 'Neuer Level') %></a>
+  </div>
   <p class="sk-admin-note">
-    <%= t(:text_level_descriptions_note, default: 'Was bedeutet jeder Level für diesen Skill? Diese Texte werden dem User beim Auswählen angezeigt.') %>
+    <%= t(:text_level_descriptions_note, default: 'Was bedeutet jeder Level für diesen Skill? Diese Texte werden dem User beim Auswählen angezeigt. Die Reihenfolge (1 = niedrigstes Level) kann per Drag & Drop geändert werden.') %>
   </p>
 
-  <div class="box tabular">
-    <p>
-      <%= f.label :levels_count, t(:label_levels_count, default: "Anzahl der Level") %>
-      <%= f.number_field :levels_count, placeholder: Setting.plugin_redmine_subskills['levels_count'] || 5, min: 1, max: 20 %>
-      <em class="info">Nach dem Speichern wird die Maske für die entsprechenden Level angepasst.</em>
-    </p>
-    <%= f.fields_for :level_descriptions, @skill.level_descriptions.sort_by(&:level) do |lf| %>
-      <%= lf.hidden_field :level %>
-      <% lvl = lf.object.level %>
-      <p>
-        <label class="sk-admin-level-lbl">
-          <%= t(:label_level_n, level: lvl, default: "Level %{level}") %>
-        </label>
-        <%= lf.text_field :label, placeholder: t("label_skill_level_#{lvl}", default: "Name / Titel"), size: 30 %>
-        <br>
-        <label class="sk-admin-level-lbl">&nbsp;</label>
-        <%= lf.text_area :description, rows: 2, cols: 55,
-            placeholder: t(:text_level_n_placeholder, level: lvl, default: "Was kann jemand auf Level %{level}?") %>
-      </p>
-    <% end %>
+  <div class="box tabular" id="sk-levels-container">
+    <div id="sk-level-rows">
+      <%= f.fields_for :level_descriptions, @skill.level_descriptions.sort_by(&:level) do |lf| %>
+        <div class="sk-level-row-item" style="display:flex; align-items:start; margin-bottom:10px; padding:10px; border:1px solid #ddd; background:#fff;" draggable="true">
+          <span class="sk-drag-handle" style="cursor:grab; margin-right:10px; font-size:18px; color:#999; margin-top:2px;" title="Verschieben">⠿</span>
+          
+          <div style="flex-grow:1;">
+            <div style="margin-bottom:5px; display:flex; align-items:center;">
+              <strong class="sk-level-number-lbl" style="width: 70px;">Level <%= lf.object.level || 1 %></strong>
+              <%= lf.hidden_field :level, class: 'sk-level-hidden-input' %>
+              <%= lf.hidden_field :_destroy, class: 'sk-level-destroy' %>
+              <%= lf.text_field :label, placeholder: t("label_skill_level_#{lf.object.level || 1}", default: "Name / Titel"), size: 30, style: "margin-left:10px;" %>
+            </div>
+            <%= lf.text_area :description, rows: 2, style: "width:100%; box-sizing:border-box;", placeholder: "Was kann jemand auf diesem Level?" %>
+          </div>
+          
+          <a href="#" onclick="skRemoveLevelRow(event, this); return false;" class="icon icon-del" style="margin-left:10px; margin-top:2px;" title="Löschen"></a>
+        </div>
+      <% end %>
+    </div>
   </div>
+
+  <template id="sk-level-row-template">
+    <div class="sk-level-row-item sk-new-row" style="display:flex; align-items:start; margin-bottom:10px; padding:10px; border:1px solid #ddd; background:#fff;" draggable="true">
+      <span class="sk-drag-handle" style="cursor:grab; margin-right:10px; font-size:18px; color:#999; margin-top:2px;" title="Verschieben">⠿</span>
+      
+      <div style="flex-grow:1;">
+        <div style="margin-bottom:5px; display:flex; align-items:center;">
+          <strong class="sk-level-number-lbl" style="width: 70px;">Level NEW</strong>
+          <input type="hidden" name="subskill_skill[level_descriptions_attributes][NEW_RECORD][level]" class="sk-level-hidden-input" value="NEW">
+          <input type="hidden" name="subskill_skill[level_descriptions_attributes][NEW_RECORD][_destroy]" class="sk-level-destroy" value="0">
+          <input type="text" name="subskill_skill[level_descriptions_attributes][NEW_RECORD][label]" placeholder="Name / Titel" size="30" style="margin-left:10px;">
+        </div>
+        <textarea name="subskill_skill[level_descriptions_attributes][NEW_RECORD][description]" rows="2" style="width:100%; box-sizing:border-box;" placeholder="Was kann jemand auf diesem Level?"></textarea>
+      </div>
+      
+      <a href="#" onclick="skRemoveLevelRow(event, this); return false;" class="icon icon-del" style="margin-left:10px; margin-top:2px;" title="Löschen"></a>
+    </div>
+  </template>
+
+  <script>
+    function skUpdateLevelNumbers() {
+      var rows = document.querySelectorAll('#sk-level-rows .sk-level-row-item:not([style*="display: none"])');
+      rows.forEach(function(row, index) {
+        var level = index + 1;
+        row.querySelector('.sk-level-number-lbl').textContent = 'Level ' + level;
+        row.querySelector('.sk-level-hidden-input').value = level;
+      });
+    }
+
+    function skAddLevelRow(e) {
+      e.preventDefault();
+      var tpl = document.getElementById('sk-level-row-template').innerHTML;
+      var time = new Date().getTime();
+      tpl = tpl.replace(/NEW_RECORD/g, time);
+      
+      var container = document.getElementById('sk-level-rows');
+      container.insertAdjacentHTML('beforeend', tpl);
+      
+      skInitDragAndDrop();
+      skUpdateLevelNumbers();
+    }
+
+    function skRemoveLevelRow(e, btn) {
+      e.preventDefault();
+      var row = btn.closest('.sk-level-row-item');
+      if (row.classList.contains('sk-new-row')) {
+        row.remove();
+      } else {
+        row.style.display = 'none';
+        row.querySelector('.sk-level-destroy').value = '1';
+      }
+      skUpdateLevelNumbers();
+    }
+
+    var skDraggingRow = null;
+
+    function skInitDragAndDrop() {
+      document.querySelectorAll('.sk-level-row-item').forEach(function(row) {
+        if (row.dataset.dndInit) return;
+        row.dataset.dndInit = "1";
+        var handle = row.querySelector('.sk-drag-handle');
+        
+        handle.addEventListener('mousedown', function() { row.setAttribute('draggable', 'true'); });
+        
+        row.addEventListener('dragstart', function(e) {
+          if (!row.hasAttribute('draggable')) { e.preventDefault(); return; }
+          skDraggingRow = row;
+          row.style.opacity = '0.4';
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', 'sk-level-row');
+        });
+
+        row.addEventListener('dragend', function() {
+          row.style.opacity = '1';
+          row.removeAttribute('draggable');
+          skDraggingRow = null;
+          document.querySelectorAll('.sk-level-row-item').forEach(function(r) { r.style.borderTop = '1px solid #ddd'; r.style.borderBottom = ''; });
+        });
+
+        row.addEventListener('dragover', function(e) {
+          if (!skDraggingRow || skDraggingRow === row) return;
+          e.preventDefault();
+          var rect = row.getBoundingClientRect();
+          var relY = e.clientY - rect.top;
+          if (relY < rect.height / 2) {
+            row.style.borderTop = '2px solid #333';
+            row.style.borderBottom = '';
+          } else {
+            row.style.borderTop = '1px solid #ddd';
+            row.style.borderBottom = '2px solid #333';
+          }
+        });
+
+        row.addEventListener('dragleave', function() {
+          row.style.borderTop = '1px solid #ddd';
+          row.style.borderBottom = '';
+        });
+
+        row.addEventListener('drop', function(e) {
+          e.preventDefault();
+          row.style.borderTop = '1px solid #ddd';
+          row.style.borderBottom = '';
+          if (!skDraggingRow || skDraggingRow === row) return;
+          
+          var rect = row.getBoundingClientRect();
+          var relY = e.clientY - rect.top;
+          
+          if (relY < rect.height / 2) {
+            row.parentNode.insertBefore(skDraggingRow, row);
+          } else {
+            row.parentNode.insertBefore(skDraggingRow, row.nextSibling);
+          }
+          skUpdateLevelNumbers();
+        });
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      skInitDragAndDrop();
+    });
+  </script>
   <% end %>
 
   <p>

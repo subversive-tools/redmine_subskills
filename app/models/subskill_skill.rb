@@ -12,6 +12,11 @@ class SubskillSkill < ActiveRecord::Base
   accepts_nested_attributes_for :level_descriptions, allow_destroy: true
 
   validates :name,     presence: true, uniqueness: true
+  before_save :update_levels_count
+
+  def update_levels_count
+    self.levels_count = level_descriptions.reject(&:marked_for_destruction?).size
+  end
   validate  :prevent_self_parenting
   validate  :prevent_rated_parenting
 
