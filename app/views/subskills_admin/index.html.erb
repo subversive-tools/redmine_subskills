@@ -215,7 +215,7 @@ function postJSON(url, data, cb) {
     headers: {'X-Requested-With': 'XMLHttpRequest'}
   }).then(function(r){ return r.json(); })
     .then(function(j){ cb(j); })
-    .catch(function(){ cb({ok: false, error: t(:label_network_error)}); });
+    .catch(function(){ cb({ok: false, error: '<%= t(:label_network_error) %>'}); });
 }
 
 // ── Drag & Drop ───────────────────────────────────────────────────────────────
@@ -322,7 +322,7 @@ document.querySelectorAll('.sk-row').forEach(function(row) {
           showToast('✓ Skill verschoben', true);
           setTimeout(function() { window.location.reload(); }, 700);
         } else {
-          showToast(j.error || t(:label_error_word), false);
+          showToast(j.error || '<%= t(:label_error_word) %>', false);
         }
       });
 
@@ -337,7 +337,7 @@ document.querySelectorAll('.sk-row').forEach(function(row) {
         tbody.querySelectorAll('tr.sk-row[data-parent-id="' + dragPid + '"]')
              .forEach(function(r) { ids.push(r.dataset.skillId); });
         postJSON(REORDER_URL, { ids: ids }, function(j) {
-          if (!j.ok) showToast(j.error || t(:label_error_word), false);
+          if (!j.ok) showToast(j.error || '<%= t(:label_error_word) %>', false);
         });
       } else {
         // Different parent → reparent to target's parent (insert as sibling of target)
@@ -346,7 +346,7 @@ document.querySelectorAll('.sk-row').forEach(function(row) {
             showToast('✓ Skill verschoben', true);
             setTimeout(function() { window.location.reload(); }, 700);
           } else {
-            showToast(j.error || t(:label_error_word), false);
+            showToast(j.error || '<%= t(:label_error_word) %>', false);
           }
         });
       }
@@ -375,7 +375,7 @@ if (theadRow) {
         showToast('✓ Auf oberste Ebene verschoben', true);
         setTimeout(function() { window.location.reload(); }, 700);
       } else {
-        showToast(j.error || t(:label_error_word), false);
+        showToast(j.error || '<%= t(:label_error_word) %>', false);
       }
     });
   });
