@@ -202,7 +202,8 @@
   ).map(function(th) {
     return {
       id: th.dataset.userId,
-      isMember: th.dataset.isMember === 'true'
+      isMember: th.dataset.isMember === 'true',
+      name: th.getAttribute('title') || ''
     };
   });
   var origUserIds = usersData.map(function(u) { return u.id; });
