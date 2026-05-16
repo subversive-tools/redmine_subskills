@@ -615,7 +615,7 @@ td.fit-low  { color: #8d1f00; }
 .psk-roles-text               { font-size: 0.72rem; color: #555; line-height: 1.2;
                                 word-wrap: break-word; max-width: 56px; margin: 0 auto; }
 
-.psk-add-member-btn           { background: none; border: 1px solid #c8d8e8;
+.psk-add-member-btn           { background: none; border: none;
                                 border-radius: 50%; width: 22px; height: 22px;
                                 font-size: 1rem; line-height: 1; cursor: pointer;
                                 color: #4a90d9; display: inline-flex;
