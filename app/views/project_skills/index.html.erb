@@ -134,7 +134,15 @@
   </tbody>
   <tfoot>
     <tr id="psk-roles-row">
-      <td class="name"><span class="psk-add-member-label"><%= t(:label_add_as_member_with_dots) %></span></td>
+      <td class="name">
+        <span class="psk-add-member-label">
+          <% if @can_manage_members %>
+            <%= link_to t(:label_member_plural), settings_project_path(@project, tab: 'members') %>
+          <% else %>
+            <%= t(:label_member_plural) %>
+          <% end %>
+        </span>
+      </td>
       <td class="short_description"></td>
       <td class="psk-td-req"></td>
       <td class="psk-td-sort"></td>
