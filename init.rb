@@ -2,7 +2,7 @@ Redmine::Plugin.register :redmine_subskills do
   name        'Subskills'
   author      'Stefan Mischke'
   description 'Skill Management and Role matrix for Redmine'
-  version     '0.3.0'
+  version     '1.0.0'
   url         'https://github.com/modoq/redmine_subskills'
   author_url  'https://github.com/modoq'
 
