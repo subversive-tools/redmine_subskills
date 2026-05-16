@@ -50,7 +50,7 @@
     <% @users_with_scores.each_with_index do |entry, i| %>
       <% user  = entry[:user] %>
       <% score = entry[:score] %>
-      <% css   = score >= 70 ? 'fit-high' : score >= 40 ? 'fit-mid' : 'fit-low' %>
+      <% css   = subskills_fit_css(score) %>
       <tr class="<%= i.even? ? 'even' : 'odd' %>">
         <td>
           <%= link_to user.name, user_skills_subskills_path(user_id: user.id) %>

@@ -56,6 +56,16 @@ Redmine::Plugin.register :redmine_subskills do
        caption: :label_subskills,
        before:  :trackers,
        html: { class: 'icon' }
+
+  # ── Plugin-Settings ───────────────────────────────────────────
+  settings default: {
+    'levels_count' => '5',
+    'fit_success_threshold' => '70',
+    'fit_warning_threshold' => '40',
+    'enable_endorsements' => '1',
+    'default_view_mode' => 'split',
+    'allow_self_assessment' => '1'
+  }, partial: 'settings/redmine_subskills'
 end
 
 require_relative 'lib/redmine_subskills/hooks'

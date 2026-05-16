@@ -1,0 +1,36 @@
+<p>
+  <label><%= t(:label_levels_count) %></label>
+  <%= number_field_tag 'settings[levels_count]', @settings['levels_count'], min: 1, max: 20 %>
+  <em class="info"><%= t(:text_levels_count_info) %></em>
+</p>
+<p>
+  <label><%= t(:label_fit_success_threshold) %> (%)</label>
+  <%= number_field_tag 'settings[fit_success_threshold]', @settings['fit_success_threshold'], min: 0, max: 100 %>
+  <em class="info"><%= t(:text_fit_success_info) %></em>
+</p>
+<p>
+  <label><%= t(:label_fit_warning_threshold) %> (%)</label>
+  <%= number_field_tag 'settings[fit_warning_threshold]', @settings['fit_warning_threshold'], min: 0, max: 100 %>
+  <em class="info"><%= t(:text_fit_warning_info) %></em>
+</p>
+<p>
+  <label><%= t(:label_enable_endorsements) %></label>
+  <%= hidden_field_tag 'settings[enable_endorsements]', 0 %>
+  <%= check_box_tag 'settings[enable_endorsements]', 1, @settings['enable_endorsements'] == '1' %>
+  <em class="info"><%= t(:text_enable_endorsements_info) %></em>
+</p>
+<p>
+  <label><%= t(:label_allow_self_assessment) %></label>
+  <%= hidden_field_tag 'settings[allow_self_assessment]', 0 %>
+  <%= check_box_tag 'settings[allow_self_assessment]', 1, @settings['allow_self_assessment'] == '1' %>
+  <em class="info"><%= t(:text_allow_self_assessment_info) %></em>
+</p>
+<p>
+  <label><%= t(:label_default_view_mode) %></label>
+  <%= select_tag 'settings[default_view_mode]', options_for_select([
+    [t(:label_view_mode_all), 'all'],
+    [t(:label_view_mode_split), 'split'],
+    [t(:label_view_mode_members), 'members_only']
+  ], @settings['default_view_mode']) %>
+  <em class="info"><%= t(:text_default_view_mode_info) %></em>
+</p>

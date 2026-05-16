@@ -30,7 +30,7 @@
     <tbody>
       <% @ranked_users.each_with_index do |entry, i| %>
         <% score = entry[:score] %>
-        <% css   = score >= 70 ? 'fit-high' : score >= 40 ? 'fit-mid' : 'fit-low' %>
+        <% css   = subskills_fit_css(score) %>
         <tr class="<%= i.even? ? 'even' : 'odd' %>">
           <td class="sk-td-rank"><%= i + 1 %></td>
           <td>
@@ -51,8 +51,8 @@
   </table>
 
   <div class="subskills-legend">
-    <span class="sk-legend-item fit-high">≥ 70% – Gute Passung</span>
-    <span class="sk-legend-item fit-mid">40–69% – Teilweise</span>
+    <span class="sk-legend-item fit-high">≥ <%= subskills_succ_thresh %>% – Gute Passung</span>
+    <span class="sk-legend-item fit-mid"><%= subskills_warn_thresh %>–<%= subskills_succ_thresh - 1 %>% – Teilweise</span>
     <span class="sk-legend-item fit-low"><%= t(:text_gaps_present) %></span>
   </div>
 <% end %>
