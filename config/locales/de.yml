@@ -56,8 +56,38 @@ de:
   label_configure_now: Jetzt konfigurieren
   text_best_match_explanation: Rangfolge aller aktiven User nach Übereinstimmung mit
     den Skill-Anforderungen dieses Projekts.
-  text_project_skills_explanation: Lege fest, welche Skills für dieses Projekt erwartet
-    werden und wie wichtig sie sind. Nicht ausgewählte Skills werden nicht berücksichtigt.
+  label_default_view_mode: Standard-Ansicht der Matrix
+  text_default_view_mode_info: Die Standard-Gruppierung, in der die Skill-Matrix für
+    neue Nutzer angezeigt wird.
+  label_default_level_labels: Standard Level-Bezeichnungen
+  text_default_level_labels_info: Hier kannst du für jeden Level den Standard-Namen
+    definieren. Es werden nur so viele angezeigt, wie oben unter 'Anzahl der Level'
+    konfiguriert.
+  label_level_n: Level %{level}
+  text_level_n_placeholder: Was kann jemand auf Level %{level}?
+  warning_levels_count_changed: 'Achtung: Eine Änderung der Level-Anzahl wirkt sich
+    auf bestehende Bewertungen und die Darstellung aus. Werden Level reduziert, können
+    Bewertungen im Profil falsch angezeigt werden oder unsichtbar werden.'
+  text_levels_count_info: Die generelle Anzahl der Level, die pro Skill vergeben werden
+    können.
+  text_skill_has_children_warning: Dieser Skill hat Unter-Skills — sein Score wird
+    automatisch berechnet.<br>Level-Beschreibungen werden nicht für manuelle Bewertung
+    genutzt.
+  text_skill_has_ratings_warning: Dieser Skill hat %{count} Bewertung(en) — er kann
+    keine Unter-Skills mehr bekommen.
+  text_skill_has_ratings_level_warning: Da dieser Skill bereits Bewertungen hat, sollten
+    Level-Beschreibungen nicht mehr grundlegend geändert, sondern höchstens verbessert
+    oder korrigiert werden.
+  label_levels_count: Anzahl der Level
+  text_inactive_skills_hidden: Inaktive Skills werden in der Matrix ausgeblendet.
+  text_only_skills_without_ratings: Nur Skills wählen, die noch keine Bewertungen
+    haben.
+  label_short_description_tooltip: Kurzbeschreibung (Tooltip)
+  text_short_description_placeholder: Kurze Beschreibung des Skills (erscheint als
+    Tooltip)
+  label_level_descriptions: Level-Beschreibungen
+  text_level_descriptions_note: Was bedeutet jeder Level für diesen Skill? Diese Texte
+    werden dem User beim Auswählen angezeigt.
   text_fit_score_explanation: "Fit-Score: Wie gut passen die Selbsteinschätzungen
     einer Person zu den Anforderungen einer Rolle? Skala: \U0001F7E2 ≥ 70% · \U0001F7E1
     40–69% · \U0001F534 < 40%"
@@ -67,8 +97,6 @@ de:
   label_error_word: Fehler
   field_position: Position
   field_active: Aktiv
-  text_only_skills_without_ratings: Nur Skills wählen, die noch keine Bewertungen
-    haben.
   text_level_descriptions_explanation: Was bedeutet jeder Level für diesen Skill?
     Diese Texte werden dem User beim Auswählen angezeigt.
   error_unauthorized: Nicht autorisiert
@@ -84,39 +112,26 @@ de:
   label_view_mode: 'Darstellung:'
   label_view_mode_all: Alle (ungruppiert)
   label_view_mode_split: Mitglieder & Externe gruppiert
-  label_view_mode_members: Nur Projektmitglieder
+  label_view_mode_members: Nur Mitglieder anzeigen
   label_toggle_expand: Ein-/Ausklappen
   label_endorsements_count: "%{count} Bestätigung(en)"
   label_add_user_as_member: "%{name} als Projektmitglied hinzufügen"
   label_drag_to_reorder: Verschieben (auch auf andere Skills ziehen zum Umhängen)
   label_user_level: "%{user}: Level %{level}"
   label_user_level_endorsements: "%{user}: Level %{level} (%{count} Bestätigungen)"
-  label_sort_columns: "Spalten sortieren"
-  label_edit_skill: "Skill bearbeiten: %{name}"
-  label_parent_skill: "Übergeordneter Skill"
+  label_sort_columns: Spalten sortieren
+  label_edit_skill: 'Skill bearbeiten: %{name}'
+  label_parent_skill: Übergeordneter Skill
   label_no_parent_skill: "— kein (Root-Skill) —"
-  label_short_description_tooltip: "Kurzbeschreibung (Tooltip)"
-  text_short_description_placeholder: "Kurze Beschreibung des Skills (erscheint als Tooltip)"
-  text_inactive_skills_hidden: "Inaktive Skills werden in der Matrix ausgeblendet."
-  text_skill_has_children_warning: "Dieser Skill hat Unter-Skills — sein Score wird automatisch berechnet.<br>Level-Beschreibungen werden nicht für manuelle Bewertung genutzt."
-  text_skill_has_ratings_warning: "Dieser Skill hat %{count} Bewertung(en) — er kann keine Unter-Skills mehr bekommen."
-  label_level_descriptions: "Level-Beschreibungen"
-  text_level_descriptions_note: "Was bedeutet jeder Level für diesen Skill? Diese Texte werden dem User beim Auswählen angezeigt."
-  label_level_n: "Level %{level}"
-  text_level_n_placeholder: "Was kann jemand auf Level %{level}?"
-  text_skill_has_ratings_level_warning: "Da dieser Skill bereits Bewertungen hat, sollten Level-Beschreibungen nicht mehr grundlegend geändert, sondern höchstens verbessert oder korrigiert werden."
-  label_levels_count: "Anzahl der Level"
-  text_levels_count_info: "Die generelle Anzahl der Level, die pro Skill vergeben werden können."
-  label_fit_success_threshold: "Passung: Success Threshold"
-  text_fit_success_info: "Ab diesem Prozentwert gilt ein Anforderungsprofil als erfüllt (Farbe: Grün)."
-  label_fit_warning_threshold: "Passung: Warning Threshold"
-  text_fit_warning_info: "Unterhalb dieses Prozentwerts werden Lücken kritisch hervorgehoben (Farbe: Rot)."
-  label_enable_endorsements: "Bestätigungen (Endorsements) aktivieren"
-  text_enable_endorsements_info: "Wenn aktiviert, können Projekt-Mitglieder die Skills anderer User bestätigen."
-  label_allow_self_assessment: "Selbsteinschätzung erlauben"
-  text_allow_self_assessment_info: "Wenn deaktiviert, können nur berechtigte Personen (z.B. Manager) die Skills bewerten."
-  label_default_view_mode: "Standard-Ansicht der Matrix"
-  text_default_view_mode_info: "Die Standard-Gruppierung, in der die Skill-Matrix für neue Nutzer angezeigt wird."
-  label_view_mode_all: "Alle (ungruppiert)"
-  label_view_mode_split: "Mitglieder & Externe gruppiert"
-  label_view_mode_members: "Nur Mitglieder anzeigen"
+  label_fit_success_threshold: 'Passung: Success Threshold'
+  text_fit_success_info: 'Ab diesem Prozentwert gilt ein Anforderungsprofil als erfüllt
+    (Farbe: Grün).'
+  label_fit_warning_threshold: 'Passung: Warning Threshold'
+  text_fit_warning_info: 'Unterhalb dieses Prozentwerts werden Lücken kritisch hervorgehoben
+    (Farbe: Rot).'
+  label_enable_endorsements: Bestätigungen (Endorsements) aktivieren
+  text_enable_endorsements_info: Wenn aktiviert, können Projekt-Mitglieder die Skills
+    anderer User bestätigen.
+  label_allow_self_assessment: Selbsteinschätzung erlauben
+  text_allow_self_assessment_info: Wenn deaktiviert, können nur berechtigte Personen
+    (z.B. Manager) die Skills bewerten.

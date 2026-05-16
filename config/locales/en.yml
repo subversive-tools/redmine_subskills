@@ -55,6 +55,33 @@ en:
   label_configure_now: Configure now
   text_best_match_explanation: Ranking of all active users by match with the skill
     requirements of this project.
+  label_default_view_mode: Default Matrix View Mode
+  text_default_view_mode_info: The default grouping in which the skill matrix is displayed
+    for new users.
+  label_default_level_labels: Default Level Labels
+  text_default_level_labels_info: Here you can define the default name for each level.
+    Only as many fields are shown as configured under 'Number of Levels' above.
+  label_level_n: Level %{level}
+  text_level_n_placeholder: What can someone do at Level %{level}?
+  warning_levels_count_changed: 'Warning: Changing the number of levels affects existing
+    ratings and display. If you reduce levels, existing higher ratings might be displayed
+    incorrectly or become invisible.'
+  text_levels_count_info: The general number of levels that can be assigned per skill.
+  text_skill_has_children_warning: This skill has child skills — its score is calculated
+    automatically.<br>Level descriptions are not used for manual rating.
+  text_skill_has_ratings_warning: This skill has %{count} rating(s) — it cannot receive
+    any child skills.
+  text_skill_has_ratings_level_warning: Since this skill already has ratings, level
+    descriptions should not be fundamentally changed, but at most improved or corrected.
+  label_levels_count: Number of Levels
+  text_inactive_skills_hidden: Inactive skills will be hidden in the matrix.
+  text_only_skills_without_ratings: Only select skills that do not have ratings yet.
+  label_short_description_tooltip: Short Description (Tooltip)
+  text_short_description_placeholder: Short description of the skill (appears as a
+    tooltip)
+  label_level_descriptions: Level Descriptions
+  text_level_descriptions_note: What does each level mean for this skill? These texts
+    will be shown to the user when selecting a level.
   text_project_skills_explanation: Define which skills are expected for this project
     and how important they are. Unselected skills are not considered.
   text_fit_score_explanation: "Fit Score: How well do a person's self-assessments
@@ -66,7 +93,6 @@ en:
   label_error_word: Error
   field_position: Position
   field_active: Active
-  text_only_skills_without_ratings: Only select skills that do not have ratings yet.
   text_level_descriptions_explanation: What does each level mean for this skill? These
     texts will be shown to the user during selection.
   error_unauthorized: Unauthorized
@@ -82,39 +108,26 @@ en:
   label_view_mode: 'View Mode:'
   label_view_mode_all: All (ungrouped)
   label_view_mode_split: Members & Externals grouped
-  label_view_mode_members: Project Members Only
+  label_view_mode_members: Members only
   label_toggle_expand: Toggle expand/collapse
   label_endorsements_count: "%{count} endorsement(s)"
   label_add_user_as_member: Add %{name} as project member
   label_drag_to_reorder: Drag to reorder (drop on other skills to change parent)
   label_user_level: "%{user}: Level %{level}"
   label_user_level_endorsements: "%{user}: Level %{level} (%{count} endorsements)"
-  label_sort_columns: "Sort columns"
-  label_edit_skill: "Edit Skill: %{name}"
-  label_parent_skill: "Parent Skill"
+  label_sort_columns: Sort columns
+  label_edit_skill: 'Edit Skill: %{name}'
+  label_parent_skill: Parent Skill
   label_no_parent_skill: "— none (Root Skill) —"
-  label_short_description_tooltip: "Short Description (Tooltip)"
-  text_short_description_placeholder: "Short description of the skill (appears as a tooltip)"
-  text_inactive_skills_hidden: "Inactive skills will be hidden in the matrix."
-  text_skill_has_children_warning: "This skill has child skills — its score is calculated automatically.<br>Level descriptions are not used for manual rating."
-  text_skill_has_ratings_warning: "This skill has %{count} rating(s) — it cannot receive any child skills."
-  label_level_descriptions: "Level Descriptions"
-  text_level_descriptions_note: "What does each level mean for this skill? These texts will be shown to the user when selecting a level."
-  label_level_n: "Level %{level}"
-  text_level_n_placeholder: "What can someone do at Level %{level}?"
-  text_skill_has_ratings_level_warning: "Since this skill already has ratings, level descriptions should not be fundamentally changed, but at most improved or corrected."
-  label_levels_count: "Number of Levels"
-  text_levels_count_info: "The general number of levels that can be assigned per skill."
-  label_fit_success_threshold: "Match: Success Threshold"
-  text_fit_success_info: "From this percentage on, a requirement profile is considered fulfilled (Color: Green)."
-  label_fit_warning_threshold: "Match: Warning Threshold"
-  text_fit_warning_info: "Below this percentage, gaps are critically highlighted (Color: Red)."
-  label_enable_endorsements: "Enable Endorsements"
-  text_enable_endorsements_info: "If enabled, project members can endorse the skills of other users."
-  label_allow_self_assessment: "Allow Self-Assessment"
-  text_allow_self_assessment_info: "If disabled, only authorized persons (e.g. managers) can rate skills."
-  label_default_view_mode: "Default Matrix View Mode"
-  text_default_view_mode_info: "The default grouping in which the skill matrix is displayed for new users."
-  label_view_mode_all: "All (ungrouped)"
-  label_view_mode_split: "Members & Externals grouped"
-  label_view_mode_members: "Members only"
+  label_fit_success_threshold: 'Match: Success Threshold'
+  text_fit_success_info: 'From this percentage on, a requirement profile is considered
+    fulfilled (Color: Green).'
+  label_fit_warning_threshold: 'Match: Warning Threshold'
+  text_fit_warning_info: 'Below this percentage, gaps are critically highlighted (Color:
+    Red).'
+  label_enable_endorsements: Enable Endorsements
+  text_enable_endorsements_info: If enabled, project members can endorse the skills
+    of other users.
+  label_allow_self_assessment: Allow Self-Assessment
+  text_allow_self_assessment_info: If disabled, only authorized persons (e.g. managers)
+    can rate skills.

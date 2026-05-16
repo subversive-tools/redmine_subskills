@@ -3,7 +3,7 @@
 <% end %>
 
 
-<h2><%= @skill.new_record? ? t(:label_new_skill) : t(:label_edit_skill, name: @skill.name, default: "Skill bearbeiten: %{name}") %></h2>
+<h2><%= @skill.new_record? ? t(:label_new_skill) : t(:label_edit_skill, name: @skill.name) %></h2>
 
 <%= form_with model: @skill,
               url: @skill.new_record? ? subskills_admin_index_path : subskills_admin_path(@skill),
@@ -23,48 +23,48 @@
     </p>
     <p>
       <%= f.label :parent_id, t(:label_parent_skill) %>
-      <%= f.select :parent_id, @parent_options, { include_blank: t(:label_no_parent_skill, default: '— kein (Root-Skill) —') } %>
-      <em class="info"><%= t(:text_only_skills_without_ratings, default: 'Nur Skills wählen, die noch keine Bewertungen haben.') %></em>
+      <%= f.select :parent_id, @parent_options, { include_blank: t(:label_no_parent_skill) } %>
+      <em class="info"><%= t(:text_only_skills_without_ratings) %></em>
     </p>
     </p>
     <p>
-      <%= f.label :description, t(:label_short_description_tooltip, default: 'Kurzbeschreibung (Tooltip)') %>
+      <%= f.label :description, t(:label_short_description_tooltip) %>
       <%= f.text_area :description, rows: 2, cols: 60,
-          placeholder: t(:text_short_description_placeholder, default: 'Kurze Beschreibung des Skills (erscheint als Tooltip)') %>
+          placeholder: t(:text_short_description_placeholder) %>
     </p>
     <p>
       <%= f.label :active, t(:field_active) %>
       <%= f.check_box :active %>
-      <em class="info"><%= t(:text_inactive_skills_hidden, default: 'Inaktive Skills werden in der Matrix ausgeblendet.') %></em>
+      <em class="info"><%= t(:text_inactive_skills_hidden) %></em>
     </p>
   </div>
 
   <%# Level-Beschreibungen – nur für Blatt-Skills sinnvoll %>
   <% if @skill.composite? %>
     <div class="flash warning sk-flash-mt">
-      <%= raw t(:text_skill_has_children_warning, default: 'Dieser Skill hat Unter-Skills — sein Score wird automatisch berechnet.<br>Level-Beschreibungen werden nicht für manuelle Bewertung genutzt.') %>
+      <%= raw t(:text_skill_has_children_warning) %>
     </div>
   <% end %>
   <% if @skill.persisted? && @skill.user_skills.any? %>
     <div class="flash warning sk-flash-mt">
-      <%= t(:text_skill_has_ratings_warning, count: @skill.user_skills.count, default: "Dieser Skill hat %{count} Bewertung(en) — er kann keine Unter-Skills mehr bekommen.") %><br>
-      <%= t(:text_skill_has_ratings_level_warning, default: "Da dieser Skill bereits Bewertungen hat, sollten Level-Beschreibungen nicht mehr grundlegend geändert, sondern höchstens verbessert oder korrigiert werden.") %>
+      <%= t(:text_skill_has_ratings_warning, count: @skill.user_skills.count) %><br>
+      <%= t(:text_skill_has_ratings_level_warning) %>
     </div>
   <% end %>
 
   <% unless @skill.composite? %>
-  <h3 class="sk-admin-h3"><%= t(:label_level_descriptions, default: 'Level-Beschreibungen') %></h3>
+  <h3 class="sk-admin-h3"><%= t(:label_level_descriptions) %></h3>
   <p class="sk-admin-note">
-    <%= t(:text_level_descriptions_note, default: 'Was bedeutet jeder Level für diesen Skill? Diese Texte werden dem User beim Auswählen angezeigt.') %>
+    <%= t(:text_level_descriptions_note) %>
   </p>
 
   <div class="box tabular">
     <p>
-      <%= f.label :levels_count, t(:label_levels_count, default: "Anzahl der Level") %>
+      <%= f.label :levels_count, t(:label_levels_count) %>
       <%= f.number_field :levels_count, placeholder: Setting.plugin_redmine_subskills['levels_count'] || 5, min: 1, max: 20 %>
       <em class="info">Nach dem Speichern wird die Maske für die entsprechenden Level angepasst.</em>
       <div id="sk-levels-warning" class="flash warning" style="display: none; margin-top: 10px;">
-        <%= t(:warning_levels_count_changed, default: 'Achtung: Eine Änderung der Level-Anzahl wirkt sich auf bestehende Bewertungen und die Darstellung aus. Werden Level reduziert, können Bewertungen im Profil falsch angezeigt werden oder unsichtbar werden.') %>
+        <%= t(:warning_levels_count_changed) %>
       </div>
     </p>
     <%= f.fields_for :level_descriptions, @skill.level_descriptions.sort_by(&:level) do |lf| %>
@@ -72,13 +72,13 @@
       <% lvl = lf.object.level %>
       <p>
         <label class="sk-admin-level-lbl">
-          <%= t(:label_level_n, level: lvl, default: "Level %{level}") %>
+          <%= t(:label_level_n, level: lvl) %>
         </label>
         <%= lf.text_field :label, placeholder: SubskillUserSkill.level_label(lvl), size: 30 %>
         <br>
         <label class="sk-admin-level-lbl">&nbsp;</label>
         <%= lf.text_area :description, rows: 2, cols: 55,
-            placeholder: t(:text_level_n_placeholder, level: lvl, default: "Was kann jemand auf Level %{level}?") %>
+            placeholder: t(:text_level_n_placeholder, level: lvl) %>
       </p>
     <% end %>
   </div>
