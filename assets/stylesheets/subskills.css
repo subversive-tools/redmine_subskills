@@ -937,3 +937,7 @@ tr.context-menu-selection a {
   margin-right: 0;
   text-align: center;
 }
+
+#psk-sort-alpha-btn.psk-active-sort svg {
+  display: none;
+}

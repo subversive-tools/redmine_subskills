@@ -255,7 +255,17 @@
       var row = document.getElementById(activeRowId);
       if (row) sortBySkill(row);
     } else {
-      reorderColumns(currentMode === 'split' ? splitUserIds : origUserIds);
+      var ids = currentMode === 'split' ? splitUserIds.slice() : origUserIds.slice();
+      if (sortDirection === -1) {
+        if (currentMode === 'split') {
+          var mems = ids.filter(function(uid) { return memberIds.indexOf(uid) !== -1; }).reverse();
+          var exts = ids.filter(function(uid) { return memberIds.indexOf(uid) === -1; }).reverse();
+          ids = mems.concat(exts);
+        } else {
+          ids = ids.reverse();
+        }
+      }
+      reorderColumns(ids);
     }
   }
 
@@ -332,6 +342,8 @@
     table.querySelectorAll('.psk-row-active').forEach(function(r) {
       r.classList.remove('psk-row-active');
     });
+    var btn = document.getElementById('psk-sort-alpha-btn');
+    if (btn) btn.classList.remove('psk-active-sort');
   }
 
   /* ── Click on skill rows ── */
@@ -368,7 +380,8 @@
         sortDirection = 1;
         sortArrow.textContent = ' →';
         clearActive();
-        moveSortArrow(alphaBtn.parentElement);
+        alphaBtn.classList.add('psk-active-sort');
+        moveSortArrow(alphaBtn);
       }
       applyCurrentSortAndFilter();
     });
@@ -378,12 +391,17 @@
   var passungRow = document.getElementById('psk-passung-row');
   if (passungRow) {
     passungRow.addEventListener('click', function() {
-      activeRowId = null;
-      sortDirection = 1;
-      sortArrow.textContent = ' →';
-      clearActive();
+      if (activeRowId === null) {
+        sortDirection *= -1;
+        sortArrow.textContent = sortDirection === 1 ? ' →' : ' ←';
+      } else {
+        activeRowId = null;
+        sortDirection = 1;
+        sortArrow.textContent = ' →';
+        clearActive();
+        moveSortArrow(passungRow.querySelector('.psk-td-sort'));
+      }
       applyCurrentSortAndFilter();
-      moveSortArrow(passungRow.querySelector('.psk-td-sort'));
     });
   }
 
