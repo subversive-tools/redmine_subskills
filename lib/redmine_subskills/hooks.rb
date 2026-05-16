@@ -49,29 +49,31 @@ module RedmineSubskills
     def view_projects_settings_members_table_header(context = {})
       project = context[:project]
       return '' unless project&.module_enabled?(:subskills)
-      '<script>
-        (function() {
-          console.log("RedmineSubskills: Header script running");
-          const thead = document.querySelector(".members thead tr");
-          if (thead && !document.getElementById("sk-th-fit")) {
-            const roleLabels = ["Rollen", "Rolle", "Roles", "Role"];
-            const ths = Array.from(thead.querySelectorAll("th"));
-            const rolesTh = ths.find(el => roleLabels.includes(el.textContent.trim()));
-            
-            const th = document.createElement("th");
-            th.id = "sk-th-fit";
-            th.textContent = "#{I18n.t(:label_skill_match, default: 'Skill-Passung')}";
-            
-            if (rolesTh && rolesTh.nextElementSibling) {
-              thead.insertBefore(th, rolesTh.nextElementSibling);
-            } else {
-              const btnTh = thead.querySelector("th.buttons");
-              if (btnTh) thead.insertBefore(th, btnTh);
-              else thead.appendChild(th);
+      <<~HTML.html_safe
+        <script>
+          (function() {
+            console.log("RedmineSubskills: Header script running");
+            const thead = document.querySelector(".members thead tr");
+            if (thead && !document.getElementById("sk-th-fit")) {
+              const roleLabels = ["Rollen", "Rolle", "Roles", "Role"];
+              const ths = Array.from(thead.querySelectorAll("th"));
+              const rolesTh = ths.find(el => roleLabels.includes(el.textContent.trim()));
+              
+              const th = document.createElement("th");
+              th.id = "sk-th-fit";
+              th.textContent = "#{I18n.t(:label_skill_match, default: 'Skill-Passung')}";
+              
+              if (rolesTh && rolesTh.nextElementSibling) {
+                thead.insertBefore(th, rolesTh.nextElementSibling);
+              } else {
+                const btnTh = thead.querySelector("th.buttons");
+                if (btnTh) thead.insertBefore(th, btnTh);
+                else thead.appendChild(th);
+              }
             }
-          }
-        })();
-      </script>'.html_safe
+          })();
+        </script>
+      HTML
     end
 
     def view_projects_settings_members_table_row(context = {})
