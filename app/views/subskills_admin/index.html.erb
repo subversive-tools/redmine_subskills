@@ -4,7 +4,9 @@
 
 <%# ─── Contextual toolbar ─────────────────────────────────────────────────── %>
 <div class="contextual">
-  <%= link_to t(:label_new_skill), new_subskills_admin_path, class: 'icon icon-add' %>
+  <%= link_to new_subskills_admin_path, class: 'icon icon-add' do %>
+    <%= sprite_icon('add') %><span class="icon-label"><%= t(:label_new_skill) %></span>
+  <% end %>
   <span class="drdn sk-drdn-wrap" id="sk-top-drdn">
     <a href="#" class="icon-only icon-actions" title="<%= t(:label_actions) %>"
        onclick="skDrdnToggle(event,'sk-top-drdn');return false;"></a>
