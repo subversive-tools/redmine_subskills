@@ -12,11 +12,8 @@
   </select>
 
   <% if User.current.allowed_to?(:manage_subskills, @project) || User.current.allowed_to?(:manage_project, @project) || User.current.allowed_to?(:manage_members, @project) %>
-    <%= link_to edit_project_skills_path(@project), class: 'sk-btn-edit-svg' do %>
-      <svg width="16" height="16" class="sk-svg-icon">
-        <use href="/assets/icons-64cb2f36.svg#icon--edit"></use>
-      </svg>
-      <%= t(:label_edit_requirements) %>
+    <%= link_to edit_project_skills_path(@project), class: 'icon icon-edit' do %>
+      <%= sprite_icon('edit') %><span class="icon-label"><%= t(:label_edit_requirements) %></span>
     <% end %>
   <% end %>
 </div>
