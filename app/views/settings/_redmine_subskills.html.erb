@@ -4,6 +4,11 @@
   <em class="info"><%= t(:text_levels_count_info) %></em>
 </p>
 <p>
+  <label><%= t(:label_default_level_labels, default: 'Standard Level-Bezeichnungen') %></label>
+  <%= text_area_tag 'settings[default_level_labels]', @settings['default_level_labels'], rows: 6, cols: 40 %>
+  <em class="info"><%= t(:text_default_level_labels_info, default: 'Ein Label pro Zeile. Zeile 1 ist Level 0 (keine Kenntnisse), Zeile 2 ist Level 1, usw.') %></em>
+</p>
+<p>
   <label><%= t(:label_fit_success_threshold) %> (%)</label>
   <%= number_field_tag 'settings[fit_success_threshold]', @settings['fit_success_threshold'], min: 0, max: 100 %>
   <em class="info"><%= t(:text_fit_success_info) %></em>

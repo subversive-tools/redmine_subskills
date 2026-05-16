@@ -56,7 +56,7 @@
 
 <script>
 (function() {
-  const LEVEL_LABELS = <%= raw SubskillUserSkill::LEVELS.values.map { |v| v[:label] }.to_json %>;
+  const LEVEL_LABELS = <%= raw (0..20).map { |l| SubskillUserSkill.level_label(l) }.to_json %>;
   const userId = <%= user.id %>;
   const chartId = 'skillsRadarChart-' + userId;
 
@@ -94,7 +94,7 @@ function subskillsUpdateSlider(input) {
   const label   = document.getElementById('level-label-' + userId + '-' + skillId);
 
   if (label) {
-    const LEVELS = <%= raw SubskillUserSkill::LEVELS.values.map { |v| v[:label] }.to_json %>;
+    const LEVELS = <%= raw (0..20).map { |l| SubskillUserSkill.level_label(l) }.to_json %>;
     label.querySelector('.level-badge').textContent = level;
     label.querySelector('.level-text').textContent  = LEVELS[level] || '';
     label.className = 'skill-row-level level-' + level;

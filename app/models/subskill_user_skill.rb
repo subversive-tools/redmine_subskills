@@ -7,13 +7,18 @@ class SubskillUserSkill < ActiveRecord::Base
   has_many :endorsements, class_name: 'SubskillEndorsement', foreign_key: 'subskill_user_skill_id', dependent: :destroy
 
   LEVELS = {
-    0 => { label: 'Keine Kenntnisse', color: '#eee' },
-    1 => { label: 'Grundkenntnisse', color: '#90b8d8' },
-    2 => { label: 'Anwender / Basic', color: '#5b9ec9' },
-    3 => { label: 'Fortgeschritten', color: '#2e78b7' },
-    4 => { label: 'Spezialist', color: '#1a5c99' },
-    5 => { label: 'Experte', color: '#0d3d6b' }
+    0 => { color: '#eee' },
+    1 => { color: '#90b8d8' },
+    2 => { color: '#5b9ec9' },
+    3 => { color: '#2e78b7' },
+    4 => { color: '#1a5c99' },
+    5 => { color: '#0d3d6b' }
   }.freeze
+
+  def self.level_label(level)
+    lines = (Setting.plugin_redmine_subskills['default_level_labels'] || "").split("\n").map(&:strip)
+    lines[level].presence || "Level #{level}"
+  end
 
   validates :user_id, presence: true
   validates :subskill_skill_id, presence: true, uniqueness: { scope: :user_id }
@@ -32,7 +37,7 @@ class SubskillUserSkill < ActiveRecord::Base
   end
 
   def level_label
-    LEVELS[level]&.fetch(:label, '')
+    self.class.level_label(level)
   end
 
   private

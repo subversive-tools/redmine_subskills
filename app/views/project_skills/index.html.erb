@@ -76,7 +76,7 @@
     </tr>
   </thead>
   <tbody>
-    <% level_labels = ['–','Grundkenntnisse','Anwender','Fortgeschritten','Experte','Spezialist'] %>
+    <% level_labels = (0..20).map { |l| SubskillUserSkill.level_label(l) } %>
 <% visible_rows.each_with_index do |row, i| %>
       <% skill = row[:skill]; depth = row[:depth]; is_root = depth == 0 %>
       <% imp_key = @req_map[skill.id] %>

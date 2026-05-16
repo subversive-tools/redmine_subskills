@@ -34,10 +34,11 @@
                 <% level = cell.is_a?(Hash) ? cell[:level] : (cell || 0) %>
                 <% prio  = cell.is_a?(Hash) ? cell[:learn_priority].to_i : 0 %>
                 <% endorse_count = cell.is_a?(Hash) ? cell[:endorse_count].to_i : 0 %>
-                <td class="sk-level-cell sk-level-<%= level %>" title="<%= user.name %>: Level <%= level %> <%= "(#{endorse_count} <%= t(:label_endorsements) %>)" if endorse_count > 0 %>">
+                <% title_str = endorse_count > 0 ? t(:label_user_level_endorsements, user: user.name, level: level, count: endorse_count) : t(:label_user_level, user: user.name, level: level) %>
+                <td class="sk-level-cell sk-level-<%= level %>" title="<%= title_str %>">
                   <span class="sk-badge"><%= level %></span>
-                  <% if prio > 0 %><span title=t(:label_learning_goal) class="sk-star-mini"></span><% end %>
-                                    <% if endorse_count > 0 %><span title="<%= endorse_count %> <%= t(:label_endorsements) %>" class="sk-endorse-mini" style="margin-left:2px;"><%= endorse_count %></span><% end %>
+                  <% if prio > 0 %><span title="<%= t(:label_learning_goal) %>" class="sk-star-mini"></span><% end %>
+                  <% if endorse_count > 0 %><span title="<%= t(:label_endorsements_count, count: endorse_count) %>" class="sk-endorse-mini" style="margin-left:2px;"><%= endorse_count %></span><% end %>
                 </td>
               <% end %>
             </tr>
@@ -48,8 +49,9 @@
   <% end %>
 
   <div class="subskills-legend">
-    <% SubskillUserSkill::LEVELS.each do |lvl, info| %>
-      <span class="sk-legend-item sk-level-<%= lvl %>"><%= lvl %> – <%= info[:label] %></span>
+    <% max_lvl = Setting.plugin_redmine_subskills['levels_count'].to_i; max_lvl = 5 if max_lvl <= 0 %>
+    <% (0..max_lvl).each do |lvl| %>
+      <span class="sk-legend-item sk-level-<%= lvl %>"><%= lvl %> – <%= SubskillUserSkill.level_label(lvl) %></span>
     <% end %>
   </div>
 <% end %>

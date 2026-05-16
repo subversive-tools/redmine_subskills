@@ -114,14 +114,14 @@
               <div class="sk-skill-body">
                 <% max_lvl = cs.levels_count.presence || Setting.plugin_redmine_subskills['levels_count'].to_i; max_lvl = 5 if max_lvl <= 0 %>
                 <% (0..max_lvl).each do |l| %>
-                  <div class="sk-level-row <%= 'sk-level-row--active' if l == lvl %> <%= 'sk-level-row--editable' if @can_edit_levels %>"
+                  <div class="sk-level-row <%= 'sk-level-row--active' if l == lvl %> <%= 'sk-level-row--editable' if @editable %>"
                        id="sk-lrow-<%= cs.id %>-<%= l %>"
-                       <% if @can_edit_levels %>onclick="skSelectLevel(<%= cs.id %>, <%= l %>)"<% end %>>
+                       <% if @can_edit_stars %>onclick="skSelectLevel(<%= cs.id %>, <%= l %>)"<% end %>>
                     <span class="sk-option-btn sk-level-<%= l %> <%= 'sk-option-btn--active' if l == lvl %>">
                       <%= l %>
                     </span>
                     <span class="sk-level-row-label">
-                      <%= l == 0 ? SubskillUserSkill::LEVELS.dig(0, :label) : (cs.level_descriptions.find { |d| d.level == l }&.label.presence || SubskillUserSkill::LEVELS.dig(l, :label) || "Level #{l}") %>
+                      <%= l == 0 ? SubskillUserSkill.level_label(0) : (cs.level_descriptions.find { |d| d.level == l }&.label.presence || SubskillUserSkill.level_label(l) || "Level #{l}") %>
                     </span>
                     <span class="sk-level-row-desc"><%= l > 0 ? (lvl_descs[l] || '') : '' %></span>
                   </div>
@@ -137,9 +137,8 @@
   <% else %>
     <%# ─── Leaf skill at root level (no parent / orphaned) — full picker ──── %>
     <% next if skill.parent_id.present? %>  <%# already rendered inside composite %>
-    <% us            = @user_skills[skill.id] %>
-    <% current_level = us&.level || 0 %>
-    <% learn_prio    = us&.learn_priority || 0 %>
+    <% current_level = @user_skills[skill.id]&.level || 0 %>
+    <% learn_prio    = @user_skills[skill.id]&.learn_priority || 0 %>
     <% level_descs   = @level_descriptions[skill.id] || {} %>
     <% starred       = learn_prio > 0 %>
 
@@ -164,6 +163,7 @@
           <% end %>
 
           <%# Endorsements %>
+          <% us = @user_skills[skill.id] %>
           <% if us && us.level > 0 %>
             <% endorse_count = us.endorsements.size %>
             <% i_endorsed = @my_endorsements&.include?(us.id) %>
@@ -187,14 +187,14 @@
       <div class="sk-skill-body">
         <% max_lvl = skill.levels_count.presence || Setting.plugin_redmine_subskills['levels_count'].to_i; max_lvl = 5 if max_lvl <= 0 %>
         <% (0..max_lvl).each do |lvl| %>
-          <div class="sk-level-row <%= 'sk-level-row--active' if lvl == current_level %> <%= 'sk-level-row--editable' if @can_edit_levels %>"
+          <div class="sk-level-row <%= 'sk-level-row--active' if lvl == current_level %> <%= 'sk-level-row--editable' if @editable %>"
                id="sk-lrow-<%= skill.id %>-<%= lvl %>"
-               <% if @can_edit_levels %>onclick="skSelectLevel(<%= skill.id %>, <%= lvl %>)"<% end %>>
+               <% if @can_edit_stars %>onclick="skSelectLevel(<%= skill.id %>, <%= lvl %>)"<% end %>>
             <span class="sk-option-btn sk-level-<%= lvl %> <%= 'sk-option-btn--active' if lvl == current_level %>">
               <%= lvl %>
             </span>
             <span class="sk-level-row-label">
-              <%= lvl == 0 ? SubskillUserSkill::LEVELS.dig(0, :label) : (skill.level_descriptions.find { |d| d.level == lvl }&.label.presence || SubskillUserSkill::LEVELS.dig(lvl, :label) || "Level #{lvl}") %>
+              <%= lvl == 0 ? SubskillUserSkill.level_label(0) : (skill.level_descriptions.find { |d| d.level == lvl }&.label.presence || SubskillUserSkill.level_label(lvl) || "Level #{lvl}") %>
             </span>
             <span class="sk-level-row-desc"><%= lvl > 0 ? (level_descs[lvl] || '') : '' %></span>
           </div>
@@ -204,15 +204,15 @@
   <% end %>
 <% end %>
 
-<% if @can_edit_stars || @can_edit_levels %>
+<% if @can_edit_stars %>
 <%# Level descriptions lookup for compact rows (JS) %>
 <script>
 var LEVEL_DESCS = <%= @level_descriptions.to_json %>;
-var LEVEL_LABELS = <%= SubskillUserSkill::LEVELS.values.map { |l| l[:label] }.to_json %>;
+var LEVEL_LABELS = <%= (0..20).map { |l| SubskillUserSkill.level_label(l) }.to_json %>;
 </script>
 <% end %>
 
-<% if @can_edit_stars || @can_edit_levels %>
+<% if @can_edit_stars %>
 <script>
 const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.content || '';
 

@@ -1,7 +1,7 @@
 <% editable    ||= false
    can_edit    ||= false
    score_map   ||= {}
-   level_labels = ['–', 'Grundkenntnisse', 'Anwender / Basic', 'Fortgeschritten', 'Spezialist', 'Experte']
+   level_labels = (0..20).map { |l| SubskillUserSkill.level_label(l) }
        level_colors = ['#ccc', '#e3f2fd', '#90caf9', '#50b1ff', '#1e88e5', '#0d47a1']
     my_endorsements ||= [] %>
 

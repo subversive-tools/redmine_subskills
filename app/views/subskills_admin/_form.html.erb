@@ -74,7 +74,7 @@
         <label class="sk-admin-level-lbl">
           <%= t(:label_level_n, level: lvl, default: "Level %{level}") %>
         </label>
-        <%= lf.text_field :label, placeholder: t("label_skill_level_#{lvl}", default: "Name / Titel"), size: 30 %>
+        <%= lf.text_field :label, placeholder: SubskillUserSkill.level_label(lvl), size: 30 %>
         <br>
         <label class="sk-admin-level-lbl">&nbsp;</label>
         <%= lf.text_area :description, rows: 2, cols: 55,
