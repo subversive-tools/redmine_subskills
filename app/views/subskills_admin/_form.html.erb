@@ -79,9 +79,27 @@
             <%= lf.text_area :description, rows: 2, style: "width:100%; box-sizing:border-box;", placeholder: "Was kann jemand auf diesem Level?" %>
           </div>
           
-          <a href="#" onclick="skRemoveLevelRow(event, this); return false;" style="margin-left:10px; margin-top:2px; opacity:0.6;" title="Löschen" onmouseover="this.style.opacity='1';" onmouseout="this.style.opacity='0.6';">
-            <%= sprite_icon('del') %>
-          </a>
+          <span class="sk-drdn-cell" style="position:relative; margin-left:10px; margin-top:2px;">
+            <a href="#" style="color:#555; text-decoration:none;" onclick="skLvlToggle(event, this); return false;" title="Aktionen">
+              <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                <circle cx="3" cy="8" r="1.5" />
+                <circle cx="8" cy="8" r="1.5" />
+                <circle cx="13" cy="8" r="1.5" />
+              </svg>
+            </a>
+            <ul class="sk-drdn-items" style="display:none; position:absolute; right:0; top:100%; z-index:99; background:#fff; border:1px solid #ccc; box-shadow:0 2px 4px rgba(0,0,0,0.2); list-style:none; padding:5px 0; margin:0; min-width:120px;">
+              <li>
+                <a href="#" onclick="skCopyLevelRow(event, this); return false;" style="display:flex; align-items:center; padding:4px 10px; color:#333; text-decoration:none;">
+                  <%= sprite_icon('copy') %><span style="margin-left:5px;">Kopieren</span>
+                </a>
+              </li>
+              <li>
+                <a href="#" onclick="skRemoveLevelRow(event, this); return false;" style="display:flex; align-items:center; padding:4px 10px; color:#333; text-decoration:none;">
+                  <%= sprite_icon('del') %><span style="margin-left:5px;">Löschen</span>
+                </a>
+              </li>
+            </ul>
+          </span>
         </div>
       <% end %>
     </div>
@@ -101,9 +119,27 @@
         <textarea name="subskill_skill[level_descriptions_attributes][NEW_RECORD][description]" rows="2" style="width:100%; box-sizing:border-box;" placeholder="Was kann jemand auf diesem Level?"></textarea>
       </div>
       
-      <a href="#" onclick="skRemoveLevelRow(event, this); return false;" style="margin-left:10px; margin-top:2px; opacity:0.6;" title="Löschen" onmouseover="this.style.opacity='1';" onmouseout="this.style.opacity='0.6';">
-        <%= sprite_icon('del') %>
-      </a>
+      <span class="sk-drdn-cell" style="position:relative; margin-left:10px; margin-top:2px;">
+        <a href="#" style="color:#555; text-decoration:none;" onclick="skLvlToggle(event, this); return false;" title="Aktionen">
+          <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+            <circle cx="3" cy="8" r="1.5" />
+            <circle cx="8" cy="8" r="1.5" />
+            <circle cx="13" cy="8" r="1.5" />
+          </svg>
+        </a>
+        <ul class="sk-drdn-items" style="display:none; position:absolute; right:0; top:100%; z-index:99; background:#fff; border:1px solid #ccc; box-shadow:0 2px 4px rgba(0,0,0,0.2); list-style:none; padding:5px 0; margin:0; min-width:120px;">
+          <li>
+            <a href="#" onclick="skCopyLevelRow(event, this); return false;" style="display:flex; align-items:center; padding:4px 10px; color:#333; text-decoration:none;">
+              <%= sprite_icon('copy') %><span style="margin-left:5px;">Kopieren</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" onclick="skRemoveLevelRow(event, this); return false;" style="display:flex; align-items:center; padding:4px 10px; color:#333; text-decoration:none;">
+              <%= sprite_icon('del') %><span style="margin-left:5px;">Löschen</span>
+            </a>
+          </li>
+        </ul>
+      </span>
     </div>
   </template>
 
@@ -142,7 +178,43 @@
       skUpdateLevelNumbers();
     }
 
+    function skCopyLevelRow(e, btn) {
+      e.preventDefault();
+      var row = btn.closest('.sk-level-row-item');
+      var clone = row.cloneNode(true);
+      
+      var time = new Date().getTime();
+      clone.querySelectorAll('input, textarea').forEach(function(input) {
+        if (input.name) {
+          input.name = input.name.replace(/\[\d+\]|\[[0-9]{13,}\]/, '[' + time + ']');
+        }
+        if (input.classList.contains('sk-level-destroy')) input.value = '0';
+        if (input.name && input.name.includes('[id]')) input.remove();
+      });
+      
+      clone.classList.add('sk-new-row');
+      delete clone.dataset.dndInit;
+      
+      row.parentNode.insertBefore(clone, row.nextSibling);
+      skInitDragAndDrop();
+      skUpdateLevelNumbers();
+    }
+
     var skDraggingRow = null;
+
+    window.skLvlToggle = function(e, btn) {
+      e.preventDefault(); e.stopPropagation();
+      var m = btn.parentElement.querySelector('.sk-drdn-items');
+      var is_open = m.style.display === 'block';
+      document.querySelectorAll('#sk-level-rows .sk-drdn-items').forEach(function(x) { x.style.display = 'none'; });
+      if (!is_open) {
+        m.style.display = 'block';
+      }
+    };
+    
+    document.addEventListener('click', function() {
+      document.querySelectorAll('#sk-level-rows .sk-drdn-items').forEach(function(m){ m.style.display='none'; });
+    });
 
     function skInitDragAndDrop() {
       document.querySelectorAll('.sk-level-row-item').forEach(function(row) {
