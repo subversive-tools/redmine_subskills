@@ -80,7 +80,7 @@
                 <span class="sk-skill-name" style="display:flex; align-items:center;">
                   <%= cs.name %>
                   
-                                    <% if @editable %>
+                                    <% if @can_edit_stars %>
                     <button type="button"
                             class="sk-star-btn <%= 'sk-star-btn--active' if star %>"
                             id="sk-star-<%= cs.id %>"
@@ -114,9 +114,9 @@
               <div class="sk-skill-body">
                 <% max_lvl = cs.levels_count.presence || Setting.plugin_redmine_subskills['levels_count'].to_i; max_lvl = 5 if max_lvl <= 0 %>
                 <% (0..max_lvl).each do |l| %>
-                  <div class="sk-level-row <%= 'sk-level-row--active' if l == lvl %> <%= 'sk-level-row--editable' if @editable %>"
+                  <div class="sk-level-row <%= 'sk-level-row--active' if l == lvl %> <%= 'sk-level-row--editable' if @can_edit_levels %>"
                        id="sk-lrow-<%= cs.id %>-<%= l %>"
-                       <% if @editable %>onclick="skSelectLevel(<%= cs.id %>, <%= l %>)"<% end %>>
+                       <% if @can_edit_levels %>onclick="skSelectLevel(<%= cs.id %>, <%= l %>)"<% end %>>
                     <span class="sk-option-btn sk-level-<%= l %> <%= 'sk-option-btn--active' if l == lvl %>">
                       <%= l %>
                     </span>
@@ -152,7 +152,7 @@
         <span class="sk-skill-name" style="display:flex; align-items:center;">
           <%= skill.name %>
 
-                    <% if @editable %>
+                    <% if @can_edit_stars %>
             <button type="button"
                     class="sk-star-btn <%= 'sk-star-btn--active' if starred %>"
                     id="sk-star-<%= skill.id %>"
@@ -187,9 +187,9 @@
       <div class="sk-skill-body">
         <% max_lvl = skill.levels_count.presence || Setting.plugin_redmine_subskills['levels_count'].to_i; max_lvl = 5 if max_lvl <= 0 %>
         <% (0..max_lvl).each do |lvl| %>
-          <div class="sk-level-row <%= 'sk-level-row--active' if lvl == current_level %> <%= 'sk-level-row--editable' if @editable %>"
+          <div class="sk-level-row <%= 'sk-level-row--active' if lvl == current_level %> <%= 'sk-level-row--editable' if @can_edit_levels %>"
                id="sk-lrow-<%= skill.id %>-<%= lvl %>"
-               <% if @editable %>onclick="skSelectLevel(<%= skill.id %>, <%= lvl %>)"<% end %>>
+               <% if @can_edit_levels %>onclick="skSelectLevel(<%= skill.id %>, <%= lvl %>)"<% end %>>
             <span class="sk-option-btn sk-level-<%= lvl %> <%= 'sk-option-btn--active' if lvl == current_level %>">
               <%= lvl %>
             </span>
@@ -204,7 +204,7 @@
   <% end %>
 <% end %>
 
-<% if @editable %>
+<% if @can_edit_stars || @can_edit_levels %>
 <%# Level descriptions lookup for compact rows (JS) %>
 <script>
 var LEVEL_DESCS = <%= @level_descriptions.to_json %>;
@@ -212,7 +212,7 @@ var LEVEL_LABELS = <%= SubskillUserSkill::LEVELS.values.map { |l| l[:label] }.to
 </script>
 <% end %>
 
-<% if @editable %>
+<% if @can_edit_stars || @can_edit_levels %>
 <script>
 const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.content || '';
 
