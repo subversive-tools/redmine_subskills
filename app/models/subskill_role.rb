@@ -6,9 +6,9 @@ class SubskillRole < ActiveRecord::Base
 
   IMPORTANCE = {
     0 => { label: '–',          color: '#eee' },
-    1 => { label: 'Hilfreich',  color: '#c8e6c9' },
-    2 => { label: 'Wichtig',    color: '#fff176' },
-    3 => { label: 'Erforderlich', color: '#ffab91' }
+    1 => { label: :label_importance_helpful,  color: '#c8e6c9' },
+    2 => { label: :label_importance_important,    color: '#fff176' },
+    3 => { label: :label_importance_required, color: '#ffab91' }
   }.freeze
 
   DEFAULTS = [

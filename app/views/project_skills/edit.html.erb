@@ -2,7 +2,7 @@
   <%= stylesheet_link_tag 'subskills', plugin: 'redmine_subskills' %>
 <% end %>
 
-<h2>Skill-Anforderungen bearbeiten</h2>
+<h2><%= t(:label_edit_skill_requirements) %></h2>
 
 <p class="sk-intro">
   <%= t(:text_project_skills_explanation) %>
@@ -43,7 +43,7 @@
             <select name="skills[<%= skill.id %>]" class="sk-importance-select">
               <% SubskillProjectRole::IMPORTANCE.each do |val, meta| %>
                 <option value="<%= val %>" <%= 'selected' if current_imp == val %>>
-                  <%= meta[:label] %>
+                  <%= meta[:label].is_a?(Symbol) ? t(meta[:label]) : meta[:label] %>
                 </option>
               <% end %>
             </select>
@@ -57,8 +57,8 @@
 </table>
 
 <p class="sk-submit-mt">
-  <%= submit_tag '<%= t(:button_save) %>', class: 'button-positive' %>
-  <%= link_to '<%= t(:button_cancel) %>', project_skills_path(@project) %>
+  <%= submit_tag t(:button_save), class: 'button-positive' %>
+  <%= link_to t(:button_cancel), project_skills_path(@project) %>
 </p>
 
 <% end %>

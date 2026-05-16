@@ -28,7 +28,7 @@
         <td class="sk-td-muted"><%= skill.category %></td>
         <td>
           <span class="sk-importance-badge" style="background:<%= info[:color] %>;">
-            <%= info[:label] %>
+            <%= info[:label].is_a?(Symbol) ? t(info[:label]) : info[:label] %>
           </span>
         </td>
       </tr>
@@ -88,7 +88,7 @@
         <tr class="<%= i.even? ? 'even' : 'odd' %>">
           <td class="skill-name-col">
             <%= skill.name %>
-            <span class="sk-importance-dot sk-imp-<%= imp %>" title="<%= SubskillRole::IMPORTANCE[imp][:label] %>">●</span>
+            <span class="sk-importance-dot sk-imp-<%= imp %>" title="<%= SubskillRole::IMPORTANCE[imp][:label].is_a?(Symbol) ? t(SubskillRole::IMPORTANCE[imp][:label]) : SubskillRole::IMPORTANCE[imp][:label] %>">●</span>
           </td>
           <% @users_with_scores.each do |entry| %>
             <% level = @user_skill_map.dig(entry[:user].id, skill.id) || 0 %>

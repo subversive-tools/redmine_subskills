@@ -84,7 +84,7 @@
                             class="sk-star-btn <%= 'sk-star-btn--active' if star %>"
                             id="sk-star-<%= cs.id %>"
                             data-skill-id="<%= cs.id %>"
-                            title="<%= t(:label_learning_goal) %>"
+                            title=t(:label_learning_goal)
                             onclick="skToggleStar(this)"
                             style="margin-left:4px;"></button>
                   <% end %>
@@ -99,7 +99,7 @@
                                class="sk-endorse-checkbox-only" 
                                <%= 'checked' if i_endorsed %>
                                onclick="skToggleEndorseCheckboxOnly(this, <%= cs.id %>)" 
-                               title="<%= i_endorsed ? '<%= t(:label_remove_endorsement) %>' : '<%= t(:label_add_endorsement) %>' %>" />
+                               title="<%= i_endorsed ? t(:label_remove_endorsement) : t(:label_add_endorsement) %>" />
                       <% else %>
                         <div class="sk-endorse-full-btn readonly <%= 'has-count has-others' if endorse_count > 0 %>">
                           <img src="/plugin_assets/redmine_subskills/images/endorse.svg" class="sk-endorse-icon" />
@@ -153,7 +153,7 @@
                     class="sk-star-btn <%= 'sk-star-btn--active' if starred %>"
                     id="sk-star-<%= skill.id %>"
                     data-skill-id="<%= skill.id %>"
-                    title="<%= t(:label_learning_goal) %>"
+                    title=t(:label_learning_goal)
                     onclick="skToggleStar(this)"
                     style="margin-left:4px;"></button>
           <% end %>
@@ -169,7 +169,7 @@
                        class="sk-endorse-checkbox-only" 
                        <%= 'checked' if i_endorsed %>
                        onclick="skToggleEndorseCheckboxOnly(this, <%= skill.id %>)" 
-                       title="<%= i_endorsed ? '<%= t(:label_remove_endorsement) %>' : '<%= t(:label_add_endorsement) %>' %>" />
+                       title="<%= i_endorsed ? t(:label_remove_endorsement) : t(:label_add_endorsement) %>" />
               <% else %>
                 <div class="sk-endorse-full-btn readonly <%= 'has-count has-others' if endorse_count > 0 %>">
                   <img src="/plugin_assets/redmine_subskills/images/endorse.svg" class="sk-endorse-icon" />
@@ -220,7 +220,7 @@ function skSelectLevel(skillId, level) {
   // Warning if endorsements exist
   const count = parseInt(block.dataset.endorseCount || 0);
   if (count > 0) {
-    if (!confirm('<%= t(:label_endorsement_warning) %>')) {
+    if (!confirm(t(:label_endorsement_warning))) {
       return;
     }
   }
@@ -263,7 +263,7 @@ function skCompactSelect(skillId, level, btn) {
   // Warning if endorsements exist
   const count = parseInt(row.dataset.endorseCount || 0);
   if (count > 0) {
-    if (!confirm('<%= t(:label_endorsement_warning) %>')) {
+    if (!confirm(t(:label_endorsement_warning))) {
       return;
     }
   }
@@ -352,7 +352,7 @@ function skToggleEndorse(btn, skillId) {
       wrap.classList.add('active');
       wrap.classList.remove('has-others');
     }
-    btn.title = '<%= t(:label_remove_endorsement) %>';
+    btn.title = t(:label_remove_endorsement);
   } else {
     currentCount = Math.max(0, currentCount - 1);
     if(wrap) {
@@ -360,7 +360,7 @@ function skToggleEndorse(btn, skillId) {
       if (currentCount > 0) wrap.classList.add('has-others');
       else wrap.classList.remove('has-others');
     }
-    btn.title = '<%= t(:label_add_endorsement) %>';
+    btn.title = t(:label_add_endorsement);
   }
   if (countSpan) countSpan.textContent = currentCount > 0 ? currentCount : "";
 
@@ -384,7 +384,7 @@ function skToggleEndorse(btn, skillId) {
           // Sync with server response
           if (countSpan) countSpan.textContent = d.count > 0 ? d.count : "";
         } else {
-          alert('<%= t(:label_error).split(':').first %>: ' + (d.error || '<%= t(:label_error_unknown) %>'));
+          alert('<%= t(:label_error).split(':').first %>: ' + (d.error || t(:label_error_unknown)));
           btn.checked = !isChecked;
         }
       } else {
@@ -399,7 +399,7 @@ function skToggleEndorse(btn, skillId) {
 
 function skToggleEndorseCheckboxOnly(btn, skillId) {
   const isChecked = btn.checked;
-  btn.title = isChecked ? '<%= t(:label_remove_endorsement) %>' : '<%= t(:label_add_endorsement) %>';
+  btn.title = isChecked ? t(:label_remove_endorsement) : t(:label_add_endorsement);
 
   const block = btn.closest('.sk-skill-block');
   let originalCount = 0;
@@ -426,9 +426,9 @@ function skToggleEndorseCheckboxOnly(btn, skillId) {
       if (contentType && contentType.includes('application/json')) {
         const d = await r.json();
         if (!r.ok || !d.ok) {
-          alert('<%= t(:label_error).split(':').first %>: ' + (d.error || '<%= t(:label_error_unknown) %>'));
+          alert('<%= t(:label_error).split(':').first %>: ' + (d.error || t(:label_error_unknown)));
           btn.checked = !isChecked;
-          btn.title = btn.checked ? '<%= t(:label_remove_endorsement) %>' : '<%= t(:label_add_endorsement) %>';
+          btn.title = btn.checked ? t(:label_remove_endorsement) : t(:label_add_endorsement);
           if (block) block.setAttribute('data-endorse-count', originalCount);
         } else {
           // Sync with exact server count
@@ -441,7 +441,7 @@ function skToggleEndorseCheckboxOnly(btn, skillId) {
     }).catch(err => {
       console.error(err);
       btn.checked = !isChecked;
-      btn.title = btn.checked ? '<%= t(:label_remove_endorsement) %>' : '<%= t(:label_add_endorsement) %>';
+      btn.title = btn.checked ? t(:label_remove_endorsement) : t(:label_add_endorsement);
       if (block) block.setAttribute('data-endorse-count', originalCount);
       alert('<%= t(:label_error_connection).split(':').first %>: ' + err.message);
     });

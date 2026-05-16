@@ -16,7 +16,7 @@
       <svg width="16" height="16" class="sk-svg-icon">
         <use href="/assets/icons-64cb2f36.svg#icon--edit"></use>
       </svg>
-      Anforderungen bearbeiten
+      <%= t(:label_edit_requirements) %>
     <% end %>
   <% end %>
 </div>
@@ -78,7 +78,7 @@
       <% skill = row[:skill]; depth = row[:depth]; is_root = depth == 0 %>
       <% imp_key = @req_map[skill.id] %>
       <% imp = imp_key.to_i > 0 ? SubskillProjectRole::IMPORTANCE[imp_key] : nil %>
-      <% req_label = imp ? "#{imp[:label]} (Level #{imp_key}+)" : nil %>
+      <% req_label = imp ? "#{(imp[:label].is_a?(Symbol) ? t(imp[:label]) : imp[:label])} (Level #{imp_key}+)" : nil %>
       <% css = "project psk-row-clickable #{is_root ? 'root parent' : "child leaf idnt idnt-#{depth}"} #{i.even? ? 'odd' : 'even'}" %>
 
       <tr class="<%= css %>" id="psk-row-<%= skill.id %>">
@@ -130,7 +130,7 @@
   </tbody>
   <tfoot>
     <tr id="psk-roles-row">
-      <td class="name" colspan="3"><span class="psk-add-member-label">Mitglied als…</span></td>
+      <td class="name" colspan="3"><span class="psk-add-member-label"><%= t(:label_add_as_member_with_dots) %></span></td>
       <% @fit_scores.each do |fs| %>
         <td class="psk-td-level" data-user-id="<%= fs[:user].id %>" data-is-member="<%= @user_roles_map.key?(fs[:user].id) ? 'true' : 'false' %>">
           <div class="psk-roles-text" title="<%= @user_roles_map[fs[:user].id] %>">

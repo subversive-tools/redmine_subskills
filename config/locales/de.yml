@@ -1,72 +1,87 @@
+---
 de:
-  label_subskills: "Skill-Matrix"
-  label_my_skills: "Meine Skills"
-  label_team_matrix: "Team-Übersicht"
-  label_skill: "Kompetenz"
-  label_skill_level: "Level"
-  label_skill_level_0: "Kein Wissen"
-  label_skill_level_1: "Grundkenntnisse"
-  label_skill_level_2: "Anwender"
-  label_skill_level_3: "Fortgeschritten"
-  label_skill_level_4: "Experte"
-  label_skill_level_5: "Spezialist"
-  notice_skills_saved: "Skills gespeichert."
-  label_save_skills: "Speichern"
-  label_radar_chart: "Radar-Übersicht"
-  label_skill_category: "Kategorie"
-  
-  label_learning_goal: "Lernziel"
-  label_endorsement: "Bestätigung"
-  label_endorsements: "Bestätigungen"
-  label_add_endorsement: "Skill bestätigen"
-  label_remove_endorsement: "Bestätigung entfernen"
-  label_edit_skills: "Skills bearbeiten →"
-  label_view_full_profile: "Vollständiges Skill-Profil ansehen →"
+  label_subskills: Skills
+  label_my_skills: Meine Skills
+  label_team_matrix: Team-Übersicht
+  label_skill: Kompetenz
+  label_skill_level: Level
+  label_skill_level_0: Kein Wissen
+  label_skill_level_1: Grundkenntnisse
+  label_skill_level_2: Anwender
+  label_skill_level_3: Fortgeschritten
+  label_skill_level_4: Experte
+  label_skill_level_5: Spezialist
+  notice_skills_saved: Skills gespeichert.
+  label_save_skills: Speichern
+  label_radar_chart: Radar-Übersicht
+  label_skill_category: Kategorie
+  label_learning_goal: Lernziel
+  label_endorsement: Bestätigung
+  label_endorsements: Bestätigungen
+  label_add_endorsement: Skill bestätigen
+  label_remove_endorsement: Bestätigung entfernen
+  label_edit_skills: Skills bearbeiten →
+  label_view_full_profile: Vollständiges Skill-Profil ansehen →
   label_back_to_profile: "← Zurück zum Profil"
-  label_skill_matrix_team: "Skill-Matrix Team"
-  label_my_role_match: "Rollen-Passung"
-  label_team_role_match: "Rollen-Passung Team"
-  label_roles_and_skills: "Rollen & Skills"
-  label_skill_profile_for: "Skills: %{name}"
-  label_aggregated_score: "Aggregierter Score: %{score}"
-  label_error: "Fehler: %{msg}"
-  label_error_unknown: "Unbekannter Fehler"
-  label_error_server: "Server-Fehler: %{status}"
-  label_error_connection: "Verbindungsfehler: %{msg}"
-  label_endorsement_warning: "Du hast bereits Bestätigungen für diesen Skill erhalten. Wenn du dein Level änderst, werden diese archiviert und sind nicht mehr sichtbar. Fortfahren?"
-  label_requirement: "Anforderung"
-  label_add_member: "Mitglied hinzufügen"
-  label_add_as_member: "Als Mitglied hinzufügen"
-  label_match: "Passung"
-  label_role: "Rolle"
-  label_import_csv: "CSV importieren"
-  label_export_csv: "CSV exportieren"
-  label_new_skill: "Neuer Skill"
-  label_new_subskill: "Neuer Unter-Skill"
-  text_are_you_sure_delete_skill: "Skill %{name} wirklich löschen?"
-  label_importance: "Wichtigkeit"
-  label_match_by_person: "Passung nach Person"
-  label_person: "Person"
-  label_aggregated: "aggregiert"
-  text_role_match_explanation: "Wie gut passen deine Selbsteinschätzungen zu den Anforderungen jeder Rolle?"
+  label_skill_matrix_team: Skill-Matrix Team
+  label_my_role_match: Rollen-Passung
+  label_team_role_match: Rollen-Passung Team
+  label_roles_and_skills: Rollen & Skills
+  label_skill_profile_for: 'Skills: %{name}'
+  label_aggregated_score: 'Aggregierter Score: %{score}'
+  label_error: 'Fehler: %{msg}'
+  label_error_unknown: Unbekannter Fehler
+  label_error_server: 'Server-Fehler: %{status}'
+  label_error_connection: 'Verbindungsfehler: %{msg}'
+  label_endorsement_warning: Du hast bereits Bestätigungen für diesen Skill erhalten.
+    Wenn du dein Level änderst, werden diese archiviert und sind nicht mehr sichtbar.
+    Fortfahren?
+  label_requirement: Anforderung
+  label_add_member: Mitglied hinzufügen
+  label_add_as_member: Als Mitglied hinzufügen
+  label_match: Passung
+  label_role: Rolle
+  label_import_csv: CSV importieren
+  label_export_csv: CSV exportieren
+  label_new_skill: Neuer Skill
+  label_new_subskill: Neuer Unter-Skill
+  text_are_you_sure_delete_skill: Skill %{name} wirklich löschen?
+  label_importance: Wichtigkeit
+  label_match_by_person: Passung nach Person
+  label_person: Person
+  label_aggregated: aggregiert
+  text_role_match_explanation: Wie gut passen deine Selbsteinschätzungen zu den Anforderungen
+    jeder Rolle?
   text_gaps_present: "< 40% – Lücken vorhanden"
-  label_configure_now: "Jetzt konfigurieren"
-  text_best_match_explanation: "Rangfolge aller aktiven User nach Übereinstimmung mit den Skill-Anforderungen dieses Projekts."
-  text_project_skills_explanation: "Lege fest, welche Skills für dieses Projekt erwartet werden und wie wichtig sie sind. Nicht ausgewählte Skills werden nicht berücksichtigt."
-  text_fit_score_explanation: "Fit-Score: Wie gut passen die Selbsteinschätzungen einer Person zu den Anforderungen einer Rolle? Skala: 🟢 ≥ 70% · 🟡 40–69% · 🔴 < 40%"
-  label_actions: "Aktionen"
-  button_copy: "Kopieren"
-  label_network_error: "Netzwerkfehler"
-  label_error_word: "Fehler"
-  field_position: "Position"
-  field_active: "Aktiv"
-  text_only_skills_without_ratings: "Nur Skills wählen, die noch keine Bewertungen haben."
-  text_level_descriptions_explanation: "Was bedeutet jeder Level für diesen Skill? Diese Texte werden dem User beim Auswählen angezeigt."
-  error_unauthorized: "Nicht autorisiert"
-  error_skill_not_reported: "Skill wurde vom Benutzer nicht gemeldet"
-  error_cannot_endorse_yourself: "Du kannst dich nicht selbst bestätigen"
-  label_skill_match: "Skill-Passung"
-label_view_mode: "Darstellung:"
-label_view_mode_all: "Alle (ungruppiert)"
-label_view_mode_split: "Mitglieder & Externe gruppiert"
-label_view_mode_members: "Nur Projektmitglieder"
+  label_configure_now: Jetzt konfigurieren
+  text_best_match_explanation: Rangfolge aller aktiven User nach Übereinstimmung mit
+    den Skill-Anforderungen dieses Projekts.
+  text_project_skills_explanation: Lege fest, welche Skills für dieses Projekt erwartet
+    werden und wie wichtig sie sind. Nicht ausgewählte Skills werden nicht berücksichtigt.
+  text_fit_score_explanation: "Fit-Score: Wie gut passen die Selbsteinschätzungen
+    einer Person zu den Anforderungen einer Rolle? Skala: \U0001F7E2 ≥ 70% · \U0001F7E1
+    40–69% · \U0001F534 < 40%"
+  label_actions: Aktionen
+  button_copy: Kopieren
+  label_network_error: Netzwerkfehler
+  label_error_word: Fehler
+  field_position: Position
+  field_active: Aktiv
+  text_only_skills_without_ratings: Nur Skills wählen, die noch keine Bewertungen
+    haben.
+  text_level_descriptions_explanation: Was bedeutet jeder Level für diesen Skill?
+    Diese Texte werden dem User beim Auswählen angezeigt.
+  error_unauthorized: Nicht autorisiert
+  error_skill_not_reported: Skill wurde vom Benutzer nicht gemeldet
+  error_cannot_endorse_yourself: Du kannst dich nicht selbst bestätigen
+  label_skill_match: Skill-Passung
+  label_add_as_member_with_dots: Mitglied als…
+  label_edit_requirements: Anforderungen bearbeiten
+  label_edit_skill_requirements: Skill-Anforderungen bearbeiten
+  label_importance_helpful: Hilfreich
+  label_importance_important: Wichtig
+  label_importance_required: Erforderlich
+  label_view_mode: 'Darstellung:'
+  label_view_mode_all: Alle (ungruppiert)
+  label_view_mode_split: Mitglieder & Externe gruppiert
+  label_view_mode_members: Nur Projektmitglieder

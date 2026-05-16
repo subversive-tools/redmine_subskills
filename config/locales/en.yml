@@ -1,72 +1,85 @@
+---
 en:
-  label_subskills: "Skill Matrix"
-  label_my_skills: "My Skills"
-  label_team_matrix: "Team Overview"
-  label_skill: "Competence"
-  label_skill_level: "Level"
-  label_skill_level_0: "No knowledge"
-  label_skill_level_1: "Basic knowledge"
-  label_skill_level_2: "User / Basic"
-  label_skill_level_3: "Advanced"
-  label_skill_level_4: "Expert"
-  label_skill_level_5: "Specialist"
-  notice_skills_saved: "Skills successfully saved."
-  label_save_skills: "Save"
-  label_radar_chart: "Radar Overview"
-  label_skill_category: "Category"
-  
-  label_learning_goal: "Learning Goal"
-  label_endorsement: "Endorsement"
-  label_endorsements: "Endorsements"
-  label_add_endorsement: "Endorse skill"
-  label_remove_endorsement: "Remove endorsement"
-  label_edit_skills: "Edit skills →"
-  label_view_full_profile: "View full skill profile →"
+  label_subskills: Skills
+  label_my_skills: My Skills
+  label_team_matrix: Team Overview
+  label_skill: Competence
+  label_skill_level: Level
+  label_skill_level_0: No knowledge
+  label_skill_level_1: Basic knowledge
+  label_skill_level_2: User / Basic
+  label_skill_level_3: Advanced
+  label_skill_level_4: Expert
+  label_skill_level_5: Specialist
+  notice_skills_saved: Skills successfully saved.
+  label_save_skills: Save
+  label_radar_chart: Radar Overview
+  label_skill_category: Category
+  label_learning_goal: Learning Goal
+  label_endorsement: Endorsement
+  label_endorsements: Endorsements
+  label_add_endorsement: Endorse skill
+  label_remove_endorsement: Remove endorsement
+  label_edit_skills: Edit skills →
+  label_view_full_profile: View full skill profile →
   label_back_to_profile: "← Back to profile"
-  label_skill_matrix_team: "Team Skill Matrix"
-  label_my_role_match: "Role Match"
-  label_team_role_match: "Team Role Match"
-  label_roles_and_skills: "Roles & Skills"
-  label_skill_profile_for: "Skills: %{name}"
-  label_aggregated_score: "Aggregated score: %{score}"
-  label_error: "Error: %{msg}"
-  label_error_unknown: "Unknown error"
-  label_error_server: "Server error: %{status}"
-  label_error_connection: "Connection error: %{msg}"
-  label_endorsement_warning: "You have already received endorsements for this skill. Changing your level will archive them, making them no longer visible. Proceed?"
-  label_requirement: "Requirement"
-  label_add_member: "Add member"
-  label_add_as_member: "Add as member"
-  label_match: "Match"
-  label_role: "Role"
-  label_import_csv: "Import CSV"
-  label_export_csv: "Export CSV"
-  label_new_skill: "New Skill"
-  label_new_subskill: "New Sub-Skill"
-  text_are_you_sure_delete_skill: "Are you sure you want to delete the skill %{name}?"
-  label_importance: "Importance"
-  label_match_by_person: "Match by Person"
-  label_person: "Person"
-  label_aggregated: "aggregated"
-  text_role_match_explanation: "How well do your self-assessments match the requirements of each role?"
+  label_skill_matrix_team: Team Skill Matrix
+  label_my_role_match: Role Match
+  label_team_role_match: Team Role Match
+  label_roles_and_skills: Roles & Skills
+  label_skill_profile_for: 'Skills: %{name}'
+  label_aggregated_score: 'Aggregated score: %{score}'
+  label_error: 'Error: %{msg}'
+  label_error_unknown: Unknown error
+  label_error_server: 'Server error: %{status}'
+  label_error_connection: 'Connection error: %{msg}'
+  label_endorsement_warning: You have already received endorsements for this skill.
+    Changing your level will archive them, making them no longer visible. Proceed?
+  label_requirement: Requirement
+  label_add_member: Add member
+  label_add_as_member: Add as member
+  label_match: Match
+  label_role: Role
+  label_import_csv: Import CSV
+  label_export_csv: Export CSV
+  label_new_skill: New Skill
+  label_new_subskill: New Sub-Skill
+  text_are_you_sure_delete_skill: Are you sure you want to delete the skill %{name}?
+  label_importance: Importance
+  label_match_by_person: Match by Person
+  label_person: Person
+  label_aggregated: aggregated
+  text_role_match_explanation: How well do your self-assessments match the requirements
+    of each role?
   text_gaps_present: "< 40% – Gaps present"
-  label_configure_now: "Configure now"
-  text_best_match_explanation: "Ranking of all active users by match with the skill requirements of this project."
-  text_project_skills_explanation: "Define which skills are expected for this project and how important they are. Unselected skills are not considered."
-  text_fit_score_explanation: "Fit Score: How well do a person's self-assessments match the requirements of a role? Scale: 🟢 ≥ 70% · 🟡 40–69% · 🔴 < 40%"
-  label_actions: "Actions"
-  button_copy: "Copy"
-  label_network_error: "Network error"
-  label_error_word: "Error"
-  field_position: "Position"
-  field_active: "Active"
-  text_only_skills_without_ratings: "Only select skills that do not have ratings yet."
-  text_level_descriptions_explanation: "What does each level mean for this skill? These texts will be shown to the user during selection."
-  error_unauthorized: "Unauthorized"
-  error_skill_not_reported: "Skill not reported by user"
-  error_cannot_endorse_yourself: "Cannot endorse yourself"
-  label_skill_match: "Skill Match"
-label_view_mode: "View mode:"
-label_view_mode_all: "All (ungrouped)"
-label_view_mode_split: "Members & Externals grouped"
-label_view_mode_members: "Project members only"
+  label_configure_now: Configure now
+  text_best_match_explanation: Ranking of all active users by match with the skill
+    requirements of this project.
+  text_project_skills_explanation: Define which skills are expected for this project
+    and how important they are. Unselected skills are not considered.
+  text_fit_score_explanation: "Fit Score: How well do a person's self-assessments
+    match the requirements of a role? Scale: \U0001F7E2 ≥ 70% · \U0001F7E1 40–69%
+    · \U0001F534 < 40%"
+  label_actions: Actions
+  button_copy: Copy
+  label_network_error: Network error
+  label_error_word: Error
+  field_position: Position
+  field_active: Active
+  text_only_skills_without_ratings: Only select skills that do not have ratings yet.
+  text_level_descriptions_explanation: What does each level mean for this skill? These
+    texts will be shown to the user during selection.
+  error_unauthorized: Unauthorized
+  error_skill_not_reported: Skill not reported by user
+  error_cannot_endorse_yourself: Cannot endorse yourself
+  label_skill_match: Skill Match
+  label_add_as_member_with_dots: Member as…
+  label_edit_requirements: Edit requirements
+  label_edit_skill_requirements: Edit skill requirements
+  label_importance_helpful: Helpful
+  label_importance_important: Important
+  label_importance_required: Required
+  label_view_mode: 'View Mode:'
+  label_view_mode_all: All (ungrouped)
+  label_view_mode_split: Members & Externals grouped
+  label_view_mode_members: Project Members Only

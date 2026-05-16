@@ -36,7 +36,7 @@
                 <% endorse_count = cell.is_a?(Hash) ? cell[:endorse_count].to_i : 0 %>
                 <td class="sk-level-cell sk-level-<%= level %>" title="<%= user.name %>: Level <%= level %> <%= "(#{endorse_count} <%= t(:label_endorsements) %>)" if endorse_count > 0 %>">
                   <span class="sk-badge"><%= level %></span>
-                  <% if prio > 0 %><span title="<%= t(:label_learning_goal) %>" class="sk-star-mini"></span><% end %>
+                  <% if prio > 0 %><span title=t(:label_learning_goal) class="sk-star-mini"></span><% end %>
                                     <% if endorse_count > 0 %><span title="<%= endorse_count %> <%= t(:label_endorsements) %>" class="sk-endorse-mini" style="margin-left:2px;"><%= endorse_count %></span><% end %>
                 </td>
               <% end %>
