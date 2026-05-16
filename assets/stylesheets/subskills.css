@@ -886,7 +886,7 @@ tr.context-menu-selection a {
 }
 
 /* ── View Modes ──────────────────────────────────────────────── */
-.psk-mode-members-only [data-is-member="false"] {
+.psk-mode-members_only [data-is-member="false"] {
   display: none !important;
 }
 .psk-split-border {

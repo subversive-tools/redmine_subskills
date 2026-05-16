@@ -174,7 +174,7 @@
         </select>
       </div>
       <div class="psk-modal-actions">
-        <%= f.submit '<%= t(:button_add) %>', class: 'button-positive' %>
+        <%= f.submit t(:button_add), class: 'button-positive' %>
         <button type="button" id="psk-modal-cancel"><%= t(:button_cancel) %></button>
       </div>
     <% end %>
@@ -224,7 +224,7 @@
   }
 
   function applyCurrentSortAndFilter() {
-    table.classList.remove('psk-mode-members-only', 'psk-mode-split', 'psk-mode-all');
+    table.classList.remove('psk-mode-members_only', 'psk-mode-split', 'psk-mode-all');
     table.classList.add('psk-mode-' + currentMode);
 
     if (activeRowId) {
