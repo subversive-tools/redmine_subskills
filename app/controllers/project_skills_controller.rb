@@ -20,7 +20,7 @@ class ProjectSkillsController < ApplicationController
                      end
 
     # Integrated best match
-    @project_users = User.active.sort_by(&:name)
+    @project_users = User.active.to_a.select(&:visible?).sort_by(&:name)
     all_us = SubskillUserSkill.where(user_id: @project_users.map(&:id)).includes(:endorsements)
     @user_skill_map = all_us.each_with_object({}) do |us, h|
       h[us.user_id] ||= {}
@@ -67,7 +67,7 @@ class ProjectSkillsController < ApplicationController
 
   # GET /projects/:project_id/skills/best-match
   def best_match
-    @users = User.active.sort_by(&:name)
+    @users = User.active.to_a.select(&:visible?).sort_by(&:name)
     all_us = SubskillUserSkill.where(user_id: @users.map(&:id))
     user_skill_map = all_us.each_with_object({}) do |us, h|
       h[us.user_id] ||= {}

@@ -9,7 +9,7 @@ class SubskillsRolesController < ApplicationController
     @categories = @roles.map(&:category).uniq
     @skills     = SubskillSkill.active.ordered
 
-    @users = User.active.sort_by(&:name)
+    @users = User.active.to_a.select(&:visible?).sort_by(&:name)
 
     # user_id => { skill_id => level }
     all_us = SubskillUserSkill.where(user_id: @users.map(&:id))
@@ -32,7 +32,7 @@ class SubskillsRolesController < ApplicationController
     @skills = SubskillSkill.active.ordered
     @req    = @role.requirements_map   # skill_id => importance
 
-    @users  = User.active.sort_by(&:name)
+    @users  = User.active.to_a.select(&:visible?).sort_by(&:name)
     all_us  = SubskillUserSkill.where(user_id: @users.map(&:id))
     @user_skill_map = all_us.each_with_object({}) do |us, h|
       h[us.user_id] ||= {}
