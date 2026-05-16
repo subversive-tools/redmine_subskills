@@ -12,13 +12,10 @@ class SubskillSkill < ActiveRecord::Base
   accepts_nested_attributes_for :level_descriptions, allow_destroy: true
 
   validates :name,     presence: true, uniqueness: true
-  before_save :update_levels_count
-
-  def update_levels_count
-    self.levels_count = level_descriptions.reject(&:marked_for_destruction?).size
-  end
   validate  :prevent_self_parenting
   validate  :prevent_rated_parenting
+
+  before_save :cleanup_excess_level_descriptions
 
   scope :active, -> { where(active: true) }
   scope :roots,  -> { where(parent_id: nil) }
@@ -292,6 +289,16 @@ class SubskillSkill < ActiveRecord::Base
   private_class_method :_score_node
 
   private
+
+  def cleanup_excess_level_descriptions
+    # If the skill is not a leaf, level descriptions don't matter anyway.
+    limit = levels_count.presence || Setting.plugin_redmine_subskills['levels_count'].to_i
+    limit = 5 if limit <= 0
+    # Destroy any level description whose level exceeds the current limit
+    level_descriptions.each do |ld|
+      ld.mark_for_destruction if ld.level > limit
+    end
+  end
 
   def prevent_self_parenting
     if parent_id.present? && parent_id == id
