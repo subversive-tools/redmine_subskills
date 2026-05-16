@@ -49,7 +49,9 @@
       <th class="short_description"><%= t(:field_description) %></th>
       <th class="psk-th-req"><%= t(:label_requirement) %></th>
       <th class="psk-th-sort" title="<%= t(:label_sort_columns) %>">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; opacity: 0.5;"><path d="M4 9h16M20 9l-4-4M20 9l-4 4M20 15H4M4 15l4-4M4 15l4 4"/></svg>
+        <a href="#" id="psk-sort-alpha-btn" class="psk-row-clickable" style="color: inherit; text-decoration: none;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; opacity: 0.5;"><path d="M4 9h16M20 9l-4-4M20 9l-4 4M20 15H4M4 15l4-4M4 15l4 4"/></svg>
+        </a>
       </th>
       <% @fit_scores.each do |fs| %>
         <th class="psk-th-user" data-user-id="<%= fs[:user].id %>" data-is-member="<%= @user_roles_map.key?(fs[:user].id) ? 'true' : 'false' %>" title="<%= fs[:user].name %>">
@@ -247,7 +249,9 @@
     table.classList.remove('psk-mode-members_only', 'psk-mode-split', 'psk-mode-all');
     table.classList.add('psk-mode-' + currentMode);
 
-    if (activeRowId) {
+    if (activeRowId === 'alpha') {
+      sortByName();
+    } else if (activeRowId) {
       var row = document.getElementById(activeRowId);
       if (row) sortBySkill(row);
     } else {
@@ -302,10 +306,25 @@
         if (aIsMember && !bIsMember) return -1;
         if (!aIsMember && bIsMember) return 1;
       }
-      if (b.lvl !== a.lvl) return b.lvl - a.lvl;
+      if (b.lvl !== a.lvl) return sortDirection * (b.lvl - a.lvl);
       return origUserIds.indexOf(a.uid) - origUserIds.indexOf(b.uid);
     });
     reorderColumns(pairs.map(function(p) { return p.uid; }));
+  }
+
+  /* ── Sort by Name ── */
+  function sortByName() {
+    var sorted = usersData.slice().sort(function(a, b) {
+      if (currentMode === 'split') {
+        var aIsMember = memberIds.indexOf(a.id) !== -1;
+        var bIsMember = memberIds.indexOf(b.id) !== -1;
+        if (aIsMember && !bIsMember) return -1;
+        if (!aIsMember && bIsMember) return 1;
+      }
+      var cmp = a.name.localeCompare(b.name);
+      return sortDirection * cmp;
+    }).map(function(u) { return u.id; });
+    reorderColumns(sorted);
   }
 
   /* ── Highlight helpers ── */
@@ -320,25 +339,48 @@
     row.addEventListener('click', function(e) {
       if (e.target.tagName === 'A') return;
       if (activeRowId === row.id) {
-        activeRowId = null;
-        clearActive();
+        sortDirection *= -1;
+        sortArrow.textContent = sortDirection === 1 ? ' →' : ' ←';
         applyCurrentSortAndFilter();
-        moveSortArrow(document.getElementById('psk-passung-row').querySelector('.psk-td-sort'));
       } else {
         activeRowId = row.id;
+        sortDirection = 1;
+        sortArrow.textContent = ' →';
         clearActive();
         row.classList.add('psk-row-active');
-        sortBySkill(row);
+        applyCurrentSortAndFilter();
         moveSortArrow(row.querySelector('.psk-td-sort'));
       }
     });
   });
+
+  /* ── Click on alpha sort button ── */
+  var alphaBtn = document.getElementById('psk-sort-alpha-btn');
+  if (alphaBtn) {
+    alphaBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (activeRowId === 'alpha') {
+        sortDirection *= -1;
+        sortArrow.textContent = sortDirection === 1 ? ' →' : ' ←';
+      } else {
+        activeRowId = 'alpha';
+        sortDirection = 1;
+        sortArrow.textContent = ' →';
+        clearActive();
+        moveSortArrow(alphaBtn.parentElement);
+      }
+      applyCurrentSortAndFilter();
+    });
+  }
 
   /* ── Click on Passung row → restore passung order ── */
   var passungRow = document.getElementById('psk-passung-row');
   if (passungRow) {
     passungRow.addEventListener('click', function() {
       activeRowId = null;
+      sortDirection = 1;
+      sortArrow.textContent = ' →';
       clearActive();
       applyCurrentSortAndFilter();
       moveSortArrow(passungRow.querySelector('.psk-td-sort'));
