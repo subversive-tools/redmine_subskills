@@ -52,6 +52,7 @@
     </div>
   <% end %>
 
+  <% unless @skill.composite? %>
   <h3 class="sk-admin-h3"><%= t(:label_level_descriptions, default: 'Level-Beschreibungen') %></h3>
   <p class="sk-admin-note">
     <%= t(:text_level_descriptions_note, default: 'Was bedeutet jeder Level für diesen Skill? Diese Texte werden dem User beim Auswählen angezeigt.') %>
@@ -78,6 +79,7 @@
       </p>
     <% end %>
   </div>
+  <% end %>
 
   <p>
     <%= f.submit @skill.new_record? ? t(:button_create) : t(:button_save), class: 'button-positive' %>
