@@ -48,6 +48,7 @@
       <th class="name"><%= t(:field_name) %></th>
       <th class="short_description"><%= t(:field_description) %></th>
       <th class="psk-th-req"><%= t(:label_requirement) %></th>
+      <th class="psk-th-sort" style="width: 24px;"></th>
       <% @fit_scores.each do |fs| %>
         <th class="psk-th-user" data-user-id="<%= fs[:user].id %>" data-is-member="<%= @user_roles_map.key?(fs[:user].id) ? 'true' : 'false' %>" title="<%= fs[:user].name %>">
           <%= link_to fs[:user].firstname, user_path(fs[:user]) %><br>
@@ -60,6 +61,7 @@
       <td class="name"></td>
       <td class="short_description"></td>
       <td class="psk-passung-label"><%= t(:label_match) %></td>
+      <td class="psk-td-sort" style="width: 24px;"></td>
       <% @fit_scores.each do |fs| %>
         <% pct = fs[:score].to_i %>
         <% badge_cls = pct >= 80 ? 'psk-score-high' : pct >= 50 ? 'psk-score-mid' : 'psk-score-low' %>
@@ -96,6 +98,7 @@
             <span class="psk-imp-badge" style="background:<%= imp[:color] %>;" title="<%= req_label %>"><%= imp[:label].is_a?(Symbol) ? t(imp[:label]) : imp[:label] %></span>
           <% end %>
         </td>
+        <td class="psk-td-sort" style="width: 24px;"></td>
         <% @fit_scores.each do |fs| %>
           <% entry   = skill.children.none? ? (@user_skill_map[fs[:user].id] || {})[skill.id] : nil %>
           <% lvl     = entry&.dig(:level).to_i %>
@@ -130,6 +133,7 @@
       <td class="name"><span class="psk-add-member-label"><%= t(:label_add_as_member_with_dots) %></span></td>
       <td class="short_description"></td>
       <td class="psk-td-req"></td>
+      <td class="psk-td-sort" style="width: 24px;"></td>
       <% @fit_scores.each do |fs| %>
         <td class="psk-td-level" data-user-id="<%= fs[:user].id %>" data-is-member="<%= @user_roles_map.key?(fs[:user].id) ? 'true' : 'false' %>">
           <div class="psk-roles-text" title="<%= @user_roles_map[fs[:user].id] %>">
@@ -143,6 +147,7 @@
       <td class="name"><span class="psk-add-member-label"><%= t(:label_add_as_member) %></span></td>
       <td class="short_description"></td>
       <td class="psk-td-req"></td>
+      <td class="psk-td-sort" style="width: 24px;"></td>
       <% @fit_scores.each do |fs| %>
         <td class="psk-td-level" data-user-id="<%= fs[:user].id %>" data-is-member="<%= @user_roles_map.key?(fs[:user].id) ? 'true' : 'false' %>">
           <a href="#" class="psk-add-member-btn"
@@ -256,8 +261,8 @@
   sortArrow.className = 'psk-sort-arrow';
   sortArrow.textContent = ' →';
 
-  var passungLabel = document.querySelector('.psk-passung-label');
-  passungLabel.appendChild(sortArrow); /* start at Passung */
+  var passungSortCell = document.getElementById('psk-passung-row').querySelector('.psk-td-sort');
+  if (passungSortCell) passungSortCell.appendChild(sortArrow); /* start at Passung */
 
   function moveSortArrow(cell) {
     cell.appendChild(sortArrow);
@@ -316,13 +321,13 @@
         activeRowId = null;
         clearActive();
         applyCurrentSortAndFilter();
-        moveSortArrow(passungLabel);
+        moveSortArrow(document.getElementById('psk-passung-row').querySelector('.psk-td-sort'));
       } else {
         activeRowId = row.id;
         clearActive();
         row.classList.add('psk-row-active');
         sortBySkill(row);
-        moveSortArrow(row.querySelector('.psk-td-req'));
+        moveSortArrow(row.querySelector('.psk-td-sort'));
       }
     });
   });
