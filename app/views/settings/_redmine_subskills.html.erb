@@ -37,24 +37,26 @@
   <em class="info"><%= t(:text_levels_count_info) %></em>
 </p>
 
-<div style="margin-top: 20px; padding-left: 20px; border-left: 3px solid #eee;">
-  <p>
+<p>
+  <label>&nbsp;</label>
+  <span style="display: block; margin-top: 15px;">
     <strong><%= t(:label_default_level_labels) %></strong><br>
     <em class="info" style="display:block; margin-top: 5px; margin-bottom: 15px;"><%= t(:text_default_level_labels_info) %></em>
-  </p>
-  <% 
-    labels = @settings['default_level_labels'] || {}
-    if labels.is_a?(String)
-      labels = labels.split("\n").map(&:strip).each_with_index.map { |l, i| [i.to_s, l] }.to_h
-    end
-  %>
-  <% (0..20).each do |lvl| %>
-    <p class="sk-level-label-setting" data-level="<%= lvl %>">
-      <label><%= t(:label_level_n, level: lvl) %></label>
-      <%= text_field_tag "settings[default_level_labels][#{lvl}]", labels[lvl.to_s], size: 40 %>
-    </p>
-  <% end %>
-</div>
+    
+    <% 
+      labels = @settings['default_level_labels'] || {}
+      if labels.is_a?(String)
+        labels = labels.split("\n").map(&:strip).each_with_index.map { |l, i| [i.to_s, l] }.to_h
+      end
+    %>
+    <% (0..20).each do |lvl| %>
+      <span class="sk-level-label-setting" data-level="<%= lvl %>" style="display: block; margin-bottom: 8px;">
+        <span style="display: inline-block; width: 100px;"><%= t(:label_level_n, level: lvl) %></span>
+        <%= text_field_tag "settings[default_level_labels][#{lvl}]", labels[lvl.to_s], size: 40 %>
+      </span>
+    <% end %>
+  </span>
+</p>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
