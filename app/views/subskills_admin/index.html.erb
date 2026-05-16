@@ -98,20 +98,25 @@
             <a href="#" class="icon-only icon-actions" title="<%= t(:label_actions) %>"
                onclick="skRowToggle(event,this);return false;"></a>
             <ul class="sk-drdn-items">
-              <li><%= link_to t(:button_edit), edit_subskills_admin_path(skill),
-                          class: 'sk-drdn-item icon icon-edit' %></li>
-              <li><%= link_to t(:button_copy), new_subskills_admin_path(copy_from: skill.id),
-                          class: 'sk-drdn-item icon icon-copy' %></li>
+              <li><%= link_to edit_subskills_admin_path(skill), class: 'sk-drdn-item sk-flex-item icon icon-edit' do %>
+                  <%= sprite_icon('edit') %><span class="icon-label"><%= t(:button_edit) %></span>
+                <% end %></li>
+              <li><%= link_to new_subskills_admin_path(copy_from: skill.id), class: 'sk-drdn-item sk-flex-item icon icon-copy' do %>
+                  <%= sprite_icon('copy') %><span class="icon-label"><%= t(:button_copy) %></span>
+                <% end %></li>
               <% if skill.can_add_children? %>
-                <li><%= link_to t(:label_new_subskill), new_subskills_admin_path(parent_id: skill.id),
-                            class: 'sk-drdn-item icon icon-add' %></li>
+                <li><%= link_to new_subskills_admin_path(parent_id: skill.id), class: 'sk-drdn-item sk-flex-item icon icon-add' do %>
+                    <%= sprite_icon('add') %><span class="icon-label"><%= t(:label_new_subskill) %></span>
+                  <% end %></li>
               <% end %>
               <li class="sk-drdn-sep"></li>
               <li>
-                <%= button_to t(:button_delete), subskills_admin_path(skill),
-                    method: :delete, class: 'icon icon-del',
+                <%= button_to subskills_admin_path(skill),
+                    method: :delete, class: 'sk-drdn-item sk-flex-item icon icon-del',
                     form_class: 'sk-inline-form',
-                    data: { confirm: "Skill '#{skill.name}' wirklich löschen?" } %>
+                    data: { confirm: "Skill '#{skill.name}' wirklich löschen?" } do %>
+                  <%= sprite_icon('del') %><span class="icon-label"><%= t(:button_delete) %></span>
+                <% end %>
               </li>
             </ul>
           </span>
