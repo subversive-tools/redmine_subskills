@@ -8,7 +8,7 @@
     <%= sprite_icon('add') %><span class="icon-label"><%= t(:label_new_skill) %></span>
   <% end %>
   <span class="drdn sk-drdn-wrap" id="sk-top-drdn">
-    <a href="#" class="icon-only icon-actions" title="Aktionen"
+    <a href="#" class="icon-only icon-actions" title="<%= t(:label_actions) %>"
        onclick="skDrdnToggle(event,'sk-top-drdn');return false;"></a>
     <ul class="sk-drdn-items">
       <li>
@@ -81,7 +81,7 @@
 
         <td class="buttons">
           <span class="sk-drdn-cell">
-            <a href="#" class="icon-only icon-actions" title="Aktionen"
+            <a href="#" class="icon-only icon-actions" title="<%= t(:label_actions) %>"
                onclick="skRowToggle(event,this);return false;"></a>
             <ul class="sk-drdn-items">
               <li><%= link_to t(:button_edit), edit_subskills_admin_path(skill),
