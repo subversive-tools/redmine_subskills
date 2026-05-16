@@ -93,7 +93,7 @@
         <td class="short_description"><%= skill.description %></td>
         <td class="psk-td-req">
           <% if imp %>
-            <span class="psk-imp-badge" style="background:<%= imp[:color] %>;" title="<%= req_label %>"><%= imp[:label] %></span>
+            <span class="psk-imp-badge" style="background:<%= imp[:color] %>;" title="<%= req_label %>"><%= imp[:label].is_a?(Symbol) ? t(imp[:label]) : imp[:label] %></span>
           <% end %>
         </td>
         <% @fit_scores.each do |fs| %>
