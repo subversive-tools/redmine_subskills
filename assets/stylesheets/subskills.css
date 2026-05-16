@@ -576,7 +576,7 @@ td.fit-low  { color: #8d1f00; }
   font-size: 0.75rem;
 }
 
-.psk-star-badge     { position: absolute; top: -7px; right: -9px;
+.psk-star-badge     { position: absolute; top: -5px; right: -9px;
                       width: 11px; height: 11px;
                       background: url(../images/target.svg) no-repeat center;
                       background-size: contain;
