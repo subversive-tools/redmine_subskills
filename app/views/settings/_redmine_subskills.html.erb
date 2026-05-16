@@ -1,26 +1,4 @@
-<p>
-  <label><%= t(:label_levels_count) %></label>
-  <%= number_field_tag 'settings[levels_count]', @settings['levels_count'], min: 1, max: 20 %>
-  <em class="info"><%= t(:text_levels_count_info) %></em>
-</p>
-<fieldset class="collapsible collapsed" style="margin-bottom: 15px;">
-  <legend onclick="toggleFieldset(this);" class="icon icon-collapsed"><%= t(:label_default_level_labels) %></legend>
-  <div style="display: none;">
-    <em class="info" style="display:block; margin-bottom: 10px;"><%= t(:text_default_level_labels_info) %></em>
-    <% 
-      labels = @settings['default_level_labels'] || {}
-      if labels.is_a?(String)
-        labels = labels.split("\n").map(&:strip).each_with_index.map { |l, i| [i.to_s, l] }.to_h
-      end
-    %>
-    <% (0..20).each do |lvl| %>
-      <p class="sk-level-label-setting" data-level="<%= lvl %>">
-        <label><%= t(:label_level_n, level: lvl) %></label>
-        <%= text_field_tag "settings[default_level_labels][#{lvl}]", labels[lvl.to_s], size: 40 %>
-      </p>
-    <% end %>
-  </div>
-</fieldset>
+
 <p>
   <label><%= t(:label_fit_success_threshold) %> (%)</label>
   <%= number_field_tag 'settings[fit_success_threshold]', @settings['fit_success_threshold'], min: 0, max: 100 %>
@@ -52,7 +30,31 @@
   ], @settings['default_view_mode']) %>
   <em class="info"><%= t(:text_default_view_mode_info) %></em>
 </p>
+
+<p>
+  <label><%= t(:label_levels_count) %></label>
+  <%= number_field_tag 'settings[levels_count]', @settings['levels_count'], min: 1, max: 20 %>
+  <em class="info"><%= t(:text_levels_count_info) %></em>
 </p>
+
+<fieldset class="collapsible" style="margin-bottom: 15px;">
+  <legend onclick="toggleFieldset(this);" class="icon icon-expanded"><%= t(:label_default_level_labels) %></legend>
+  <div>
+    <em class="info" style="display:block; margin-bottom: 10px;"><%= t(:text_default_level_labels_info) %></em>
+    <% 
+      labels = @settings['default_level_labels'] || {}
+      if labels.is_a?(String)
+        labels = labels.split("\n").map(&:strip).each_with_index.map { |l, i| [i.to_s, l] }.to_h
+      end
+    %>
+    <% (0..20).each do |lvl| %>
+      <p class="sk-level-label-setting" data-level="<%= lvl %>">
+        <label><%= t(:label_level_n, level: lvl) %></label>
+        <%= text_field_tag "settings[default_level_labels][#{lvl}]", labels[lvl.to_s], size: 40 %>
+      </p>
+    <% end %>
+  </div>
+</fieldset>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
