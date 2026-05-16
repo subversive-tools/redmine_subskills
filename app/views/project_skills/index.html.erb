@@ -48,7 +48,9 @@
       <th class="name"><%= t(:field_name) %></th>
       <th class="short_description"><%= t(:field_description) %></th>
       <th class="psk-th-req"><%= t(:label_requirement) %></th>
-      <th class="psk-th-sort"></th>
+      <th class="psk-th-sort" title="<%= t(:label_sort_columns) %>">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; opacity: 0.5;"><path d="M4 9h16M20 9l-4-4M20 9l-4 4M20 15H4M4 15l4-4M4 15l4 4"/></svg>
+      </th>
       <% @fit_scores.each do |fs| %>
         <th class="psk-th-user" data-user-id="<%= fs[:user].id %>" data-is-member="<%= @user_roles_map.key?(fs[:user].id) ? 'true' : 'false' %>" title="<%= fs[:user].name %>">
           <%= link_to fs[:user].firstname, user_path(fs[:user]) %><br>

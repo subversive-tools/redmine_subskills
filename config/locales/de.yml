@@ -85,3 +85,10 @@ de:
   label_view_mode_all: Alle (ungruppiert)
   label_view_mode_split: Mitglieder & Externe gruppiert
   label_view_mode_members: Nur Projektmitglieder
+  label_toggle_expand: Ein-/Ausklappen
+  label_endorsements_count: "%{count} Bestätigung(en)"
+  label_add_user_as_member: "%{name} als Projektmitglied hinzufügen"
+  label_drag_to_reorder: Verschieben (auch auf andere Skills ziehen zum Umhängen)
+  label_user_level: "%{user}: Level %{level}"
+  label_user_level_endorsements: "%{user}: Level %{level} (%{count} Bestätigungen)"
+  label_sort_columns: "Spalten sortieren"

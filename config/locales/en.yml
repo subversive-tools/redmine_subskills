@@ -15,7 +15,7 @@ en:
   label_save_skills: Save
   label_radar_chart: Radar Overview
   label_skill_category: Category
-  label_learning_goal: Learning Goal
+  label_learning_goal: Learning goal
   label_endorsement: Endorsement
   label_endorsements: Endorsements
   label_add_endorsement: Endorse skill
@@ -83,3 +83,10 @@ en:
   label_view_mode_all: All (ungrouped)
   label_view_mode_split: Members & Externals grouped
   label_view_mode_members: Project Members Only
+  label_toggle_expand: Toggle expand/collapse
+  label_endorsements_count: "%{count} endorsement(s)"
+  label_add_user_as_member: Add %{name} as project member
+  label_drag_to_reorder: Drag to reorder (drop on other skills to change parent)
+  label_user_level: "%{user}: Level %{level}"
+  label_user_level_endorsements: "%{user}: Level %{level} (%{count} endorsements)"
+  label_sort_columns: "Sort columns"
