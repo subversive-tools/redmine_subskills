@@ -589,7 +589,7 @@ td.fit-low  { color: #8d1f00; }
                       content: ''; display: block; width: 100%; height: 100%;
                       background: url(../images/endorse.svg) no-repeat center;
                       background-size: contain; 
-                      filter: invert(34%) sepia(69%) saturate(518%) hue-rotate(76deg) brightness(93%) contrast(93%); /* #2e7d32 Green */
+                      filter: invert(44.9%) sepia(78.4%) saturate(838.4%) hue-rotate(76deg) brightness(93%) contrast(93%); /* #2e7d32 Green */
                     }
 .psk-no-level       { color: #ccc; font-size: 0.85rem; }
 
