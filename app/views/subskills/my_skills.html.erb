@@ -39,8 +39,9 @@
         </span>
         <%# Aggregate dots (muted) %>
         <span class="sk-agg-dots" title="<%= t(:label_aggregated_score).split(':').first %>: <%= sprintf('%.1f', agg) %>">
-          <% (1..5).each do |l| %>
-            <% c = agg_r >= l ? dot_colors[agg_r] : '#ddd' %>
+          <% max_lvl = skill.levels_count.presence || Setting.plugin_redmine_subskills['levels_count'].to_i; max_lvl = 5 if max_lvl <= 0 %>
+          <% (1..max_lvl).each do |l| %>
+            <% c = agg_r >= l ? (dot_colors[agg_r] || dot_colors.last) : '#ddd' %>
             <span class="sk-agg-dot" style="background:<%= c %>;border-color:<%= c %>;"></span>
           <% end %>
         </span>
@@ -111,14 +112,17 @@
                 </span>
               </div>
               <div class="sk-skill-body">
-                <% (0..5).each do |l| %>
+                <% max_lvl = cs.levels_count.presence || Setting.plugin_redmine_subskills['levels_count'].to_i; max_lvl = 5 if max_lvl <= 0 %>
+                <% (0..max_lvl).each do |l| %>
                   <div class="sk-level-row <%= 'sk-level-row--active' if l == lvl %> <%= 'sk-level-row--editable' if @editable %>"
                        id="sk-lrow-<%= cs.id %>-<%= l %>"
                        <% if @editable %>onclick="skSelectLevel(<%= cs.id %>, <%= l %>)"<% end %>>
                     <span class="sk-option-btn sk-level-<%= l %> <%= 'sk-option-btn--active' if l == lvl %>">
                       <%= l %>
                     </span>
-                    <span class="sk-level-row-label"><%= SubskillUserSkill::LEVELS[l][:label] %></span>
+                    <span class="sk-level-row-label">
+                      <%= l == 0 ? SubskillUserSkill::LEVELS[0][:label] : (cs.level_descriptions.find { |d| d.level == l }&.label.presence || SubskillUserSkill::LEVELS[l][:label] || "Level #{l}") %>
+                    </span>
                     <span class="sk-level-row-desc"><%= l > 0 ? (lvl_descs[l] || '') : '' %></span>
                   </div>
                 <% end %>
@@ -181,14 +185,17 @@
         </span>
       </div>
       <div class="sk-skill-body">
-        <% (0..5).each do |lvl| %>
+        <% max_lvl = skill.levels_count.presence || Setting.plugin_redmine_subskills['levels_count'].to_i; max_lvl = 5 if max_lvl <= 0 %>
+        <% (0..max_lvl).each do |lvl| %>
           <div class="sk-level-row <%= 'sk-level-row--active' if lvl == current_level %> <%= 'sk-level-row--editable' if @editable %>"
                id="sk-lrow-<%= skill.id %>-<%= lvl %>"
                <% if @editable %>onclick="skSelectLevel(<%= skill.id %>, <%= lvl %>)"<% end %>>
             <span class="sk-option-btn sk-level-<%= lvl %> <%= 'sk-option-btn--active' if lvl == current_level %>">
               <%= lvl %>
             </span>
-            <span class="sk-level-row-label"><%= SubskillUserSkill::LEVELS[lvl][:label] %></span>
+            <span class="sk-level-row-label">
+              <%= lvl == 0 ? SubskillUserSkill::LEVELS[0][:label] : (skill.level_descriptions.find { |d| d.level == lvl }&.label.presence || SubskillUserSkill::LEVELS[lvl][:label] || "Level #{lvl}") %>
+            </span>
             <span class="sk-level-row-desc"><%= lvl > 0 ? (level_descs[lvl] || '') : '' %></span>
           </div>
         <% end %>
@@ -235,7 +242,7 @@ function skSelectLevel(skillId, level) {
     if (icon) icon.style.filter = 'grayscale(1) opacity(0.3)';
   }
 
-  for (let l = 0; l <= 5; l++) {
+  for (let l = 0; l <= 20; l++) {
     const row = document.getElementById('sk-lrow-' + skillId + '-' + l); if (!row) continue;
     row.classList.toggle('sk-level-row--active', l === level);
     const btn = row.querySelector('.sk-option-btn');

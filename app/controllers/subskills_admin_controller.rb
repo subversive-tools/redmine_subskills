@@ -232,14 +232,16 @@ class SubskillsAdminController < ApplicationController
 
   def skill_params
     params.require(:subskill_skill).permit(
-      :name, :description, :position, :active, :parent_id,
-      level_descriptions_attributes: [:id, :level, :description]
+      :name, :description, :position, :active, :parent_id, :levels_count,
+      level_descriptions_attributes: [:id, :level, :description, :label]
     )
   end
 
   def build_level_descriptions(skill)
     existing = skill.level_descriptions.index_by(&:level)
-    (1..5).each { |lvl| skill.level_descriptions.build(level: lvl) unless existing[lvl] }
+    target_count = skill.levels_count.presence || Setting.plugin_redmine_subskills['levels_count'].to_i
+    target_count = 5 if target_count <= 0
+    (1..target_count).each { |lvl| skill.level_descriptions.build(level: lvl) unless existing[lvl] }
   end
 
   # Skills that can serve as parent of `skill` (not itself, not its descendants)

@@ -26,7 +26,7 @@
     <%# ── Composite / Parent skill – header row with aggregated score ── %>
     <% agg = (score_map[skill.id] || 0.0) %>
     <% agg_rounded = agg.round %>
-    <% dot_color = agg_rounded > 0 ? level_colors[agg_rounded] : '#ccc' %>
+    <% dot_color = agg_rounded > 0 ? (level_colors[agg_rounded] || level_colors.last) : '#ccc' %>
     <% next if agg_rounded == 0 && tree_rows.none? { |r| r[:skill].parent_id == skill.id && (score_map[r[:skill].id] || 0) > 0 } %>
     <thead>
       <tr>
@@ -55,7 +55,8 @@
     <% endorse_count = us ? us.endorsements.size : 0 %>
     <% next if current_level == 0 && !learn %>
 
-    <% descs_json = (1..5).each_with_object({}) { |l, h|
+    <% max_lvl = skill.levels_count.presence || Setting.plugin_redmine_subskills['levels_count'].to_i; max_lvl = 5 if max_lvl <= 0 %>
+    <% descs_json = (1..max_lvl).each_with_object({}) { |l, h|
          h[l] = level_descs[[skill.id, l]].to_s
        }.to_json %>
 
@@ -72,11 +73,13 @@
         </div>
       </td>
 
-      <% dot_color = current_level > 0 ? level_colors[current_level] : '#ccc' %>
+      <% dot_color = current_level > 0 ? (level_colors[current_level] || level_colors.last) : '#ccc' %>
       <td class="sk-td-center-top">
                         <div class="sk-flex-dots">
-          <% (1..5).each do |lvl| %>
-            <span title="<%= level_labels[lvl] %>"
+          <% max_lvl = skill.levels_count.presence || Setting.plugin_redmine_subskills['levels_count'].to_i; max_lvl = 5 if max_lvl <= 0 %>
+          <% (1..max_lvl).each do |lvl| %>
+            <% lbl = skill.level_descriptions.find { |d| d.level == lvl }&.label.presence || level_labels[lvl] || "Level #{lvl}" %>
+            <span title="<%= lbl %>"
                   class="sk-dot"
                   style="border:2px solid <%= current_level >= lvl ? dot_color : '#ccc' %>;
                          background:<%= current_level >= lvl ? dot_color : 'transparent' %>;"></span>

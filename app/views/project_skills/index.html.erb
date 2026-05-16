@@ -112,7 +112,8 @@
             <% if skill.children.none? %>
               <% if lvl > 0 %>
                 <% desc = @level_descs.dig(skill.id, lvl).presence %>
-                <% tip  = [level_labels[lvl], desc].compact.join(': ') %>
+                <% lbl = skill.level_descriptions.find { |d| d.level == lvl }&.label.presence || level_labels[lvl] || "Level #{lvl}" %>
+                <% tip  = [lbl, desc].compact.join(': ') %>
                 <% tip += " (#{endorse} Bestätigungen)" if endorse > 0 %>
                 <span class="psk-level-wrap" title="<%= tip %>">
                   <span class="sk-option-btn sk-level-<%= lvl %> sk-option-btn--active"><%= lvl %></span>
