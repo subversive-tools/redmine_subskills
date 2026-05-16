@@ -9,6 +9,8 @@ class SubskillSkill < ActiveRecord::Base
   belongs_to :parent, class_name: 'SubskillSkill', optional: true
   has_many :children, class_name: 'SubskillSkill', foreign_key: 'parent_id', dependent: :destroy
 
+  accepts_nested_attributes_for :level_descriptions, allow_destroy: true
+
   validates :name,     presence: true, uniqueness: true
   validates :category, presence: true
   validate  :prevent_self_parenting

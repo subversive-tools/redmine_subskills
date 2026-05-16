@@ -1,0 +1,1 @@
+- [ ] Anzahl Levels pro Skill selber bestimmen (Default in Addon-Einstellungen konfigurierbar)
