@@ -145,10 +145,10 @@
       <td class="psk-td-req"></td>
       <% @fit_scores.each do |fs| %>
         <td class="psk-td-level" data-user-id="<%= fs[:user].id %>" data-is-member="<%= @user_roles_map.key?(fs[:user].id) ? 'true' : 'false' %>">
-          <button type="button" class="psk-add-member-btn"
-                  data-user-id="<%= fs[:user].id %>"
-                  data-user-name="<%= h(fs[:user].name) %>"
-                  title="<%= t(:label_add_user_as_member, name: h(fs[:user].name)) %>"><%= sprite_icon('add') %></button>
+          <a href="#" class="psk-add-member-btn"
+             data-user-id="<%= fs[:user].id %>"
+             data-user-name="<%= h(fs[:user].name) %>"
+             title="<%= t(:label_add_user_as_member, name: h(fs[:user].name)) %>"><%= sprite_icon('add') %></a>
         </td>
       <% end %>
     </tr>
@@ -341,6 +341,7 @@
   if (modal) {
     document.querySelectorAll('.psk-add-member-btn').forEach(function(btn) {
       btn.addEventListener('click', function(e) {
+        e.preventDefault();
         e.stopPropagation();
         var uid  = btn.dataset.userId;
         var name = btn.dataset.userName;
