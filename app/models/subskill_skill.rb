@@ -14,6 +14,7 @@ class SubskillSkill < ActiveRecord::Base
   validates :name,     presence: true, uniqueness: true
   validates :category, presence: true
   validate  :prevent_self_parenting
+  validate  :prevent_rated_parenting
 
   scope :active, -> { where(active: true) }
   scope :roots,  -> { where(parent_id: nil) }
@@ -291,6 +292,15 @@ class SubskillSkill < ActiveRecord::Base
   def prevent_self_parenting
     if parent_id.present? && parent_id == id
       errors.add(:parent_id, "kann nicht sich selbst als übergeordnet haben")
+    end
+  end
+
+  def prevent_rated_parenting
+    if parent_id_changed? && parent_id.present?
+      new_parent = SubskillSkill.find_by(id: parent_id)
+      if new_parent && new_parent.user_skills.any?
+        errors.add(:parent_id, "kann nicht als Eltern-Skill gesetzt werden, da er bereits Bewertungen hat")
+      end
     end
   end
 end
