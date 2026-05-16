@@ -39,7 +39,7 @@
             </div>
             <div class="skill-row-level level-<%= current_level %>" id="level-label-<%= user.id %>-<%= skill.id %>">
               <span class="level-badge"><%= current_level %></span>
-              <span class="level-text"><%= SubskillUserSkill::LEVELS[current_level][:label] %></span>
+              <span class="level-text"><%= SubskillUserSkill::LEVELS.dig(current_level, :label) || "Level #{current_level}" %></span>
             </div>
           </div>
         <% end %>

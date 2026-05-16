@@ -17,7 +17,7 @@ class SubskillUserSkill < ActiveRecord::Base
 
   validates :user_id, presence: true
   validates :subskill_skill_id, presence: true, uniqueness: { scope: :user_id }
-  validates :level, inclusion: { in: 0..5 }
+  validates :level, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 20 }
   validates :learn_priority, inclusion: { in: 0..3 }
 
   before_save :archive_endorsements_on_level_change, if: :level_changed?

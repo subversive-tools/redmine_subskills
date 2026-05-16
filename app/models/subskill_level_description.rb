@@ -3,6 +3,5 @@ class SubskillLevelDescription < ActiveRecord::Base
 
   belongs_to :skill, class_name: 'SubskillSkill', foreign_key: 'subskill_skill_id', inverse_of: :level_descriptions
 
-  validates :level, inclusion: { in: 1..5 }
-  validates :subskill_skill_id, presence: true
+  validates :level, numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 20 }
 end

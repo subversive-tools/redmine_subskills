@@ -16,7 +16,7 @@
     else
       imp_labels = { 1 => 'Hilfreich', 2 => 'Wichtig', 3 => 'Erforderlich' }
       detail_lines = details.map do |d|
-        level_text = SubskillUserSkill::LEVELS[d[:user_level].to_i][:label] rescue d[:user_level].to_i
+        level_text = SubskillUserSkill::LEVELS.dig(d[:user_level].to_i, :label) rescue d[:user_level].to_i
         "• #{d[:skill_name]}: IST #{d[:user_level].to_i} (#{level_text}) | SOLL #{imp_labels[d[:req_imp]]}"
       end
       tooltip = detail_lines.join("\n").gsub('"', '&quot;')

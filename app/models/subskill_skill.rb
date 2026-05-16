@@ -2,7 +2,7 @@ class SubskillSkill < ActiveRecord::Base
   self.table_name = 'subskill_skills'
 
   has_many :user_skills, class_name: 'SubskillUserSkill', foreign_key: 'subskill_skill_id', dependent: :destroy
-  has_many :level_descriptions, class_name: 'SubskillLevelDescription', foreign_key: 'subskill_skill_id', dependent: :destroy
+  has_many :level_descriptions, class_name: 'SubskillLevelDescription', foreign_key: 'subskill_skill_id', dependent: :destroy, inverse_of: :skill
   has_many :role_requirements, class_name: 'SubskillRoleRequirement', foreign_key: 'subskill_skill_id', dependent: :destroy
   has_many :project_requirements, class_name: 'SubskillProjectRequirement', foreign_key: 'subskill_skill_id', dependent: :destroy
 
@@ -12,7 +12,6 @@ class SubskillSkill < ActiveRecord::Base
   accepts_nested_attributes_for :level_descriptions, allow_destroy: true
 
   validates :name,     presence: true, uniqueness: true
-  validates :category, presence: true
   validate  :prevent_self_parenting
   validate  :prevent_rated_parenting
 

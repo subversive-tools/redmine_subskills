@@ -121,7 +121,7 @@
                       <%= l %>
                     </span>
                     <span class="sk-level-row-label">
-                      <%= l == 0 ? SubskillUserSkill::LEVELS[0][:label] : (cs.level_descriptions.find { |d| d.level == l }&.label.presence || SubskillUserSkill::LEVELS[l][:label] || "Level #{l}") %>
+                      <%= l == 0 ? SubskillUserSkill::LEVELS.dig(0, :label) : (cs.level_descriptions.find { |d| d.level == l }&.label.presence || SubskillUserSkill::LEVELS.dig(l, :label) || "Level #{l}") %>
                     </span>
                     <span class="sk-level-row-desc"><%= l > 0 ? (lvl_descs[l] || '') : '' %></span>
                   </div>
@@ -194,7 +194,7 @@
               <%= lvl %>
             </span>
             <span class="sk-level-row-label">
-              <%= lvl == 0 ? SubskillUserSkill::LEVELS[0][:label] : (skill.level_descriptions.find { |d| d.level == lvl }&.label.presence || SubskillUserSkill::LEVELS[lvl][:label] || "Level #{lvl}") %>
+              <%= lvl == 0 ? SubskillUserSkill::LEVELS.dig(0, :label) : (skill.level_descriptions.find { |d| d.level == lvl }&.label.presence || SubskillUserSkill::LEVELS.dig(lvl, :label) || "Level #{lvl}") %>
             </span>
             <span class="sk-level-row-desc"><%= lvl > 0 ? (level_descs[lvl] || '') : '' %></span>
           </div>
