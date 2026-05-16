@@ -917,3 +917,6 @@ tr.context-menu-selection a {
 #psk-table tfoot td.name {
   background-color: #fff;
 }
+
+.sk-flex-item { display: flex !important; align-items: center; gap: 8px; }
+.sk-flex-item span { flex: 1; }

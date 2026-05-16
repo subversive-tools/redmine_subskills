@@ -13,12 +13,28 @@
         <%= form_with url: import_csv_subskills_admin_index_path, multipart: true, local: true do |f| %>
           <%= f.file_field :csv_file, accept: '.csv', style: 'display:none;',
               id: 'sk-csv-input', onchange: 'this.form.submit()' %>
-          <label for="sk-csv-input" class="sk-drdn-item icon icon-attachment">
-            <%= t(:label_import_csv) %>
+          <label for="sk-csv-input" class="sk-drdn-item sk-flex-item">
+            <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="min-width:16px;">
+  <ellipse cx="10" cy="5" rx="4" ry="1.5" />
+  <path d="M 6 5 V 8.5 C 6 10, 14 10, 14 8.5 V 5" />
+  <path d="M 6 8.5 V 12 C 6 13.5, 14 13.5, 14 12 V 8.5" />
+  <path d="M 1 1 L 6 4" />
+  <path d="M 2 4 L 6 4 L 5 1" />
+</svg>
+            <span><%= t(:label_import_csv) %></span>
           </label>
         <% end %>
       </li>
-      <li><%= link_to t(:label_export_csv), export_csv_subskills_admin_index_path, class: 'sk-drdn-item icon icon-download' %></li>
+      <li><%= link_to export_csv_subskills_admin_index_path, class: 'sk-drdn-item sk-flex-item' do %>
+          <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="min-width:16px;">
+  <ellipse cx="6" cy="4" rx="4" ry="1.5" />
+  <path d="M 2 4 V 7.5 C 2 9, 10 9, 10 7.5 V 4" />
+  <path d="M 2 7.5 V 11 C 2 12.5, 10 12.5, 10 11 V 7.5" />
+  <path d="M 8 10 L 15 15" />
+  <path d="M 11 15 L 15 15 L 14 11" />
+</svg>
+          <span><%= t(:label_export_csv) %></span>
+        <% end %></li>
     </ul>
   </span>
 </div>
