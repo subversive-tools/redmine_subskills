@@ -890,7 +890,7 @@ tr.context-menu-selection a {
   display: none !important;
 }
 .psk-split-border {
-  border-right: 3px solid #ccc !important;
+  border-right: 2px dashed #cccccc73 !important;
 }
 
 /* ── Sticky First Column ─────────────────────────────────────── */
