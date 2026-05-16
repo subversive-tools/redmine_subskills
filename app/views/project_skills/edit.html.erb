@@ -5,8 +5,7 @@
 <h2>Skill-Anforderungen bearbeiten</h2>
 
 <p class="sk-intro">
-  Lege fest, welche Skills für dieses Projekt erwartet werden und wie wichtig sie sind.
-  Nicht ausgewählte Skills werden nicht berücksichtigt.
+  <%= t(:text_project_skills_explanation) %>
 </p>
 
 <%= form_tag update_project_skills_path(@project), method: :post do %>

@@ -60,7 +60,7 @@ module RedmineSubskills
             
             const th = document.createElement("th");
             th.id = "sk-th-fit";
-            th.textContent = "Skill-Passung";
+            th.textContent = "#{I18n.t(:label_skill_match, default: 'Skill-Passung')}";
             
             if (rolesTh && rolesTh.nextElementSibling) {
               thead.insertBefore(th, rolesTh.nextElementSibling);

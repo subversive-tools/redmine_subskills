@@ -5,8 +5,7 @@
 <h2>Rollen-Passung Team</h2>
 
 <p class="sk-intro">
-  Fit-Score: Wie gut passen die Selbsteinschätzungen einer Person zu den Anforderungen einer Rolle?
-  Skala: 🟢 ≥ 70% · 🟡 40–69% · 🔴 &lt; 40%
+  <%= t(:text_fit_score_explanation) %>
 </p>
 
 <% @categories.each do |cat| %>
@@ -50,5 +49,5 @@
 <div class="subskills-legend">
   <span class="sk-legend-item fit-high">≥ 70% – Gute Passung</span>
   <span class="sk-legend-item fit-mid">40–69% – Teilweise</span>
-  <span class="sk-legend-item fit-low">&lt; 40% – Lücken vorhanden</span>
+  <span class="sk-legend-item fit-low"><%= t(:text_gaps_present) %></span>
 </div>

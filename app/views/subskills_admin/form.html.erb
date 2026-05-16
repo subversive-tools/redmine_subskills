@@ -29,11 +29,11 @@
           placeholder: 'z.B. Was bedeutet Level 3 in diesem Skill?' %>
     </p>
     <p>
-      <%= f.label :position, 'Position' %>
+      <%= f.label :position, '<%= t(:field_position) %>' %>
       <%= f.number_field :position, min: 0, style: 'width:80px' %>
     </p>
     <p>
-      <%= f.label :active, 'Aktiv' %>
+      <%= f.label :active, '<%= t(:field_active) %>' %>
       <%= f.check_box :active %>
       <em class="info">Inaktive Skills werden in der Matrix ausgeblendet.</em>
     </p>
