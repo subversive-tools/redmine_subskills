@@ -2,7 +2,15 @@
   <%= stylesheet_link_tag 'subskills', plugin: 'redmine_subskills' %>
 <% end %>
 
-<div class="contextual">
+<% has_members = @fit_scores.any? { |fs| @user_roles_map.key?(fs[:user].id) } %>
+<div class="contextual" style="display: flex; gap: 10px; align-items: center;">
+  <label for="psk-view-mode" style="font-size: 0.9em; color: #555;"><%= t(:label_view_mode, default: "Darstellung:") %></label>
+  <select id="psk-view-mode" class="psk-view-mode-select" onchange="pskChangeViewMode(this.value)" style="margin-right: 15px;">
+    <option value="all"><%= t(:label_view_mode_all, default: "Alle (ungruppiert)") %></option>
+    <option value="split"><%= t(:label_view_mode_split, default: "Mitglieder & Externe gruppiert") %></option>
+    <option value="members_only" <%= 'disabled' unless has_members %>><%= t(:label_view_mode_members, default: "Nur Projektmitglieder") %></option>
+  </select>
+
   <% if User.current.allowed_to?(:manage_subskills, @project) || User.current.allowed_to?(:manage_project, @project) || User.current.allowed_to?(:manage_members, @project) %>
     <%= link_to edit_project_skills_path(@project), class: 'sk-btn-edit-svg' do %>
       <svg width="16" height="16" class="sk-svg-icon">
@@ -44,7 +52,7 @@
       <th class="short_description"><%= t(:field_description) %></th>
       <th class="psk-th-req"><%= t(:label_requirement) %></th>
       <% @fit_scores.each do |fs| %>
-        <th class="psk-th-user" data-user-id="<%= fs[:user].id %>" title="<%= fs[:user].name %>">
+        <th class="psk-th-user" data-user-id="<%= fs[:user].id %>" data-is-member="<%= @user_roles_map.key?(fs[:user].id) ? 'true' : 'false' %>" title="<%= fs[:user].name %>">
           <%= link_to fs[:user].firstname, user_path(fs[:user]) %><br>
           <%= link_to fs[:user].lastname, user_path(fs[:user]), class: 'psk-user-lastname' %>
         </th>
@@ -96,7 +104,7 @@
           <% lvl     = entry&.dig(:level).to_i %>
           <% star    = entry&.dig(:star) %>
           <% endorse = entry&.dig(:endorse_count).to_i %>
-          <td class="psk-td-level" data-user-id="<%= fs[:user].id %>" data-level="<%= lvl %>">
+          <td class="psk-td-level" data-user-id="<%= fs[:user].id %>" data-is-member="<%= @user_roles_map.key?(fs[:user].id) ? 'true' : 'false' %>" data-level="<%= lvl %>">
             <% if skill.children.none? %>
               <% if lvl > 0 %>
                 <% desc = @level_descs.dig(skill.id, lvl).presence %>
@@ -124,7 +132,7 @@
     <tr id="psk-roles-row">
       <td class="name" colspan="3"><span class="psk-add-member-label">Mitglied als…</span></td>
       <% @fit_scores.each do |fs| %>
-        <td class="psk-td-level" data-user-id="<%= fs[:user].id %>">
+        <td class="psk-td-level" data-user-id="<%= fs[:user].id %>" data-is-member="<%= @user_roles_map.key?(fs[:user].id) ? 'true' : 'false' %>">
           <div class="psk-roles-text" title="<%= @user_roles_map[fs[:user].id] %>">
             <%= @user_roles_map[fs[:user].id].presence || '–' %>
           </div>
@@ -135,7 +143,7 @@
     <tr id="psk-add-member-row">
       <td class="name" colspan="3"><span class="psk-add-member-label"><%= t(:label_add_as_member) %></span></td>
       <% @fit_scores.each do |fs| %>
-        <td class="psk-td-level" data-user-id="<%= fs[:user].id %>">
+        <td class="psk-td-level" data-user-id="<%= fs[:user].id %>" data-is-member="<%= @user_roles_map.key?(fs[:user].id) ? 'true' : 'false' %>">
           <button type="button" class="psk-add-member-btn"
                   data-user-id="<%= fs[:user].id %>"
                   data-user-name="<%= h(fs[:user].name) %>"
@@ -180,9 +188,53 @@
   if (!table) return;
 
   /* Original user order (passung-sorted, set by server) */
-  var origUserIds = Array.from(
-    table.querySelectorAll('thead tr:first-child [data-user-id]')
-  ).map(function(th) { return th.dataset.userId; });
+    var usersData = Array.from(
+    table.querySelectorAll('thead tr:first-child th[data-user-id]')
+  ).map(function(th) {
+    return {
+      id: th.dataset.userId,
+      isMember: th.dataset.isMember === 'true'
+    };
+  });
+  var origUserIds = usersData.map(function(u) { return u.id; });
+  var memberIds = usersData.filter(function(u) { return u.isMember; }).map(function(u) { return u.id; });
+  var externalIds = usersData.filter(function(u) { return !u.isMember; }).map(function(u) { return u.id; });
+  var splitUserIds = memberIds.concat(externalIds);
+
+  var currentMode = 'all';
+  window.pskChangeViewMode = function(mode) {
+    currentMode = mode;
+    applyCurrentSortAndFilter();
+  };
+
+  function updateSplitBorder() {
+    table.querySelectorAll('.psk-split-border').forEach(function(el) {
+      el.classList.remove('psk-split-border');
+    });
+    if (currentMode === 'split' && memberIds.length > 0 && externalIds.length > 0) {
+      table.querySelectorAll('tr').forEach(function(row) {
+        var cells = Array.from(row.children).filter(function(c) {
+          return c.dataset && c.dataset.isMember === 'true';
+        });
+        if (cells.length > 0) {
+          cells[cells.length - 1].classList.add('psk-split-border');
+        }
+      });
+    }
+  }
+
+  function applyCurrentSortAndFilter() {
+    table.classList.remove('psk-mode-members-only', 'psk-mode-split', 'psk-mode-all');
+    table.classList.add('psk-mode-' + currentMode);
+
+    if (activeRowId) {
+      var row = document.getElementById(activeRowId);
+      if (row) sortBySkill(row);
+    } else {
+      reorderColumns(currentMode === 'split' ? splitUserIds : origUserIds);
+    }
+  }
+
 
   var activeRowId = null;
 
@@ -201,7 +253,6 @@
   /* ── Column reorder ── */
   function reorderColumns(orderedIds) {
     table.querySelectorAll('tr').forEach(function(row) {
-      /* Nur direkte Kind-Elemente mit data-user-id – keine verschachtelten (z.B. Button in tfoot-td) */
       var userCells = Array.from(row.children).filter(function(c) {
         return c.dataset && c.dataset.userId;
       });
@@ -211,6 +262,7 @@
       userCells.forEach(function(c) { row.removeChild(c); });
       orderedIds.forEach(function(uid) { if (map[uid]) row.appendChild(map[uid]); });
     });
+    updateSplitBorder();
   }
 
   /* ── Sort by skill level ── */
@@ -224,6 +276,12 @@
       return { uid: c.dataset.userId, lvl: parseInt(c.dataset.level || '0') };
     });
     pairs.sort(function(a, b) {
+      if (currentMode === 'split') {
+        var aIsMember = memberIds.indexOf(a.uid) !== -1;
+        var bIsMember = memberIds.indexOf(b.uid) !== -1;
+        if (aIsMember && !bIsMember) return -1;
+        if (!aIsMember && bIsMember) return 1;
+      }
       if (b.lvl !== a.lvl) return b.lvl - a.lvl;
       return origUserIds.indexOf(a.uid) - origUserIds.indexOf(b.uid);
     });
@@ -244,7 +302,7 @@
       if (activeRowId === row.id) {
         activeRowId = null;
         clearActive();
-        reorderColumns(origUserIds);
+        applyCurrentSortAndFilter();
         moveSortArrow(passungLabel);
       } else {
         activeRowId = row.id;
@@ -262,7 +320,7 @@
     passungRow.addEventListener('click', function() {
       activeRowId = null;
       clearActive();
-      reorderColumns(origUserIds);
+      applyCurrentSortAndFilter();
       moveSortArrow(passungLabel);
     });
   }

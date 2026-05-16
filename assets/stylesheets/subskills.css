@@ -884,3 +884,11 @@ tr.context-menu-selection:hover {
 tr.context-menu-selection a {
   color: #f8f8f8 !important;
 }
+
+/* ── View Modes ──────────────────────────────────────────────── */
+.psk-mode-members-only [data-is-member="false"] {
+  display: none !important;
+}
+.psk-split-border {
+  border-right: 3px solid #ccc !important;
+}

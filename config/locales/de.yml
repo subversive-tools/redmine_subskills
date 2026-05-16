@@ -66,3 +66,7 @@ de:
   error_skill_not_reported: "Skill wurde vom Benutzer nicht gemeldet"
   error_cannot_endorse_yourself: "Du kannst dich nicht selbst bestätigen"
   label_skill_match: "Skill-Passung"
+label_view_mode: "Darstellung:"
+label_view_mode_all: "Alle (ungruppiert)"
+label_view_mode_split: "Mitglieder & Externe gruppiert"
+label_view_mode_members: "Nur Projektmitglieder"

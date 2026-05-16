@@ -66,3 +66,7 @@ en:
   error_skill_not_reported: "Skill not reported by user"
   error_cannot_endorse_yourself: "Cannot endorse yourself"
   label_skill_match: "Skill Match"
+label_view_mode: "View mode:"
+label_view_mode_all: "All (ungrouped)"
+label_view_mode_split: "Members & Externals grouped"
+label_view_mode_members: "Project members only"
