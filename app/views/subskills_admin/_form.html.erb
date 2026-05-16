@@ -55,7 +55,9 @@
   <% unless @skill.composite? %>
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
     <h3 class="sk-admin-h3" style="margin:0;"><%= t(:label_level_descriptions, default: 'Level-Beschreibungen') %></h3>
-    <a href="#" onclick="skAddLevelRow(event); return false;" class="icon icon-add"><%= t(:button_add, default: 'Neuer Level') %></a>
+    <a href="#" onclick="skAddLevelRow(event); return false;" style="display:flex; align-items:center; text-decoration:none;">
+      <%= sprite_icon('add') %><span style="margin-left:4px;"><%= t(:button_add, default: 'Neuer Level') %></span>
+    </a>
   </div>
   <p class="sk-admin-note">
     <%= t(:text_level_descriptions_note, default: 'Was bedeutet jeder Level für diesen Skill? Diese Texte werden dem User beim Auswählen angezeigt. Die Reihenfolge (1 = niedrigstes Level) kann per Drag & Drop geändert werden.') %>
@@ -77,7 +79,9 @@
             <%= lf.text_area :description, rows: 2, style: "width:100%; box-sizing:border-box;", placeholder: "Was kann jemand auf diesem Level?" %>
           </div>
           
-          <a href="#" onclick="skRemoveLevelRow(event, this); return false;" class="icon icon-del" style="margin-left:10px; margin-top:2px;" title="Löschen"></a>
+          <a href="#" onclick="skRemoveLevelRow(event, this); return false;" style="margin-left:10px; margin-top:2px; opacity:0.6;" title="Löschen" onmouseover="this.style.opacity='1';" onmouseout="this.style.opacity='0.6';">
+            <%= sprite_icon('del') %>
+          </a>
         </div>
       <% end %>
     </div>
@@ -97,7 +101,9 @@
         <textarea name="subskill_skill[level_descriptions_attributes][NEW_RECORD][description]" rows="2" style="width:100%; box-sizing:border-box;" placeholder="Was kann jemand auf diesem Level?"></textarea>
       </div>
       
-      <a href="#" onclick="skRemoveLevelRow(event, this); return false;" class="icon icon-del" style="margin-left:10px; margin-top:2px;" title="Löschen"></a>
+      <a href="#" onclick="skRemoveLevelRow(event, this); return false;" style="margin-left:10px; margin-top:2px; opacity:0.6;" title="Löschen" onmouseover="this.style.opacity='1';" onmouseout="this.style.opacity='0.6';">
+        <%= sprite_icon('del') %>
+      </a>
     </div>
   </template>
 

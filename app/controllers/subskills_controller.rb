@@ -48,6 +48,8 @@ class SubskillsController < ApplicationController
     @score_map   = SubskillSkill.active.compute_scores_for_user(@target_user.id)
     @user_skills = SubskillUserSkill.where(user_id: @target_user.id).includes(:endorsements).index_by(&:subskill_skill_id)
     @editable    = true
+    @can_edit_stars = true
+    @can_edit_levels = User.current.admin? || Setting.plugin_redmine_subskills['allow_self_assessment'] != '0'
 
     all_leaf_ids = SubskillSkill.active.leaves.pluck(:id)
     descs = SubskillLevelDescription.where(subskill_skill_id: all_leaf_ids)
@@ -87,6 +89,8 @@ class SubskillsController < ApplicationController
                                     .includes(:endorsements)
                                     .index_by(&:subskill_skill_id)
     @editable    = (User.current == @target_user) || User.current.admin?
+    @can_edit_stars = @editable
+    @can_edit_levels = User.current.admin? || (User.current == @target_user && Setting.plugin_redmine_subskills['allow_self_assessment'] != '0')
 
     if @user_skills.any? && User.current != @target_user
       @my_endorsements = SubskillEndorsement.active.where(
@@ -132,7 +136,10 @@ class SubskillsController < ApplicationController
     )
 
     # Only update fields that were explicitly sent
-    us.level          = params[:level].to_i.clamp(0, 5)          if params.key?(:level)
+    if params.key?(:level)
+      can_edit_levels = User.current.admin? || (User.current == @target_user && Setting.plugin_redmine_subskills['allow_self_assessment'] != '0')
+      us.level = params[:level].to_i.clamp(0, 20) if can_edit_levels
+    end
     us.learn_priority = params[:learn_priority].to_i.clamp(0, 1) if params.key?(:learn_priority)
     us.save!
 
