@@ -29,14 +29,14 @@
           <% if is_root %>
             <span class="expander icon-expander open"
                   onclick="pskEditToggle(<%= skill.id %>, this)"
-                  title="Ein-/Ausklappen"></span>
+                  title="<%= t(:label_toggle_expand) %>"></span>
           <% end %>
           <%= skill.name %>
           <% if skill.composite? && !is_root %>
             <em class="sk-text-hint">(<%= t(:label_aggregated) %>)</em>
           <% end %>
         </td>
-        <td class="short_description"><%= skill.description %></td>
+        <td class="short_description"><div class="sk-desc-clamp"><%= skill.description %></div></td>
         <td>
           <% if skill.children.none? %>
             <%# Only leaf skills get a dropdown %>
