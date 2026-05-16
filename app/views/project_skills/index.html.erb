@@ -63,7 +63,7 @@
       <% @fit_scores.each do |fs| %>
         <% pct = fs[:score].to_i %>
         <% badge_cls = pct >= 80 ? 'psk-score-high' : pct >= 50 ? 'psk-score-mid' : 'psk-score-low' %>
-        <td class="psk-score-cell" data-user-id="<%= fs[:user].id %>">
+        <td class="psk-score-cell" data-user-id="<%= fs[:user].id %>" data-is-member="<%= @user_roles_map.key?(fs[:user].id) ? 'true' : 'false' %>">
           <span class="psk-score-badge <%= badge_cls %>" title="<%= t(:label_match) %>: <%= pct %>%"><%= pct %>%</span>
         </td>
       <% end %>
