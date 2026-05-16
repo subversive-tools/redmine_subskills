@@ -925,3 +925,15 @@ tr.context-menu-selection a {
 #psk-table td.short_description {
   min-width: 350px;
 }
+
+#psk-table th.psk-th-sort,
+#psk-table td.psk-td-sort {
+  width: 18px;
+  min-width: 18px;
+  max-width: 18px;
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: 0;
+  margin-right: 0;
+  text-align: center;
+}
