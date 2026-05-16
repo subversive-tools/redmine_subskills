@@ -64,7 +64,7 @@
         <% pct = fs[:score].to_i %>
         <% badge_cls = pct >= 80 ? 'psk-score-high' : pct >= 50 ? 'psk-score-mid' : 'psk-score-low' %>
         <td class="psk-score-cell" data-user-id="<%= fs[:user].id %>">
-          <span class="psk-score-badge <%= badge_cls %>" title="Passung: <%= pct %>%"><%= pct %>%</span>
+          <span class="psk-score-badge <%= badge_cls %>" title="<%= t(:label_match) %>: <%= pct %>%"><%= pct %>%</span>
         </td>
       <% end %>
     </tr>
@@ -83,7 +83,7 @@
           <% if is_root %>
             <span class="expander icon-expander open"
                   onclick="pskToggle(<%= skill.id %>, this)"
-                  title="Ein-/Ausklappen"></span>
+                  title="<%= t(:label_toggle_expand) %>"></span>
           <% end %>
           <span class="psk-skill-name"><%= skill.name %></span>
           <% if skill.composite? && !is_root %>
@@ -110,10 +110,10 @@
                 <span class="psk-level-wrap" title="<%= tip %>">
                   <span class="sk-option-btn sk-level-<%= lvl %> sk-option-btn--active"><%= lvl %></span>
                   <% if star %>
-                    <span class="psk-star-badge" title="Lernziel"></span>
+                    <span class="psk-star-badge" title="<%= t(:label_learning_goal) %>"></span>
                   <% end %>
                   <% if endorse > 0 %>
-                    <span class="psk-endorse-badge" title="<%= endorse %> Bestätigungen"></span>
+                    <span class="psk-endorse-badge" title="<%= t(:label_endorsements_count, count: endorse) %>"></span>
                   <% end %>
                 </span>
               <% else %>
@@ -144,7 +144,7 @@
           <button type="button" class="psk-add-member-btn"
                   data-user-id="<%= fs[:user].id %>"
                   data-user-name="<%= h(fs[:user].name) %>"
-                  title="<%= h(fs[:user].name) %> als Projektmitglied hinzufügen"><%= sprite_icon('add') %></button>
+                  title="<%= t(:label_add_user_as_member, name: h(fs[:user].name)) %>"><%= sprite_icon('add') %></button>
         </td>
       <% end %>
     </tr>
@@ -155,27 +155,26 @@
 
 <%# ── Add-member modal ─────────────────────────────────────────── %>
 <% if @can_manage_members %>
-<div id="psk-member-modal" class="psk-modal-overlay" style="display:none;">
-  <div class="psk-modal-box">
-    <h3 class="psk-modal-title"><%= t(:label_add_member) %></h3>
-    <p class="psk-modal-user"></p>
-    <%= form_with url: project_memberships_path(@project), method: :post, local: true,
-                  id: 'psk-member-form' do |f| %>
-      <%= hidden_field_tag 'membership[user_ids][]', '', id: 'psk-member-user-id' %>
-      <div class="psk-modal-field">
-        <label>Rolle:</label>
-        <select name="membership[role_ids][]" class="psk-modal-select">
+<div id="psk-member-modal" style="display:none;">
+  <h3 class="title"><%= t(:label_add_member) %></h3>
+  <%= form_with url: project_memberships_path(@project), method: :post, local: true, id: 'psk-member-form' do |f| %>
+    <%= hidden_field_tag 'membership[user_ids][]', '', id: 'psk-member-user-id' %>
+    <div class="box">
+      <p><strong class="psk-modal-user"></strong></p>
+      <p>
+        <label><%= t(:label_role) %>:</label><br>
+        <select name="membership[role_ids][]" style="width:100%;">
           <% @project_roles.each do |role| %>
             <option value="<%= role.id %>"><%= role.name %></option>
           <% end %>
         </select>
-      </div>
-      <div class="psk-modal-actions">
-        <%= f.submit t(:button_add), class: 'button-positive' %>
-        <button type="button" id="psk-modal-cancel"><%= t(:button_cancel) %></button>
-      </div>
-    <% end %>
-  </div>
+      </p>
+    </div>
+    <p class="buttons">
+      <%= submit_tag t(:button_add) %>
+      <a href="#" onclick="hideModal(this); return false;"><%= t(:button_cancel) %></a>
+    </p>
+  <% end %>
 </div>
 <% end %>
 
@@ -343,14 +342,8 @@
         var name = btn.dataset.userName;
         document.getElementById('psk-member-user-id').value = uid;
         modal.querySelector('.psk-modal-user').textContent = name;
-        modal.style.display = 'flex';
+        showModal('psk-member-modal', '350px');
       });
-    });
-    document.getElementById('psk-modal-cancel').addEventListener('click', function() {
-      modal.style.display = 'none';
-    });
-    modal.addEventListener('click', function(e) {
-      if (e.target === modal) modal.style.display = 'none';
     });
   }
 
