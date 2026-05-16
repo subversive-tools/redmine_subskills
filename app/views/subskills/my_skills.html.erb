@@ -137,8 +137,9 @@
   <% else %>
     <%# ─── Leaf skill at root level (no parent / orphaned) — full picker ──── %>
     <% next if skill.parent_id.present? %>  <%# already rendered inside composite %>
-    <% current_level = @user_skills[skill.id]&.level || 0 %>
-    <% learn_prio    = @user_skills[skill.id]&.learn_priority || 0 %>
+    <% us            = @user_skills[skill.id] %>
+    <% current_level = us&.level || 0 %>
+    <% learn_prio    = us&.learn_priority || 0 %>
     <% level_descs   = @level_descriptions[skill.id] || {} %>
     <% starred       = learn_prio > 0 %>
 
@@ -163,7 +164,6 @@
           <% end %>
 
           <%# Endorsements %>
-          <% us = @user_skills[skill.id] %>
           <% if us && us.level > 0 %>
             <% endorse_count = us.endorsements.size %>
             <% i_endorsed = @my_endorsements&.include?(us.id) %>
