@@ -172,6 +172,7 @@
   <h3 class="title"><%= t(:label_add_member) %></h3>
   <%= form_with url: project_memberships_path(@project), method: :post, local: true, id: 'psk-member-form' do |f| %>
     <%= hidden_field_tag 'membership[user_ids][]', '', id: 'psk-member-user-id' %>
+    <%= hidden_field_tag 'back_url', project_skills_path(@project) %>
     <div class="box">
       <p><strong class="psk-modal-user"></strong></p>
       <p>
