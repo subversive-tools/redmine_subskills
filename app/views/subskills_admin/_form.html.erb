@@ -59,14 +59,7 @@
   </p>
 
   <div class="box tabular">
-    <p>
-      <%= f.label :levels_count, t(:label_levels_count) %>
-      <%= f.number_field :levels_count, placeholder: Setting.plugin_redmine_subskills['levels_count'] || 5, min: 1, max: 20 %>
-      <em class="info">Nach dem Speichern wird die Maske für die entsprechenden Level angepasst.</em>
-      <div id="sk-levels-warning" class="flash warning" style="display: none; margin-top: 10px;">
-        <%= t(:warning_levels_count_changed) %>
-      </div>
-    </p>
+
     <%= f.fields_for :level_descriptions, @skill.level_descriptions.sort_by(&:level) do |lf| %>
       <%= lf.hidden_field :level %>
       <% lvl = lf.object.level %>
@@ -90,19 +83,4 @@
   </p>
 <% end %>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-  var countField = document.getElementById("subskill_skill_levels_count");
-  var warningDiv = document.getElementById("sk-levels-warning");
-  if (countField && warningDiv) {
-    var originalValue = countField.value;
-    countField.addEventListener("input", function() {
-      if (this.value !== originalValue && this.value !== "") {
-        warningDiv.style.display = "block";
-      } else {
-        warningDiv.style.display = "none";
-      }
-    });
-  }
-});
-</script>
+
