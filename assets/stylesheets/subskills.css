@@ -892,3 +892,28 @@ tr.context-menu-selection a {
 .psk-split-border {
   border-right: 3px solid #ccc !important;
 }
+
+/* ── Sticky First Column ─────────────────────────────────────── */
+#psk-table th.name,
+#psk-table td.name {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+}
+#psk-table th.name {
+  z-index: 3;
+  background-color: #eeeeee;
+  background-clip: padding-box;
+  border-right: 1px solid #ddd;
+  box-shadow: 2px 0 5px -2px rgba(0,0,0,0.1);
+}
+#psk-table td.name {
+  background-color: inherit;
+  background-clip: padding-box;
+  border-right: 1px solid #ddd;
+  box-shadow: 2px 0 5px -2px rgba(0,0,0,0.1);
+}
+/* Ensure tfoot sticky elements inherit white/grey background */
+#psk-table tfoot td.name {
+  background-color: #fff;
+}
