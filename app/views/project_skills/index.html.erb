@@ -201,9 +201,22 @@
   var externalIds = usersData.filter(function(u) { return !u.isMember; }).map(function(u) { return u.id; });
   var splitUserIds = memberIds.concat(externalIds);
 
-  var currentMode = 'all';
+  var currentMode = localStorage.getItem('psk-view-mode') || 'all';
+  var modeSelect = document.getElementById('psk-view-mode');
+  
+  if (currentMode !== 'all') {
+    if (currentMode === 'members_only' && memberIds.length === 0) {
+      currentMode = 'all';
+      localStorage.setItem('psk-view-mode', 'all');
+    } else {
+      if (modeSelect) modeSelect.value = currentMode;
+      setTimeout(function() { applyCurrentSortAndFilter(); }, 0);
+    }
+  }
+
   window.pskChangeViewMode = function(mode) {
     currentMode = mode;
+    localStorage.setItem('psk-view-mode', mode);
     applyCurrentSortAndFilter();
   };
 
