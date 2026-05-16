@@ -562,7 +562,7 @@ td.fit-low  { color: #8d1f00; }
 
 .psk-aggregated     { font-size: 0.75rem; color: #999; margin-left: 4px; }
 
-.psk-td-req         { text-align: center; }
+.psk-td-req         { text-align: center; white-space: nowrap; }
 .psk-imp-badge      { padding: 2px 8px; border-radius: 3px; font-size: 0.78rem;
                       color: #333; white-space: nowrap; }
 
