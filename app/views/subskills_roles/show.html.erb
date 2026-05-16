@@ -3,7 +3,7 @@
 <% end %>
 
 <div class="contextual">
-  <%= link_to '← Rollen-Übersicht', subskills_roles_path, class: 'button' %>
+  <%= link_to "← #{t(:label_roles_overview, default: 'Rollen-Übersicht')}", subskills_roles_path, class: 'button' %>
 </div>
 
 <h2><%= @role.name %></h2>

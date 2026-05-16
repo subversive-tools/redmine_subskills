@@ -24,7 +24,7 @@
       "<span class=\"sk-fit-badge\" title=\"#{tooltip}\" style=\"color:#{color}; font-weight:bold; cursor:help;\">#{score}%</span>"
     end
   else
-    "<span class=\"sk-fit-badge\" style=\"color:#ccc;\" title=\"Keine Anforderungen für dieses Projekt definiert\">?</span>"
+    "<span class=\"sk-fit-badge\" style=\"color:#ccc;\" title=\"#{t(:text_no_requirements_defined, default: 'Keine Anforderungen für dieses Projekt definiert')}\">?</span>"
   end
 %>
 

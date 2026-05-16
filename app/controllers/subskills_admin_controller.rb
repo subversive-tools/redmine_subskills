@@ -36,7 +36,7 @@ class SubskillsAdminController < ApplicationController
   def create
     @skill = SubskillSkill.new(skill_params)
     if @skill.save
-      flash[:notice] = "Skill '#{@skill.name}' wurde erstellt."
+      flash[:notice] = t(:notice_skill_created, default: "Skill '%{name}' wurde erstellt.", name: @skill.name)
       redirect_to subskills_admin_index_path
     else
       @parent_options = parent_options_for(@skill)
@@ -53,7 +53,7 @@ class SubskillsAdminController < ApplicationController
   # PATCH /subskills/admin/:id
   def update
     if @skill.update(skill_params)
-      flash[:notice] = "Skill '#{@skill.name}' wurde aktualisiert."
+      flash[:notice] = t(:notice_skill_updated, default: "Skill '%{name}' wurde aktualisiert.", name: @skill.name)
       redirect_to subskills_admin_index_path
     else
       @parent_options = parent_options_for(@skill)
@@ -64,12 +64,12 @@ class SubskillsAdminController < ApplicationController
   # DELETE /subskills/admin/:id
   def destroy
     if @skill.children.any?
-      flash[:error] = "Skill '#{@skill.name}' hat noch Unter-Skills und kann nicht gelöscht werden."
+      flash[:error] = t(:error_skill_has_children_delete, default: "Skill '%{name}' hat noch Unter-Skills und kann nicht gelöscht werden.", name: @skill.name)
       return redirect_to subskills_admin_index_path
     end
     name = @skill.name
     @skill.destroy
-    flash[:notice] = "Skill '#{name}' wurde gelöscht."
+    flash[:notice] = t(:notice_skill_deleted, default: "Skill '%{name}' wurde gelöscht.", name: name)
     redirect_to subskills_admin_index_path
   end
 
@@ -113,33 +113,33 @@ class SubskillsAdminController < ApplicationController
 
     if new_parent_id.present?
       target = SubskillSkill.find_by(id: new_parent_id)
-      return render(json: { ok: false, error: 'Ziel nicht gefunden.' }, status: 422) unless target
-      return render(json: { ok: false, error: 'Skill kann nicht sein eigener Eltern-Skill sein.' }, status: 422) if target.id == skill.id
+      return render(json: { ok: false, error: t(:error_target_not_found, default: 'Ziel nicht gefunden.') }, status: 422) unless target
+      return render(json: { ok: false, error: t(:error_cannot_be_own_parent, default: 'Skill kann nicht sein eigener Eltern-Skill sein.') }, status: 422) if target.id == skill.id
 
       # Prevent circular references (target must not be a descendant of skill)
       node = target
       while node.parent_id
         node = SubskillSkill.find(node.parent_id)
-        return render(json: { ok: false, error: 'Zirkuläre Abhängigkeit nicht erlaubt.' }, status: 422) if node.id == skill.id
+        return render(json: { ok: false, error: t(:label_error_circular_dependency, default: 'Zirkuläre Abhängigkeit nicht erlaubt.') }, status: 422) if node.id == skill.id
       end
 
       # Target must be able to accept children
       unless target.children.any? || target.user_skills.none?
-        return render(json: { ok: false, error: "'#{target.name}' hat bereits Bewertungen und kann keine Kinder aufnehmen." }, status: 422)
+        return render(json: { ok: false, error: t(:error_target_has_ratings_cannot_accept_children, default: "'%{name}' hat bereits Bewertungen und kann keine Kinder aufnehmen.", name: target.name) }, status: 422)
       end
     end
 
     skill.update!(parent_id: new_parent_id)
     render json: { ok: true }
   rescue ActiveRecord::RecordNotFound
-    render json: { ok: false, error: 'Skill nicht gefunden.' }, status: 404
+    render json: { ok: false, error: t(:error_skill_not_found, default: 'Skill nicht gefunden.') }, status: 404
   rescue => e
     render json: { ok: false, error: e.message }, status: 422
   end
 
   def seed
     SubskillSkill.seed_defaults!
-    flash[:notice] = "Standard-Skills wurden eingespielt (#{SubskillSkill.count} insgesamt)."
+    flash[:notice] = t(:notice_default_skills_seeded, default: "Standard-Skills wurden eingespielt (%{count} insgesamt).", count: SubskillSkill.count)
     redirect_to subskills_admin_index_path
   end
 
@@ -169,7 +169,7 @@ class SubskillsAdminController < ApplicationController
   def import_csv
     file = params[:csv_file]
     unless file
-      flash[:error] = 'Keine Datei ausgewählt.'
+      flash[:error] = t(:error_no_file_selected, default: 'Keine Datei ausgewählt.')
       return redirect_to subskills_admin_index_path
     end
 
@@ -203,12 +203,12 @@ class SubskillsAdminController < ApplicationController
       end
     end
 
-    msg = "Import: #{created} neu, #{updated} aktualisiert."
-    msg += " Fehler: #{errors.join(' | ')}" if errors.any?
+    msg = t(:text_import_success, default: "Import: %{created} neu, %{updated} aktualisiert.", created: created, updated: updated)
+    msg += " " + t(:text_import_errors, default: "Fehler: %{errors}", errors: errors.join(' | ')) if errors.any?
     flash[errors.any? ? :warning : :notice] = msg
     redirect_to subskills_admin_index_path
   rescue => e
-    flash[:error] = "CSV-Fehler: #{e.message}"
+    flash[:error] = t(:error_csv_import, default: "CSV-Fehler: %{msg}", msg: e.message)
     redirect_to subskills_admin_index_path
   end
 
@@ -232,16 +232,16 @@ class SubskillsAdminController < ApplicationController
 
   def skill_params
     params.require(:subskill_skill).permit(
-      :name, :description, :position, :active, :parent_id,
-      level_descriptions_attributes: [:id, :level, :description, :label, :_destroy]
+      :name, :description, :position, :active, :parent_id, :levels_count,
+      level_descriptions_attributes: [:id, :level, :description, :label]
     )
   end
 
   def build_level_descriptions(skill)
-    return if skill.persisted? || skill.composite?
-    target_count = Setting.plugin_redmine_subskills['levels_count'].to_i
+    existing = skill.level_descriptions.index_by(&:level)
+    target_count = skill.levels_count.presence || Setting.plugin_redmine_subskills['levels_count'].to_i
     target_count = 5 if target_count <= 0
-    (1..target_count).each { |lvl| skill.level_descriptions.build(level: lvl) }
+    (1..target_count).each { |lvl| skill.level_descriptions.build(level: lvl) unless existing[lvl] }
   end
 
   # Skills that can serve as parent of `skill` (not itself, not its descendants)

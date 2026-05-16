@@ -114,7 +114,7 @@
                 <%= button_to subskills_admin_path(skill),
                     method: :delete, class: 'sk-drdn-item sk-flex-item icon icon-del',
                     form_class: 'sk-inline-form',
-                    data: { confirm: "Skill '#{skill.name}' wirklich löschen?" } do %>
+                    data: { confirm: t(:text_are_you_sure_delete_skill, name: skill.name) } do %>
                   <%= sprite_icon('del') %><span class="icon-label"><%= t(:button_delete) %></span>
                 <% end %>
               </li>
@@ -325,7 +325,7 @@ document.querySelectorAll('.sk-row').forEach(function(row) {
     var tbody   = document.getElementById('sk-tbody');
 
     if (isDescendantOf(row, dragId)) {
-      showToast('Zirkuläre Abhängigkeit nicht erlaubt.', false); return;
+      showToast('<%= t(:label_error_circular_dependency, default: "Zirkuläre Abhängigkeit nicht erlaubt.") %>', false); return;
     }
 
     var zone     = dropZone(e, row);

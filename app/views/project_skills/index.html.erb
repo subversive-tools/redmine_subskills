@@ -6,9 +6,9 @@
 <div class="contextual" style="display: flex; gap: 10px; align-items: center;">
   <label for="psk-view-mode" style="font-size: 0.9em; color: #555;"><%= t(:label_view_mode, default: "Darstellung:") %></label>
   <select id="psk-view-mode" class="psk-view-mode-select" onchange="pskChangeViewMode(this.value)" style="margin-right: 15px;">
-    <option value="all"><%= t(:label_view_mode_all, default: "Alle (ungruppiert)") %></option>
-    <option value="split"><%= t(:label_view_mode_split, default: "Mitglieder & Externe gruppiert") %></option>
-    <option value="members_only" <%= 'disabled' unless has_members %>><%= t(:label_view_mode_members, default: "Nur Projektmitglieder") %></option>
+    <option value="all"><%= t(:label_view_mode_all) %></option>
+    <option value="split"><%= t(:label_view_mode_split) %></option>
+    <option value="members_only" <%= 'disabled' unless has_members %>><%= t(:label_view_mode_members) %></option>
   </select>
 
   <% if User.current.allowed_to?(:manage_subskills, @project) || User.current.allowed_to?(:manage_project, @project) || User.current.allowed_to?(:manage_members, @project) %>
@@ -114,7 +114,7 @@
                 <% desc = @level_descs.dig(skill.id, lvl).presence %>
                 <% lbl = skill.level_descriptions.find { |d| d.level == lvl }&.label.presence || level_labels[lvl] || "Level #{lvl}" %>
                 <% tip  = [lbl, desc].compact.join(': ') %>
-                <% tip += " (#{endorse} Bestätigungen)" if endorse > 0 %>
+                <% tip += " (#{endorse} #{t(:label_endorsements, default: 'Bestätigungen')})" if endorse > 0 %>
                 <span class="psk-level-wrap" title="<%= tip %>">
                   <span class="sk-option-btn sk-level-<%= lvl %> sk-option-btn--active"><%= lvl %></span>
                   <% if star %>
