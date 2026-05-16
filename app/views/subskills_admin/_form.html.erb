@@ -94,9 +94,16 @@
                 </a>
               </li>
               <li>
-                <a href="#" onclick="skRemoveLevelRow(event, this); return false;" style="display:flex; align-items:center; padding:4px 10px; color:#333; text-decoration:none;">
-                  <%= sprite_icon('del') %><span style="margin-left:5px;">Löschen</span>
-                </a>
+                <% is_used = @used_levels&.include?(lf.object.level) %>
+                <% if is_used %>
+                  <span style="display:flex; align-items:center; padding:4px 10px; color:#ccc; cursor:not-allowed;" title="Es gibt bereits Wertungen, die diesen Level nutzen.">
+                    <%= sprite_icon('del') %><span style="margin-left:5px;">Löschen</span>
+                  </span>
+                <% else %>
+                  <a href="#" onclick="skRemoveLevelRow(event, this); return false;" style="display:flex; align-items:center; padding:4px 10px; color:#333; text-decoration:none;">
+                    <%= sprite_icon('del') %><span style="margin-left:5px;">Löschen</span>
+                  </a>
+                <% end %>
               </li>
             </ul>
           </span>
