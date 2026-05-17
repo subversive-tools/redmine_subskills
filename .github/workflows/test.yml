@@ -1,63 +1,102 @@
-name: Test Redmine Plugin
+# OPTION A: Standalone (kein subversive-tools/.github Org-Repo nötig)
+# Umbenennen zu test.yml und direkt verwenden.
+#
+# OPTION B: Reusable Workflow (sobald subversive-tools/.github existiert)
+# Den job-Block durch diesen ersetzen:
+#
+#   jobs:
+#     test:
+#       uses: subversive-tools/.github/.github/workflows/redmine-plugin-test.yml@main
+#       with:
+#         plugin_name: redmine_subskills
+#         matrix: >-
+#           [
+#             {"redmine": "5.1-stable", "ruby": "3.1"},
+#             {"redmine": "6.0-stable", "ruby": "3.2"}
+#           ]
+
+name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [main]
   pull_request:
-    branches: [ "main" ]
 
 jobs:
   test:
+    name: "Redmine ${{ matrix.redmine }} / Ruby ${{ matrix.ruby }}"
     runs-on: ubuntu-latest
+
     strategy:
+      fail-fast: false
       matrix:
-        redmine: ['5.1-stable', '6.0-stable']
-        ruby: ['3.2', '3.3']
-        exclude:
-          - redmine: '5.1-stable'
-            ruby: '3.3'
+        include:
+          - redmine: "5.1-stable"
+            ruby: "3.1"
+          - redmine: "6.0-stable"
+            ruby: "3.2"
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: redmine_test
+          POSTGRES_USER: redmine
+          POSTGRES_PASSWORD: redmine
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    env:
+      RAILS_ENV: test
+      BUNDLE_WITH: postgresql
 
     steps:
-    - name: Checkout Plugin
-      uses: actions/checkout@v4
-      with:
-        path: plugin_src
+      - name: Checkout plugin
+        uses: actions/checkout@v4
+        with:
+          path: plugin_src
 
-    - name: Checkout Redmine
-      uses: actions/checkout@v4
-      with:
-        repository: redmine/redmine
-        ref: ${{ matrix.redmine }}
-        path: redmine
+      - name: Checkout Redmine ${{ matrix.redmine }}
+        uses: actions/checkout@v4
+        with:
+          repository: redmine/redmine
+          ref: ${{ matrix.redmine }}
+          path: redmine
 
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: ${{ matrix.ruby }}
-        bundler-cache: false
+      - name: Move plugin into Redmine
+        run: mv plugin_src redmine/plugins/redmine_subskills
 
-    - name: Prepare Redmine & Plugin
-      run: |
-        cp -r plugin_src redmine/plugins/redmine_subskills
-        cd redmine
-        cp config/database.yml.example config/database.yml
-        # Configure SQLite for tests
-        sed -i 's/adapter: mysql2/adapter: sqlite3/' config/database.yml
-        sed -i 's/database: redmine_test/database: db\/test.sqlite3/' config/database.yml
+      - name: Setup Ruby ${{ matrix.ruby }}
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          working-directory: redmine
+          bundler-cache: true
 
-    - name: Install Dependencies
-      working-directory: ./redmine
-      run: |
-        bundle config set --local without 'development'
-        bundle install --jobs 4 --retry 3
+      - name: Configure test database
+        run: |
+          cat > redmine/config/database.yml << 'EOF'
+          test:
+            adapter: postgresql
+            host: localhost
+            port: 5432
+            database: redmine_test
+            username: redmine
+            password: redmine
+            encoding: utf8
+          EOF
 
-    - name: Setup Database & Run Tests
-      working-directory: ./redmine
-      env:
-        RAILS_ENV: test
-      run: |
-        bundle exec rake db:create
-        bundle exec rake db:migrate
-        bundle exec rake redmine:plugins:migrate
-        # Run plugin tests
-        bundle exec rake redmine:plugins:test NAME=redmine_subskills
+      - name: Migrate Redmine & plugin
+        working-directory: redmine
+        run: |
+          bundle exec rake db:migrate
+          bundle exec rake redmine:plugins:migrate NAME=redmine_subskills
+
+      - name: Run plugin tests
+        working-directory: redmine
+        run: bundle exec rake test:plugins NAME=redmine_subskills
