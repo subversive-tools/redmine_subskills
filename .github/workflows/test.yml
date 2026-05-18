@@ -1,20 +1,3 @@
-# OPTION A: Standalone (kein subversive-tools/.github Org-Repo nötig)
-# Umbenennen zu test.yml und direkt verwenden.
-#
-# OPTION B: Reusable Workflow (sobald subversive-tools/.github existiert)
-# Den job-Block durch diesen ersetzen:
-#
-#   jobs:
-#     test:
-#       uses: subversive-tools/.github/.github/workflows/redmine-plugin-test.yml@main
-#       with:
-#         plugin_name: redmine_subskills
-#         matrix: >-
-#           [
-#             {"redmine": "5.1-stable", "ruby": "3.1"},
-#             {"redmine": "6.0-stable", "ruby": "3.2"}
-#           ]
-
 name: CI
 
 on:
