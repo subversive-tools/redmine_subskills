@@ -1,93 +1,101 @@
 # Redmine Subskills Plugin
 
-> Empower your team with intelligent skill tracking and role matching directly in Redmine.
-
 ![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)
-![Redmine](https://img.shields.io/badge/Redmine-4.0%2B-red.svg?logo=redmine)
+![Redmine](https://img.shields.io/badge/Redmine-5.0%20%7C%206.0-red.svg?logo=redmine)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
-## ✦ What is Sub-Skills?
+A Redmine plugin for skill tracking and role matching. Teams maintain their own competence profiles, managers see who fits a project best — all within Redmine, no separate HR system required.
 
-The Sub-Skills plugin transforms Redmine into a comprehensive competence management tool. It enables organizations to track employee skills, define required roles, and find the perfect match for project requirements.
+> Built for organisations that want competence management without a proprietary platform.
 
-**Core Features:**
-- ❖ **Skill Catalog**: Centrally manage roles, competencies, and skill requirements
-- ⚲ **Personal Profiles**: Users can maintain and update their own skill profiles
-- ⌖ **Role Matching**: Automatically calculate how well a user fits a specific role
-- ⊞ **Team Matrices**: Visual skill matrix and role-fit overview for entire teams
-- ⚒ **Project Integration**: Define skill requirements for projects and find the "Best Match"
-- ⚙ **Admin Controls**: Dedicated administration panel for managing the underlying skill taxonomy
+## Screenshots
 
-## ⎚ Screenshots
+*(Screenshots coming soon)*
 
-*(Screenshot placeholders - Add your images here)*
+## Features
 
-## ⬢ Installation
+- **Skill catalog**: centrally manage roles, competencies, and skill requirements
+- **Personal profiles**: users maintain and self-assess their own skill levels
+- **Role matching**: automatically calculate how well a user fits a defined role
+- **Team matrix**: visual skill matrix and role-fit overview for entire teams
+- **Project integration**: define skill requirements per project and find the best match
+- **Admin controls**: dedicated administration panel for managing the skill taxonomy
 
-### Requirements
-- **Redmine**: Version 4.0.0 or higher
-- **Ruby**: Compatible with your Redmine installation
-- **Permissions**: Admin access for initial setup
+## Requirements
 
-### Quick Setup
+- Redmine 5.0 or higher
+- Admin access for initial setup
 
-1. **Download & Extract**
+## Installation
+
+> [!IMPORTANT]
+> The plugin directory **MUST** be named `redmine_subskills` for assets to load correctly.
+
+1. **Clone** into your plugins directory:
    ```bash
    cd /path/to/redmine/plugins
-   git clone https://github.com/modoq/redmine_subskills.git
+   git clone https://github.com/subversive-tools/redmine_subskills.git redmine_subskills
    ```
 
-2. **Run Migrations**
+2. **Run migrations**:
    ```bash
-   bundle exec rake redmine:plugins:migrate NAME=redmine_subskills RAILS_ENV=production
+   bundle exec rake redmine:plugins:migrate RAILS_ENV=production
    ```
 
-3. **Restart Redmine**
-   ```bash
-   # For development
-   bundle exec rails server
+3. **Restart Redmine**.
 
-   # For production (passenger/nginx)
-   sudo systemctl restart redmine
-   ```
+4. **Set up the skill catalog** under **Administration > Skills**.
 
-4. **Configure Plugin**
-   - Navigate to **Administration → Skills** to set up your skill catalog
-   - Enable the "Subskills" module in your projects
+## Configuration
 
-## ⎈ Usage Guide
+Navigate to **Administration > Plugins > Subskills > Configure**.
 
-### 1. The Skill Catalog
-The foundation of the plugin. Define the available skills, group them into logical categories, and assemble them into target profiles (Roles).
+| Option | Description | Default |
+|:---|:---|:---|
+| **Levels count** | Number of proficiency levels (e.g. 0–5) | `5` |
+| **Level labels** | Custom labels for each level | Keine / Basic / … / Experte |
+| **Fit thresholds** | % thresholds for green/yellow/red role-fit indicator | 70 / 40 |
+| **Enable endorsements** | Allow peers to endorse skill entries | Enabled |
+| **Default view mode** | Initial view for skill matrix (`split`, `full`) | `split` |
+| **Allow self-assessment** | Users can rate their own skills | Enabled |
 
-### 2. Personal Skill Management
-Users access "My Skills" to self-assess their competencies against the available catalog. The "Rollen-Passung" (Role Match) view shows them their readiness for specific career paths or project roles.
+### Permissions
 
-### 3. Team & Project Management
-- **Skill Matrix Team**: Managers get a birds-eye view of all available skills in their team.
-- **Project Requirements**: Inside a project, use the "Skills" tab to define what competencies are needed.
-- **Best Match**: The system automatically suggests the best fitting team members for the project based on their skill profiles.
+Go to **Administration > Roles and permissions** and configure:
 
-## ⇋ Contributing
+| Permission | Description |
+|:---|:---|
+| *View subskills* | See skill profiles and matrices in a project |
+| *Manage subskills* | Edit skill requirements and team assignments |
 
-We welcome contributions! Here's how to get started:
+## Usage
 
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
-4. **Push** to the branch (`git push origin feature/amazing-feature`)
-5. **Open** a Pull Request
+### Skill catalog
 
-## ⚖ License
+Under **Administration > Skills**, define the available skills, group them into categories, and assemble them into role profiles.
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+### Personal skills
 
-## ✉ Contact
+Users access **My Skills** from the top menu to self-assess their competencies. The **Role Match** view shows readiness for specific roles or career paths.
 
-- ⚠ **Issues**: [GitHub Issues](https://github.com/modoq/redmine_subskills/issues)
-- 🗨 **Discussions**: [GitHub Discussions](https://github.com/modoq/redmine_subskills/discussions)
-- @ **Contact**: [Project Author](https://github.com/modoq)
+### Team & project view
 
----
+Enable the **Skills** module in a project to access:
 
-*"Building the perfect team starts with knowing your skills."*
+- **Skill Matrix**: overview of all skills available in the team
+- **Role Match**: fit score per team member for defined role profiles
+- **Best Match**: suggested team members for the project based on skill fit
+
+## Contributing
+
+Contributions are welcome — please fork the repository and open a Pull Request.
+
+1. Fork it
+2. Create your feature branch (`git checkout -b feature/my-feature`)
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
+
+## License
+
+[MIT License](LICENSE) — Copyright (c) 2026 Stefan Mischke
