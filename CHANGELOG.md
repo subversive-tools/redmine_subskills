@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.0.1] - 2026-05-19
+
+### Fixed
+- `SubskillEndorsementTest` rewritten to use the correct model interface (`user_skill:` instead of the non-existent `user:` / `skill:` associations); removed hardcoded German error message assertions.
+
 ## [1.0.0] - 2026-05-16
 
 ### Changed
