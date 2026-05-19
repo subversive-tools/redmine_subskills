@@ -1,6 +1,13 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+
+## [1.0.0] - 2026-05-16
+
+### Changed
+- Declared stable release — all core features considered production-ready.
+- Fixed migration version compatibility (changed `7.2` to `5.2`) for broader Rails support.
 
 ## [0.3.0] - 2026-05-15
 
